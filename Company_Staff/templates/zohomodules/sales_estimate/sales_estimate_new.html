@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<body>
+
+    <div class="body-wrapper">
+        <div class="container-fluid">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a {% if log_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'sales_estimate' %}" class="text-warning-emphasis">Estimate</a></li>
+              <li class="breadcrumb-item" aria-current="page">Add</li>
+            </ol>
+          </nav>
+
+          <div style="overflow-x:auto;background-color: black;border-radius: 10px;" class="m-3 p-5">
+            <h1 class="text-white">New Estimate</h1>
+            <form  method="post" action=""  enctype="multipart/form-data" class="mb-3">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <label></label> 
+                        <input type="text" class="form-control" placeholder="Name" aria-label="First name">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="email" class="form-control" placeholder="" aria-label="Last name">
+                    </div>
+                    <div class="col-md-4">
+                        <textarea class="form-control"></textarea>
+                    </div>
+                </div>
+          </div>
+
+
+
+        </div>
+    </div>
+
+
+
+
+</body>
+
+
+
+
+
+{% endblock %}
