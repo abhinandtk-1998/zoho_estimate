@@ -17,7 +17,7 @@
         <div class="container-fluid">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a {% if log_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item"><a {% if login_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
               <li class="breadcrumb-item" aria-current="page">Estimate</li>
             </ol>
           </nav>

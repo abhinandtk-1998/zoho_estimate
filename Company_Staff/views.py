@@ -14799,6 +14799,7 @@ def sales_estimate_new(request):
         if login_d.user_type == 'Company':
             dash_details = CompanyDetails.objects.get(login_details=login_d,superadmin_approval=1,Distributor_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            customer_details = Customer.objects.filter(company=dash_details)
 
 
 
@@ -14806,7 +14807,8 @@ def sales_estimate_new(request):
             context = {
                 'details':dash_details,
                 'allmodules':allmodules,
-                'log_d':log_d,
+                'login_d':login_d,
+                'customer':customer_details
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -14814,12 +14816,14 @@ def sales_estimate_new(request):
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            customer_details = Customer.objects.filter(company=dash_details.company)
 
 
             context = {
                 'details':dash_details,
                 'allmodules':allmodules,
-                'log_d':log_d,
+                'login_d':login_d,
+                'customer':customer_details,
 
             }
 

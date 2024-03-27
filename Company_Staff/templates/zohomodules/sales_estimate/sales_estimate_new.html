@@ -2,40 +2,249 @@
 {% block content %}
 {% load static %}
 
+<style>
+  .form-control{
+        color: white;
+    }
+
+  .modal-content{
+        color-scheme: black;
+        color: white;
+        background-color:#464545fd;
+        border: 1px solid rgb(138, 135, 135);
+    }
+
+  input {
+      color-scheme: dark;
+  }
+
+  #searchInput {
+  margin-bottom: 10px;
+  }
+  
+</style>
+
+
+
 <body>
 
     <div class="body-wrapper">
         <div class="container-fluid">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a {% if log_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
+              <li class="breadcrumb-item"><a {% if login_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
               <li class="breadcrumb-item"><a href="{% url 'sales_estimate' %}" class="text-warning-emphasis">Estimate</a></li>
               <li class="breadcrumb-item" aria-current="page">Add</li>
             </ol>
           </nav>
 
-          <div style="overflow-x:auto;background-color: black;border-radius: 10px;" class="m-3 p-5">
-            <h1 class="text-white">New Estimate</h1>
+          <div style="overflow-x:auto;background-color: black;border-radius: 10px;color: white;" class="m-3 p-5">
+            <h1 class="text-white mb-5">NEW ESTIMATE</h1>
+            <hr style="color: yellow;" class="mb-5">
             <form  method="post" action=""  enctype="multipart/form-data" class="mb-3">
                 {% csrf_token %}
-                <div class="row">
-                    <div class="col-md-4">
-                        <label></label> 
-                        <input type="text" class="form-control" placeholder="Name" aria-label="First name">
+
+                <div class="form-group row mt-4">
+                  <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                    <label>Name</label>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-7">
+                     
+                    <div class="input-group">
+                      <select id="nameSelect" class="form-select" aria-label="Select name" onchange="filterNames(this)">
+                        <option selected>Select a name</option>
+                        {% for c in customer %}
+                        <option value="{{c.id}}" data-email="{{c.email}}" data-address="{{c.address}}">{{c.first_name}} {{c.last_name}}</option>
+                        {% endfor %}
+                      </select>
+                      <!-- Button to trigger modal -->
+                      <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-plus text-yellow"></i></button>
+
+                      
+                      
+                      
                     </div>
-                    <div class="col-md-4">
-                        <input type="email" class="form-control" placeholder="" aria-label="Last name">
-                    </div>
-                    <div class="col-md-4">
-                        <textarea class="form-control"></textarea>
-                    </div>
+                  </div>
                 </div>
+
+
+
+                <div class="form-group row mt-4">
+                  <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                      <label>Company Name</label>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-7">
+                      <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
+                      <div class="invalid-feedback">Please fill out this field.</div>   
+
+                  </div>
+                </div>
+                
+            </form>
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Form content -->
+
+                    <form  method="post" action=""  enctype="multipart/form-data" class="mb-3">
+                      {% csrf_token %}
+
+                      <div class="form-group row mt-4">
+                        <label class="col-sm-12 col-md-3 col-lg-3 col-form-label" style="color: white;">Customer Type</label>
+                        
+                        <div class=" col-sm-12 col-md-3 col-lg-3">
+                            <input  type="radio"  value="Business" name="type" >
+                                    <label for="Business"> Business</label>
+                                   &nbsp;&nbsp;&nbsp;
+                                   <input  type="radio"  value="Individual" name="type" >
+                                   <label for="Business">Individual</label>
+                        </div><br>
+                      </div>
+
+                      <div class=" form-group row">
+                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                            <label>Name</label>
+                        </div>
+                        <div class="col-sm-12 col-md-1 col-lg-1" >
+                            <select id="select1"  name="salutation" class="form-control bg-light text-dark mt-2 " >
+                            
+                                <option value="Mr">Mr</option>
+                                <option value="Mrs">Mrs</option>
+                                <option value="Ms">Ms</option>
+                                <option value="Dr">Dr</option>
+    
+                            </select> 
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-3" >
+                            <input  type="text" class="form-control bg-light text-dark mt-2 change-disply " id="fname" name="first_name" placeholder="first name" required >
+    
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-3" >
+                            <input type="text" class="form-control bg-light text-dark mt-2 " id="lname" name="last_name" placeholder="last name" required >
+    
+                        </div>
+                      </div>
+
+                      <div class="form-group row mt-4">
+                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Display Name</label></div>
+                        <div class="col-sm-12 col-md-6 col-lg-7">
+                           
+                            <select class="form-control bg-light text-dark "  name="v_display_name" id="v_display_name">
+                                
+                            </select>
+                            
+                               
+                                
+                        </div>
+                      </div>
+
+                      <div class="form-group row mt-4">
+                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                            <label>Company Name</label>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-7">
+                            <input  type="text" class="form-control bg-light text-dark " name="company_name" required>     
+                            <div class="invalid-feedback">Please fill out this field.</div>   
+    
+                        </div>
+                      </div>
+
+                      <div class="form-group row mt-4">
+                        <div class="col-sm-12 col-md-3 col-lg-3 col-form-label"><label>Customer Email</label></div>
+                        <div class="col-sm-12 col-md-6 col-lg-7">
+                            <input  type="email" class="form-control bg-light text-dark" name="vendor_email"  id="vendor-email"  required> 
+                            <span class=" text-danger mt-1" id="email-message-id" style="font-size: 10px;"></span>   
+        
+                        </div>
+  
+                      </div>
+
+                      <div class="form-group row mt-4">
+                        <div class="col-sm-12 col-md-3 col-lg-3 ">
+                            <label class="col-form-label text-white">Customer phone</label>
+                        </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <input id="workphone"  type="text" class="form-control bg-light text-dark mt-2" pattern="[0-9]{7}"  name="w_phone" placeholder="work phone" required>
+                            <span id="work-phone-message" class="mt-2 " style="font-size: 10px;"></span >
+                            <span id="workphone_label" class="mt-2 text-danger" style="font-size: 10px;"></span >
+                            <div class="invalid-feedback"></div>   
+        
+                        </div>
+                        <div class=" col-sm-12 col-md-3 col-lg-4">
+                            <input id="mphone"  type="text" pattern="[0-9]{10}" class="form-control bg-light text-dark mt-2"  name="m_phone" placeholder="mobile number" required>
+                            <span id="phone-message" class="mt-2 " style="font-size: 10px;"></span >
+                            <span id="mphone_label" class="mt-2 text-danger" style="font-size: 10px;"></span >
+                            <div class="invalid-feedback"></div>   
+        
+                        </div>
+    
+                        <hr style="border: none; height: 2px; background-color: #ffcc00; margin: 20px 0;">
+    
+                        <div class="toggle1 section-toggle">
+                            <a href="">Add More Details</a>
+    
+                        </div>
+    
+    
+                    </div>
+    
+
+
+
+
+                    </form>
+
+                    
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Modal End-->
+
+
           </div>
 
 
 
         </div>
     </div>
+
+
+
+    <script>
+
+
+      // search name
+      function filterNames(select) {
+          var input, filter, options, option, i, txtValue;
+          input = select.value.toUpperCase();
+          options = select.getElementsByTagName("option");
+          
+          for (i = 0; i < options.length; i++) {
+              option = options[i];
+              txtValue = option.textContent || option.innerText;
+              if (txtValue.toUpperCase().indexOf(input) > -1 || input === "SELECT A NAME") {
+                  option.style.display = "";
+              } else {
+                  option.style.display = "none";
+              }
+          }
+      }
+      
+  </script>
 
 
 
