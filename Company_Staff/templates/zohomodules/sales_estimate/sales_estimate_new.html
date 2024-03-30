@@ -35,6 +35,42 @@
     label{
         color: white;
     }
+
+    .section-3 .section-toggle
+    {
+        margin-bottom: 0.50rem;
+    }
+     .section-toggle a
+    {
+
+        color: rgb(230, 171, 45);
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        font-size:1.275rem;
+    }
+    .add_another
+    {
+       
+        color: rgb(230, 171, 45);
+    }
+    #tbl thead th{
+        font-size: 0.785rem;
+    }
+    @media (max-width:700px)
+    {
+    .section-3
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr ;  
+
+    }
+    .section-3 .section-toggle a
+    {
+
+        color: rgb(230, 171, 45);
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        font-size:0.875rem;
+    }
+    }
   
 </style>
 
@@ -55,7 +91,7 @@
           <div style="overflow-x:auto;background-color: black;border-radius: 10px;color: white;" class="m-3 p-5">
             <h1 class="text-white mb-3 mt-3">NEW ESTIMATE</h1>
             <hr style="color: yellow;" class="mb-5">
-            <form  method="post" action="{% url 'sales_estimate_new_customer' %}"  enctype="multipart/form-data" class="mb-3">
+            <form  method="post" action=""  enctype="multipart/form-data" class="mb-3">
                 {% csrf_token %}
 
                 <div class="form-group row mt-4">
@@ -65,12 +101,13 @@
                   <div class="col-sm-12 col-md-6 col-lg-7">
                      
                     <div class="input-group">
-                      <select id="nameSelect" class="form-select" aria-label="Select name" onchange="filterNames(this)">
-                        <option selected>Select a name</option>
-                        {% for c in customer %}
-                        <option value="{{c.id}}" data-email="{{c.email}}" data-address="{{c.address}}">{{c.first_name}} {{c.last_name}}</option>
-                        {% endfor %}
-                      </select>
+                        <select id="nameSelect" class="form-select" aria-label="Select name" onchange="updateFields(this)">
+                            <option selected>Select a name</option>
+                            {% for c in customer %}
+                            <option value="{{ c.id }}" data-email="{{ c.customer_email }}" data-address="{{ c.address }}" 
+                            data-gst-treatment="{{c.GST_treatement}}" data-gst-number="{{c.GST_number}}" data-place-of-supply="{{c.place_of_supply}}">{{ c.first_name }} {{ c.last_name }}</option>
+                            {% endfor %}
+                        </select>
                       <!-- Button to trigger modal -->
                       <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-plus text-yellow"></i></button>
 
@@ -85,14 +122,140 @@
 
                 <div class="form-group row mt-4">
                   <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
-                      <label>Company Name</label>
+                      <label>Email</label>
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-7">
-                      <input  type="text" class="form-control " name="company_name" required>     
+                      <input  type="email" class="form-control" name="email" required>     
                       <div class="invalid-feedback">Please fill out this field.</div>   
 
                   </div>
                 </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>Billing Address</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <textarea class="form-control" name="billingAddress"></textarea>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>GST Treatment</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input  type="text" class="form-control" name="gst_treatment" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>GST Number</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input  type="text" class="form-control" name="gst_number" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>Place of Supply</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input  type="text" class="form-control" name="place_of_supply" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>Estimate No</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input  type="number" class="form-control" name="estimate_no" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>Estimate Date</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input id="est_date" type="date" class="form-control" name="estimate_date" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="form-group row mt-4">
+                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
+                    
+                    <!-- <div class=" col-sm-12 col-md-6 col-lg-7">
+                        <select name="payment_term" id="paytearm-select" class="form-control">
+                           
+
+                          {% for pay_terms in comp_payment_terms %}
+                            <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
+                          {% endfor %}
+                            
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-4 ">
+                        <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
+                    </div> -->
+
+                    <div class="input-group">
+                        <div class=" col-sm-12 col-md-6 col-lg-7">
+                            <select name="payment_term" id="paytearm-select" class="form-control">
+                            
+
+                                {% for pay_terms in comp_payment_terms %}
+                                <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
+                                {% endfor %}
+                                
+                            </select>
+                            <!-- <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a> -->
+                            <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#newpayment"><i class="fa fa-plus text-yellow"></i></button>
+                        </div>
+                      
+                    </div>
+
+                </div>
+
+
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                      <label>Payment Terms</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                       
+                      <div class="input-group">
+                        <select name="payment_term" id="paytearm-select" class="form-control">
+                            
+
+                            {% for pay_terms in comp_payment_terms %}
+                            <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
+                            {% endfor %}
+                            
+                        </select>
+                        <!-- Button to trigger modal -->
+                        <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#newpayment"><i class="fa fa-plus text-yellow"></i></button>
+  
+                        
+                        
+                        
+                      </div>
+                    </div>
+                  </div>
+
+
                 
             </form>
 
@@ -100,17 +263,20 @@
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-xl">
-                <div class="modal-content" style="background-color: black;">
+                <div class="modal-content">
                   <div class="modal-header">
-                    <h1 class="modal-title text-white" id="exampleModalLabel">New Customer</h1>
+                    
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
+                  <div class="card p-3 m-3" style="background-color: black;">
                     <!-- Form content -->
+
+                    <h1 class="text-white" id="exampleModalLabel">New Customer</h1>
 
                     <hr style="color: yellow;" class="mb-5">
 
-                    <form  method="post" action=""  enctype="multipart/form-data" class="mb-3">
+                    <form  method="post" action="{% url 'sales_estimate_new_customer' %}"  enctype="multipart/form-data" class="mb-3">
                       {% csrf_token %}
 
                       <div class="form-group row mt-4">
@@ -472,7 +638,7 @@
                               <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
                               
                               <div class=" col-sm-12 col-md-3 col-lg-3">
-                                  <select name="payment_terms" id="paytearm-select" class="form-control">
+                                  <select name="payment_term" id="paytearm-select" class="form-control">
                                      
       
                                     {% for pay_terms in comp_payment_terms %}
@@ -830,6 +996,7 @@
 
 
             </form>
+                  </div>
 
             <!--------------- Payments Seciton Start ----------------->
 
@@ -1645,6 +1812,38 @@ $('#mphone').on('input', function() {
           }
       }
 
+
+      function updateFields(select) {
+        var selectedOption = select.options[select.selectedIndex];
+        var email = selectedOption.getAttribute('data-email');
+        var address = selectedOption.getAttribute('data-address');
+        var gst_t = selectedOption.getAttribute('data-gst-treatment');
+        var gst_number = selectedOption.getAttribute('data-gst-number');
+        var place_of_supply = selectedOption.getAttribute('data-place-of-supply');
+
+        // Update email and address fields
+        document.getElementsByName("email")[0].value = email;
+        document.getElementsByName("billingAddress")[0].value = address;
+        document.getElementsByName("gst_treatment")[0].value = gst_t;
+        document.getElementsByName("gst_number")[0].value = gst_number;
+        document.getElementsByName("place_of_supply")[0].value = place_of_supply;
+    }
+
+
+
+
+     // Get today's date
+    var today = new Date();
+
+    // Format date as YYYY-MM-DD
+    var yyyy = today.getFullYear();
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var dd = String(today.getDate()).padStart(2, '0');
+
+    var todayString = yyyy + '-' + mm + '-' + dd;
+
+    // Set the default value of the input field to today's date
+    document.getElementById('est_date').value = todayString;
       
   </script>
 

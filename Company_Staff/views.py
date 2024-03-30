@@ -14800,9 +14800,10 @@ def sales_estimate_new(request):
             dash_details = CompanyDetails.objects.get(login_details=login_d,superadmin_approval=1,Distributor_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details,status='New')
             customer_details = Customer.objects.filter(company=dash_details)
+            comp_details = CompanyDetails.objects.get(id=dash_details.id)
 
-            comp_payment_terms=Company_Payment_Term.objects.filter(company=dash_details)
-            price_lists=PriceList.objects.filter(company=dash_details,type='Sales',status='Active')
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
+            price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
 
 
 
@@ -14810,8 +14811,9 @@ def sales_estimate_new(request):
             context = {
                 'details':dash_details,
                 'allmodules':allmodules,
-                'login_d':login_d,
-                'customer':customer_details
+                'login_details':login_d,
+                'customer':customer_details,
+                'price_lists':price_lists,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -14820,13 +14822,18 @@ def sales_estimate_new(request):
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             customer_details = Customer.objects.filter(company=dash_details.company)
+            comp_details = CompanyDetails.objects.get(login_details=login_d)
+
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
+            price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
 
 
             context = {
                 'details':dash_details,
                 'allmodules':allmodules,
-                'login_d':login_d,
+                'login_details':login_d,
                 'customer':customer_details,
+                'price_lists':price_lists,
 
             }
 
@@ -14895,7 +14902,7 @@ def sales_estimate_new_customer(request):
                 customer_data.opening_balance_type='Opening Balance not selected'
     
             customer_data.opening_balance=request.POST['opening_bal']
-            customer_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_terms'])
+            customer_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_term'])
             # customer_data.price_list=request.POST['plst']
             plst=request.POST.get('plst')
             if plst!=0:
@@ -14948,7 +14955,7 @@ def sales_estimate_new_customer(request):
             
             vendor_history_obj=CustomerHistory()
             vendor_history_obj.company=comp_details
-            vendor_history_obj.login_details=log_details
+            vendor_history_obj.login_details=login_d
             vendor_history_obj.customer=customer_data
             vendor_history_obj.date=date.today()
             vendor_history_obj.action='Completed'
@@ -14986,6 +14993,8 @@ def sales_estimate_new_customer(request):
                     for ele in mapped2:
                         created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
                                 work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
+                        
+return redirect('sales_estimate_new')
 
 
 
