@@ -110,6 +110,7 @@
                         </select>
                       <!-- Button to trigger modal -->
                       <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-plus text-yellow"></i></button>
+                      
 
                       
                       
@@ -180,6 +181,17 @@
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
+                
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>Reference No</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input  type="number" class="form-control" name="reference_no" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+  
+                    </div>
+                  </div>
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
@@ -191,42 +203,6 @@
                     </div>
                 </div>
 
-                <div class="form-group row mt-4">
-                    <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Payment Terms</label>
-                    
-                    <!-- <div class=" col-sm-12 col-md-6 col-lg-7">
-                        <select name="payment_term" id="paytearm-select" class="form-control">
-                           
-
-                          {% for pay_terms in comp_payment_terms %}
-                            <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
-                          {% endfor %}
-                            
-                        </select>
-
-                    </div>
-
-                    <div class="col-md-4 ">
-                        <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a>
-                    </div> -->
-
-                    <div class="input-group">
-                        <div class=" col-sm-12 col-md-6 col-lg-7">
-                            <select name="payment_term" id="paytearm-select" class="form-control">
-                            
-
-                                {% for pay_terms in comp_payment_terms %}
-                                <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
-                                {% endfor %}
-                                
-                            </select>
-                            <!-- <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newpayment" data-toggle="modal" style="color: white; background-color: rgb(210, 132, 30);" >+</a> -->
-                            <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#newpayment"><i class="fa fa-plus text-yellow"></i></button>
-                        </div>
-                      
-                    </div>
-
-                </div>
 
 
 
@@ -237,16 +213,76 @@
                     <div class="col-sm-12 col-md-6 col-lg-7">
                        
                       <div class="input-group">
-                        <select name="payment_term" id="paytearm-select" class="form-control">
+                        <select name="payment_term" id="paytearm-select" class="form-control" onchange="update_expiryDate(this)">
                             
-
+                            <option selected>Select a payment_term</option>
                             {% for pay_terms in comp_payment_terms %}
-                            <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
+                            <option value="{{pay_terms.id}}" data-days="{{pay_terms.days}}" >{{pay_terms.term_name}}</option>
                             {% endfor %}
                             
                         </select>
                         <!-- Button to trigger modal -->
-                        <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#newpayment"><i class="fa fa-plus text-yellow"></i></button>
+                        <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#newpayment1"><i class="fa fa-plus text-yellow"></i></button>
+
+                        <!--------------- Payments Seciton Start ----------------->
+
+                            <div class="modal fade" id="newpayment1">
+                                <div class="modal-dialog modal-md">
+                                <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                                    <div class="modal-header " style="background: rgb(32, 35, 37);">
+                                        <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
+                                        <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" style="background: rgb(32, 35, 37);">
+                                    <div class="card p-3 m-3" style="background-color: #141414a2;">
+                                        <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
+                                        
+                            
+                            
+                                        <div class="row mt-2">
+                            
+                                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                                                <label for="termname" style="color: white">Term Name *</label>
+
+                                            <input type="text " class="form-control mt-2" id="tname" name="term_name" autocapitalize="characters" required> 
+                                            <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
+                                            <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
+                                            </div>
+                            
+                                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                                                <label for="termdays" style="color: white">Number of Days *</label>
+
+                                            <input type="number" class="form-control mt-2" id="tdays" name="term_days" autocapitalize="characters" required>
+                                            </div>
+                                            <div class="col-md-2 mt-2"></div>
+                            
+                                        </div>
+                                        
+                                        <div class="row mt-5">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="d-flex">
+                                                <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
+                                                type="submit" data-dismiss="modal" id="termSave">Save
+                                                </button> 
+                                                
+                            
+                                                <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
+                                                data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">Cancel</span>
+                                                </button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>  
+                            </div> 
+
+                            <!------------------- Payments  Section End -------------->
   
                         
                         
@@ -254,6 +290,87 @@
                       </div>
                     </div>
                   </div>
+
+                <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label>Expiration Date</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                        <input id="exp_date" type="date" class="form-control" name="exp_date" required>     
+                        <div class="invalid-feedback">Please fill out this field.</div>   
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        
+                        <div class="table-responsive">
+                        
+                            <table id="tbl" class="table text-white">
+                                <thead>
+                                    <tr>
+                                        
+                                    <th>Salutation</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email Address</th>
+                                    <th >Work Phone <br><span id="twph_label"></span></th>
+                                    <th >Mobile <br><span id="tlabel"></span>    </th>
+                                    <th >Skype Name/No</th>
+                                    <th >Designation</th>
+                                    <th >Department</th>
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                <td><select name="salutation[]" class="form-control bg-transparent border-1 text-white"  id="PLACE" >
+                                    <option class="text-dark"  >Select</option>
+                                    <option class="text-dark" value="Mr" >Mr.</option>
+                                    <option class="text-dark" value="Mrs">Mrs.</option>
+                                    <option class="text-dark" value="Ms">Ms.</option>
+                                    <option class="text-dark" value="Miss">Miss.</option>
+                                    <option class="text-dark" value="Dr">Dr.</option>
+                                    </select></td>
+                                <td><input type="text" class=" form-control border-1 bg-transparent text-white"    name="first_name[]"  ></td>
+                                <td><input type="text"class="form-control border-1 bg-transparent text-white"  name="last_name[]" /></td>
+                                <td>
+                                    <input type="text" class="form-control border-1 bg-transparent text-white" name="email[]" />
+                                    
+                                    
+                                </td>
+                                
+                                <td>
+                                    <input type="tel" pattern="[0-9]{7}" class="form-control border-1 bg-transparent text-white"  id="twphone" name="wphone[]"/>
+                                   
+                                </td>
+                                <td>
+                                    <input type="tel" pattern="[0-9]{10}"  class="form-control border-1 bg-transparent text-white"  id="tmobile" onclick="sample1()"   name="mobile[]" />
+                                    
+                                </td>
+                                <td><input type="number" class="form-control border-1 bg-transparent text-white"  onclick="sample()" name="skype[]" /></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white"  name="designation[]" /></td>
+                                <td><input type="text" class="form-control border-1 bg-transparent text-white"  name="department[]" /></td>
+                                <td><button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button></td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            
+                        </div>
+                        
+                        <div class="button add_another mt-3 ">
+                            <i class="fa fa-user-plus" aria-hidden="true"></i> 
+                            <span class="text-small" style="margin-left: 0.30rem;">
+                                Add Contact Person
+                            </span>
+                        </div>
+                           
+                        
+                    </div>
+                    
+                </div>
+
 
 
                 
@@ -878,7 +995,7 @@
                             
                             <div class="table-responsive">
                             
-                                <table id="tbl" class="table text-white" style="background-color: rgba(250, 227, 198, 0.5);">
+                                <table id="tbl" class="table text-white">
                                     <thead>
                                         <tr>
                                             
@@ -998,66 +1115,7 @@
             </form>
                   </div>
 
-            <!--------------- Payments Seciton Start ----------------->
-
-            <div class="modal fade" id="newpayment">
-                <div class="modal-dialog modal-md">
-                <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
-                    <div class="modal-header " style="background: rgb(32, 35, 37);">
-                        <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
-                        <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body" style="background: rgb(32, 35, 37);">
-                    <div class="card p-3 m-3" style="background-color: #141414a2;">
-                        <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
-                        
             
-            
-                        <div class="row mt-2">
-            
-                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
-                                <label for="termname" style="color: white">Term Name *</label>
-
-                            <input type="text " class="form-control mt-2" id="tname" name="term_name" autocapitalize="characters" required> 
-                            <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
-                            <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
-                            </div>
-            
-                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
-                                <label for="termdays" style="color: white">Number of Days *</label>
-
-                            <input type="number" class="form-control mt-2" id="tdays" name="term_days" autocapitalize="characters" required>
-                            </div>
-                            <div class="col-md-2 mt-2"></div>
-            
-                        </div>
-                        
-                        <div class="row mt-5">
-                            <div class="col-lg-12 col-md-12 col-sm-12">
-                            <div class="d-flex">
-                                <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
-                                type="submit" data-dismiss="modal" id="termSave">Save
-                                </button> 
-                                
-            
-                                <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
-                                data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">Cancel</span>
-                                </button>
-                            </div>
-                            </div>
-                        </div>
-                        </form>
-                    </div>
-                    </div>
-                </div>
-                </div>  
-            </div> 
-
-            <!------------------- Payments  Section End -------------->
-
 
 
 
@@ -1067,6 +1125,72 @@
 
         </div>
     </div>
+
+
+
+
+
+
+    <!--------------- Payments Seciton Start ----------------->
+
+    <div class="modal fade" id="newpayment">
+        <div class="modal-dialog modal-md">
+        <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+            <div class="modal-header " style="background: rgb(32, 35, 37);">
+                <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
+                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="background: rgb(32, 35, 37);">
+            <div class="card p-3 m-3" style="background-color: #141414a2;">
+                <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
+                
+    
+    
+                <div class="row mt-2">
+    
+                    <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                        <label for="termname" style="color: white">Term Name *</label>
+
+                    <input type="text " class="form-control mt-2" id="tname" name="term_name" autocapitalize="characters" required> 
+                    <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
+                    <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
+                    </div>
+    
+                    <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                        <label for="termdays" style="color: white">Number of Days *</label>
+
+                    <input type="number" class="form-control mt-2" id="tdays" name="term_days" autocapitalize="characters" required>
+                    </div>
+                    <div class="col-md-2 mt-2"></div>
+    
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="d-flex">
+                        <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
+                        type="submit" data-dismiss="modal" id="termSave">Save
+                        </button> 
+                        
+    
+                        <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
+                        data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">Cancel</span>
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>  
+    </div> 
+
+    <!------------------- Payments  Section End -------------->
+
 
 
 
@@ -1844,6 +1968,31 @@ $('#mphone').on('input', function() {
 
     // Set the default value of the input field to today's date
     document.getElementById('est_date').value = todayString;
+
+
+
+
+
+
+
+    function update_expiryDate(select) {
+        var selectedOption = select.options[select.selectedIndex];
+        var days = selectedOption.getAttribute('data-days');
+        var est_date = document.getElementById('est_date').value;
+
+
+        // Convert estimate date string to Date object
+        var estimateDate = new Date(est_date);
+
+        // Calculate expiration date by adding payment term days to estimate date
+        var expirationDate = new Date(estimateDate.getTime() + (days * 24 * 60 * 60 * 1000));
+
+        // Format expiration date as YYYY-MM-DD
+        var formattedExpirationDate = expirationDate.toISOString().slice(0, 10);
+
+        // Update the expiration date input field
+        document.getElementById('exp_date').value = formattedExpirationDate;
+    }
       
   </script>
 

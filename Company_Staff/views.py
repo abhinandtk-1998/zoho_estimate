@@ -14814,6 +14814,7 @@ def sales_estimate_new(request):
                 'login_details':login_d,
                 'customer':customer_details,
                 'price_lists':price_lists,
+                'comp_payment_terms':comp_payment_terms,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -14834,6 +14835,7 @@ def sales_estimate_new(request):
                 'login_details':login_d,
                 'customer':customer_details,
                 'price_lists':price_lists,
+                'comp_payment_terms':comp_payment_terms,
 
             }
 
@@ -14994,7 +14996,7 @@ def sales_estimate_new_customer(request):
                         created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
                                 work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
                         
-return redirect('sales_estimate_new')
+    return redirect('sales_estimate_new')
 
 
 
