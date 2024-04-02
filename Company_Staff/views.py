@@ -14804,6 +14804,8 @@ def sales_estimate_new(request):
 
             comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
+            items=Items.objects.filter(company=comp_details)
+            unit=Unit.objects.filter(company=comp_details)
 
 
 
@@ -14815,6 +14817,8 @@ def sales_estimate_new(request):
                 'customer':customer_details,
                 'price_lists':price_lists,
                 'comp_payment_terms':comp_payment_terms,
+                'items':items,
+                'unit':unit,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -14827,6 +14831,8 @@ def sales_estimate_new(request):
 
             comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
+            items=Items.objects.filter(company=comp_details)
+            unit=Unit.objects.filter(company=comp_details)
 
 
             context = {
@@ -14836,6 +14842,8 @@ def sales_estimate_new(request):
                 'customer':customer_details,
                 'price_lists':price_lists,
                 'comp_payment_terms':comp_payment_terms,
+                'items':items,
+                'unit':unit,
 
             }
 
