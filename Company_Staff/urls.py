@@ -379,6 +379,7 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate',views.sales_estimate,name='sales_estimate'),
     path('Zohomodule/Sales/Estimate/New',views.sales_estimate_new,name='sales_estimate_new'),
     path('Zohomodule/Sales/Estimate/New/Customer_new',views.sales_estimate_new_customer,name='sales_estimate_new_customer'),
+    path('Zohomodule/Sales/Estimate/New/item_new',views.sales_estimate_new_item,name='sales_estimate_new_item'),
 
     
     

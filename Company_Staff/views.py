@@ -14805,7 +14805,7 @@ def sales_estimate_new(request):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
             items=Items.objects.filter(company=comp_details)
-            unit=Unit.objects.filter(company=comp_details)
+            units=Unit.objects.filter(company=comp_details)
 
 
 
@@ -14818,7 +14818,7 @@ def sales_estimate_new(request):
                 'price_lists':price_lists,
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
-                'unit':unit,
+                'units':units,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -14832,7 +14832,7 @@ def sales_estimate_new(request):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
             items=Items.objects.filter(company=comp_details)
-            unit=Unit.objects.filter(company=comp_details)
+            units=Unit.objects.filter(company=comp_details)
 
 
             context = {
@@ -14843,7 +14843,7 @@ def sales_estimate_new(request):
                 'price_lists':price_lists,
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
-                'unit':unit,
+                'units':units,
 
             }
 
@@ -15005,6 +15005,153 @@ def sales_estimate_new_customer(request):
                                 work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
                         
     return redirect('sales_estimate_new')
+
+def sales_estimate_new_item(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type=='Company':
+            company_id = request.session['login_id']
+
+        
+            if request.method == 'POST':
+                a=Items()
+                b=Item_Transaction_History()
+                c = CompanyDetails.objects.get(login_details=company_id)
+                b.company=c
+                b.Date=date.today()
+                b.logindetails=login_d
+                a.login_details=login_d
+                a.company=c
+                a.item_type = request.POST.get("type",None)
+                a.item_name = request.POST.get("name",None)
+                unit_id = request.POST.get("unit")
+                uid=Unit.objects.get(id=unit_id)
+                # unit_instance = get_object_or_404(Unit, id=unit_id)
+                a.unit = uid
+                a.hsn_code = request.POST.get("hsn",None)
+                a.tax_reference = request.POST.get("radio",None)
+                a.intrastate_tax = request.POST.get("intra",None)
+                a.interstate_tax= request.POST.get("inter",None)
+                a.selling_price = request.POST.get("sel_price",None)
+                a.sales_account = request.POST.get("sel_acc",None)
+                a.sales_description = request.POST.get("sel_desc",None)
+                a.purchase_price = request.POST.get("cost_price",None)
+                a.purchase_account = request.POST.get("cost_acc",None)
+                a.purchase_description = request.POST.get("pur_desc",None)
+                # track = request.POST.get("trackState",None)
+                track_state_value = request.POST.get("trackstate", None)
+
+    # Check if the checkbox is checked
+                if track_state_value == "on":
+                    a.track_inventory = 1
+                else:
+                    a.track_inventory = 0
+
+                
+                minstock=request.POST.get("minimum_stock",None)
+                if minstock != "":
+                    a.minimum_stock_to_maintain = request.POST.get("minimum_stock",None)
+                else:
+                    a.minimum_stock_to_maintain = 0
+                a.activation_tag = 'Active'
+                a.type = 'Opening Stock'
+                a.inventory_account = request.POST.get("invacc",None)
+                a.opening_stock = request.POST.get("openstock",None)
+                a.current_stock=request.POST.get("openstock",None)
+                a.opening_stock_per_unit = request.POST.get("rate",None)
+                item_name= request.POST.get("name",None)
+                hsncode=request.POST.get("hsn",None)
+                
+                if Items.objects.filter(item_name=item_name, company=c).exists():
+                    error='yes'
+                    messages.error(request,'Item with same name exsits !!!')
+                    return redirect('new_items')
+                elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
+                    error='yes'
+                    messages.error(request,'Item with same  hsn code exsits !!!')
+                    return redirect('new_items')
+                else:
+                    a.save()    
+                    t=Items.objects.get(id=a.id)
+                    b.items=t
+                    b.save()
+                    return redirect('items_list')
+            
+        else:
+            staff_id = request.session['login_id']
+            if request.method=='POST':
+                a=Items()
+                b=Item_Transaction_History()
+                staff = LoginDetails.objects.get(id=staff_id)
+                sf = StaffDetails.objects.get(login_details=staff)
+                c=sf.company
+                b.Date=date.today()
+                b.company=c
+                b.logindetails=login_d
+                a.login_details=login_d
+                a.company=c
+                a.item_type = request.POST.get("type",None)
+                a.item_name = request.POST.get("name",None)
+                unit_id = request.POST.get("unit")
+                unit_instance = get_object_or_404(Unit, id=unit_id)
+                a.unit = unit_instance
+                a.hsn_code = request.POST.get("hsn",None)
+                a.tax_reference = request.POST.get("radio",None)
+                a.intrastate_tax = request.POST.get("intra",None)
+                a.interstate_tax= request.POST.get("inter",None)
+                a.selling_price = request.POST.get("sel_price",None)
+                a.sales_account = request.POST.get("sel_acc",None)
+                a.sales_description = request.POST.get("sel_desc",None)
+                a.purchase_price = request.POST.get("cost_price",None)
+                a.purchase_account = request.POST.get("cost_acc",None)
+                a.purchase_description = request.POST.get("pur_desc",None)
+                # track_state_value = request.POST.get("trackState", None)
+
+                track_state_value = request.POST.get("trackstate", None)
+
+                # Check if the checkbox is checked
+                if track_state_value == "on":
+                    a.track_inventory = 1
+                else:
+                    a.track_inventory = 0
+                minstock=request.POST.get("minimum_stock",None)
+                item_name= request.POST.get("name",None)
+                hsncode=request.POST.get("hsn",None)
+                
+                if minstock != "":
+                    a.minimum_stock_to_maintain = request.POST.get("minimum_stock",None)
+                else:
+                    a.minimum_stock_to_maintain = 0
+                # a.activation_tag = request.POST.get("status",None)
+                a.inventory_account = request.POST.get("invacc",None)
+                a.opening_stock = request.POST.get("openstock",None)
+                a.current_stock=request.POST.get("openstock",None)
+            
+            
+
+            
+                if Items.objects.filter(item_name=item_name,company=c).exists():
+                    error='yes'
+                    messages.error(request,'Item with same name exsits !!!')
+                    return redirect('new_items')
+                elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
+                    error='yes'
+                    messages.error(request,'Item with same  hsn code exsits !!!')
+                    return redirect('new_items')
+                else:
+                    a.save()    
+                    t=Items.objects.get(id=a.id)
+                    b.items=t
+                    b.save()
+                    return redirect('items_list')
+
+    else:
+        redirect('/')
+
+
 
 
 

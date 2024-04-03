@@ -224,66 +224,7 @@
                         <!-- Button to trigger modal -->
                         <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#newpayment1"><i class="fa fa-plus text-yellow"></i></button>
 
-                        <!--------------- Payments Seciton Start ----------------->
-
-                            <div class="modal fade" id="newpayment1">
-                                <div class="modal-dialog modal-md">
-                                <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
-                                    <div class="modal-header " style="background: rgb(32, 35, 37);">
-                                        <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
-                                        <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body" style="background: rgb(32, 35, 37);">
-                                    <div class="card p-3 m-3" style="background-color: #141414a2;">
-                                        <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
-                                        
-                            
-                            
-                                        <div class="row mt-2">
-                            
-                                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
-                                                <label for="termname" style="color: white">Term Name *</label>
-
-                                            <input type="text " class="form-control mt-2" id="tname1" name="term_name" autocapitalize="characters" required> 
-                                            <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
-                                            <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
-                                            </div>
-                            
-                                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
-                                                <label for="termdays" style="color: white">Number of Days *</label>
-
-                                            <input type="number" class="form-control mt-2" id="tdays1" name="term_days" autocapitalize="characters" required>
-                                            </div>
-                                            <div class="col-md-2 mt-2"></div>
-                            
-                                        </div>
-                                        
-                                        <div class="row mt-5">
-                                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <div class="d-flex">
-                                                <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
-                                                type="submit" data-dismiss="modal" id="termSave1">Save
-                                                </button> 
-                                                
-                            
-                                                <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
-                                                data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">Cancel</span>
-                                                </button>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        </form>
-                                    </div>
-                                    </div>
-                                </div>
-                                </div>  
-                            </div> 
-
-                            <!------------------- Payments  Section End -------------->
-  
+                        
                         
                         
                         
@@ -370,6 +311,363 @@
                                 Add item
                             </span>
                         </div>
+
+
+
+
+
+
+
+
+
+                        <!-- Modal Add Item -->
+    <div class="modal fade" id="addItem" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <div class="card p-3 m-3" style="background-color: black;">
+
+
+                <div class="col-md-12">
+                    <div class="card mb-3 bg-black shadow p-3 mb-5 rounded" style="max-width: 1400px;">
+                    
+                   <br>
+                   <!-- <div style="background-color: rgb(0, 0, 0); border-radius: 10px; width:80% ;margin-left: 18%;"> -->
+                    <div >
+                      <h4 id="selected_customer_heading" class="text" style="color: white; margin-left: 2%; padding-top: 20px;"><b>NEW ITEM</b></h4>
+                    </div>
+                 <br>
+                <div class="container-fluid"> 
+                  {% for m in messages %}
+                  <p style="color: chocolate;">{{m}}</p>
+                  {% endfor %}
+          
+                  <form action="" method="POST" id="add" style="padding-left: 20px;">
+                    {% csrf_token%}
+                    <br>  
+                    <h3 class="mb-3 text-white mt-4" style="font-size: 2rem;"></h3>
+                    <br>
+                    <fieldset class="form-group" >
+                        <div class="row">
+                          <hr>
+                         
+                            <div class="col-12 col-md-10">
+                              <label class="col-12 col-md-2 col-form-label pt-3" style="color: aliceblue;">Type  &nbsp;&nbsp;<i
+                                class="fa fa-question-circle"></i></label>
+                                <div class="form-check form-check-inline">
+                                    <input required class="form-check-input" type="radio" name="type" id="gridRadios1" value="Goods">
+                                    <label class="form-check-label text-white" for="gridRadios1">Goods</label>
+                                </div> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+                                <div class="form-check form-check-inline ml-md-3">
+                                    <input required class="form-check-input" type="radio" name="type" id="gridRadios2" value="Services">
+                                    <label class="form-check-label text-white" for="gridRadios2">Services</label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br>
+                    <div class="form-group row">
+                        <label  class="col-sm-2 col-form-label " style="color: aliceblue;">Name *</label>
+                        <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
+                          <input required type="text" class="form-control" name="name" id="nameInput" style="color: aliceblue;" placeholder="Enter Item Name">  
+                        </div>
+                      </div>
+                      <br>
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" style="color: aliceblue;">Unit <i class="fa fa-question-circle"></i></label>
+                        <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
+                            <div class="d-flex align-items-center">
+                                <select name="unit" class="form-control" id="selunit"  style="background-color: black; color: white;border-radius: 5px;"  >
+                                  {% for i in units %}
+                                    <option value={{i.id}}>{{i.unit_name}}</option>
+                                  {% endfor %}
+                                </select>
+                                <!-- <script>
+                                  $(document).ready(function() {
+                                    // Initialize select2
+                                    $('#selunit').select2();
+                                  });
+                                  </script>                        
+                                   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer ></script> -->
+                                <a class="btn btn-outline-warning py-2" style="cursor: pointer;" data-toggle="modal" data-target="#unitmodal" style="height: 38px; margin-right: 3px;">+</a>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label" style="color: aliceblue;">HSN Code</label>
+                        <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
+                            <input required type="text" class="form-control" name="hsn" required id="hsn_code" style="color: aliceblue;" placeholder="Enter six digit HSN code" oninput="validateInput()">
+                            <div id="validationResult"></div>
+                        </div>
+                    </div>
+                    <br>
+                    <fieldset class="form-group" >
+                        <div class="row">
+                      
+                            <div class="col-12 col-md-10">
+                              <label class="col-12 col-md-2 col-form-label pt-3" style="color: aliceblue;">Tax Preference: &nbsp;&nbsp;</label>
+                                <div class="form-check form-check-inline">
+                                    <input required class="form-check-input" type="radio" name="radio" id="gridRadios1" onclick="showAllSelect()" value="taxable">
+                                    <label class="form-check-label text-white" for="gridRadios1">Taxable</label>
+                                </div> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+                                <div class="form-check form-check-inline ml-md-3">
+                                    <input required class="form-check-input" type="radio" name="radio" id="gridRadios2"  onclick="hideAllSelect()" value="None-Taxable">
+                                    <label class="form-check-label text-white" for="gridRadios2"> None-Taxable</label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                  
+          <br>
+                      <div class="row">
+                        <div class="col-md-3">
+                      
+                          <div id="select1_div" style="display: none;">
+                            <label for="select1">Intra-State TAX</label><br> <br>
+                            <select name="intra" class="form-control" id="select1" style="background-color: black; color: white;">
+                                <option value="0">GST0[0%]</option>
+                                <option value="3">GST3[3%]</option>
+                                <option value="5">GST5[5%]</option>
+                                <option value="12">GST12[12%]</option>
+                                <option value="18">GST18[18%]</option>
+                                <option value="28">GST28[28%]</option>
+                            </select>
+                            
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div id="select2_div" style="display: none;">
+                            <label for="select2">Inter-State TAX</label> <br><br>
+                            <select name="inter" class="form-control " id="select2" style="background-color: black; color: white;">
+                              <option value="0">IGST0[0%]</option>
+                              <option value="5">IGST3[3%]</option>
+                              <option value="5">IGST5[5%]</option>
+                              <option value="12">IGST12[12%]</option>
+                              <option value="18">IGST18[18%]]</option>
+                              <option value="28">IGST28[28%]</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <br>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <input  type="checkbox" name="selling" checked> <label >selling  information</label><br><br>
+                          <div class="form-group row">
+                            <br>
+                            <label class="col-sm-2 col-form-label" style="color: aliceblue;">Selling price </label>
+                            <div class="col-sm-12 col-md-7 col-9 ml-5">
+                              <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                  <div class="input-group-text text-white" style="background-color: black;">INR</div>
+                                </div>
+                                <input required type="text" name="sel_price" style="color: #ede4e4;" class="form-control">
+                              </div>
+                            </div>
+                          </div>
+                          <br>
+                          <br>
+                          <div class="form-group row">
+                            <label  class="col-sm-2 col-form-label" style="color: aliceblue;">Account *</label>
+                            <div class="col-sm-10 col-md-7 col-9 ml-5">
+                              <select name="sel_acc" id="sel_account" class="form-control " style="background-color: black; color: white;">
+                                <option value=" ">--Select Account--</option>
+                                <option value="General Income">General Income</option>
+                                <option value="Interest Income">Interest Income</option>
+                                <option value="Late Fee  Income">Late Fee  Income</option>  
+                                <option value="Discount Income">Discount Income</option>
+                                <option value="Other Charges">Other Charges</option>
+                                <option value="Shipping Charge">Shipping Charge</option>
+                            
+                              </select>                              
+                            </div>
+                          </div>
+                          <br>
+                          <br>
+                          <div class="form-group row">
+                            <label  class="col-sm-2 col-form-label" style="color: aliceblue;">Description </label>
+                            <div class="col-sm-10 col-md-7 col-9 ml-5">
+                              <input  type="text" style="color: #ede4e4;" name="sel_desc" id="desc" class="form-control " placeholder="Enter Discription">
+                            </div>
+                          </div>
+                                                
+                        </div>
+                        <div class="col-md-6">
+                          <input type="checkbox" name="purchase" checked> <label for="">Purchase information</label><br><br>
+                          <div class="form-group row">
+                            <br>
+                            <label  class="col-sm-2 col-form-label" style="color: aliceblue;">Cost Price*</label>
+                            <div class="col-sm-10 col-md-7 col-9">
+                              <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                  <div class="input-group-text text-white" style="background-color: black;">INR</div>
+                                </div>
+                                <input required type="text" id="c_price" style="color: #ede4e4;" class="form-control " name="cost_price" >
+                              </div>
+                            </div>
+                          </div>
+                          <br>
+                          <div class="form-group row in">
+                  
+                            <label class="col-sm-2 col-form-label" style="color: aliceblue;">Account*</label>
+                            <div class="col-sm-10 col-md-7 col-5">
+                                <div class="d-flex align-items-center">
+                                    <select name="cost_acc" class="form-control " id="myaccount" style="color: #fefefe;background-color: #000;" required>
+                                      <option value="">--Select Account--</option>
+                                      <optgroup id="expensesel" label="Expense">
+                                 
+                                      {% for i in accounts %}
+          
+                                      {% if i.account_type == 'Expense' %}
+                                    
+                                        <option value="{{i.account_name}}">{{i.account_name}}</option>
+                                
+                                      {% endif %}
+                                      {% endfor %}
+                                    </optgroup>
+                                    <optgroup id="costofgoods" label="Cost Of Goods Sold">
+                                      {% for i in accounts %}
+                                      {% if i.account_type == 'Cost Of Goods Sold' %}
+                                
+                                        <option value="{{i.account_name}}">{{i.account_name}}</option>
+                                        
+                                        {% endif %}
+                                        {% endfor %}
+                                      </optgroup>
+                                      <optgroup id="otherexpensesel" label="Other Expense">
+                                      {% for i in accounts %}
+                                      {% if i.account_type == 'Other Expense' %}
+                                
+                                        <option value="{{i.account_name}}">{{i.account_name}}</option>
+                                        
+                                        {% endif %}
+                                        {% endfor %}
+                                      </optgroup>
+                          
+                                     
+                                  
+                                    </select>
+                                    <script>
+                                      $(document).ready(function() {
+                                        // Initialize select2
+                                        $('#myaccount').select2();
+                                      });
+                                      </script>                        
+                                       <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer ></script>
+                                    <a class="btn btn-outline-warning py-2" style="cursor: pointer;" data-toggle="modal" data-target="#account" style="height: 38px; margin-right: 3px;">+</a>
+             
+                                </div>
+                               
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group row in">
+                            <label class="col-sm-2 col-form-label" style="color: aliceblue;">Description</label>
+                            <div class="col-sm-10 col-md-7 col-5">
+                                <div class="d-flex align-items-center">
+                                    <input  type="text" id="purchase_desc" style="color: #ede4e4;" name="pur_desc" class="form-control " placeholder="Enter Discription">
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        </div>
+                        <br>     <br>
+                        <div class="form-group row text-center">
+                            <label class="col-sm-2 col-form-label" style="color: aliceblue;">Minimum Stock to maintain :</label>
+                            <div class="col-sm-10 col-md-7 col-9 d-flex align-items-center" style="margin-left: -2.2rem;">
+                              <input type="number" id="min_stock" style="color: #ede4e4;" name="minimum_stock" class="form-control mx-auto" placeholder="Enter Minimum Stock">
+                            </div>
+                          </div>
+                          <br>
+                         
+                        <br><br>     
+                        <div class="row" >
+                          <div class="col-md-10">
+                            {% comment %} <label style="color: aliceblue;"><input type="checkbox" value="trackstate" name="trackstate" onclick="toggleForm()" style="display: none;">
+                           Track Inventory for this item</label> {% endcomment %}
+                            <!-- {% comment %} <input type="checkbox" name="trackState" id="trackStateCheckbox">{% endcomment %} -->
+                            <label style="color: aliceblue;">
+                           
+                              <input type="checkbox" name="trackstate" class=" "  onclick="toggleFormFields()">
+                              Track Inventory for this item
+                            </label>   <br>   <br>
+                            <div id="formFields" style="display: none;"> 
+                              <div class="form-group row" >
+                                <label class="col-sm-2 col-form-label" style="color: aliceblue;">Inventory Account *</label>
+                                <div class="col-sm-10 col-md-7 col-9" style="margin-left: -1rem;">
+                                  <select class="form-select form-select-sm mt-3 " name="invacc" style="background-color: black; color: white;">
+                                    <option value="">Choose..</option>
+                                    <option value="inventory assets">Inventory Asset</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <br>
+                              <div class="form-group row ">
+                                <label class="col-sm-2 col-form-label" style="color: aliceblue;">Opening Stock</label>
+                                <div class=" col-md-5">
+                                  <input  type="number" style="color: #ede4e4;" class="form-control "  name="openstock" value="0">
+                                </div>
+                                </div>
+                                <br>
+                                <div class="form-group row ">
+                                    <label class="col-sm-2 col-form-label" style="color: aliceblue;">Opening Stock Rate per Unit</label>
+                                    <div class=" col-md-5">
+                                        <input type="number" style="color: #ede4e4;" class="form-control" name="rate"  value="0">
+                                    </div>
+                                    </div>
+          
+                              </div>
+                            </div>
+                          </div>
+                          
+                        <div class="form-inline " style="margin-bottom: 200px;padding-bottom: 20px;">
+                            <button type="submit" id="addItem"  class="mr-3 btn" style="background-color: chocolate;color: aliceblue;" value="Save">Save</button>
+                            <button type="button" class="mr-3 btn" onclick="resetForm()" value="Cancel" style="margin-left:10px;background-color: chocolate;color: aliceblue;">Cancel</button>
+                          </div>   
+                          
+                          <div class="form-inline " style="margin-bottom: 200px;"></div>
+                          <div class="form-inline " style="margin-bottom: 200px;"></div>
+                          <div class="form-inline " style="margin-bottom: 200px;"></div>
+                </form>
+                </div>
+                </div>
+                </div>
+                
+                {% comment %} <div id="total-bill-amount" class="mt-3" style="color: white;"></div> {% endcomment %}
+                <div>
+                    <div id="noDataMessage" style="display: none; color: white;">No data found for selected dates.</div>	
+                    <br><br><br><br><br>
+                </div>
+            
+          </div>
+          
+          
+          </div>
+
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -471,345 +769,7 @@
 
 
 
-                        <!-- Modal Add Item -->
-                        <div class="modal fade" id="addItem" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                <div class="card p-3 m-3" style="background-color: black;">
-
-
-                                    <div class="col-md-12">
-                                        <div class="card mb-3 bg-black shadow p-3 mb-5 rounded" style="max-width: 1400px;">
-                                        
-                                       <br>
-                                       <!-- <div style="background-color: rgb(0, 0, 0); border-radius: 10px; width:80% ;margin-left: 18%;"> -->
-                                        <div >
-                                          <h4 id="selected_customer_heading" class="text" style="color: white; margin-left: 2%; padding-top: 20px;"><b>NEW ITEM</b></h4>
-                                        </div>
-                                     <br>
-                                    <div class="container-fluid"> 
-                                      {% for m in messages %}
-                                      <p style="color: chocolate;">{{m}}</p>
-                                      {% endfor %}
-                              
-                                      <form action="{% url 'create_item'%}" method="POST" id="add" style="padding-left: 20px;">
-                                        {% csrf_token%}
-                                        <br>  
-                                        <h3 class="mb-3 text-white mt-4" style="font-size: 2rem;"></h3>
-                                        <br>
-                                        <fieldset class="form-group" >
-                                            <div class="row">
-                                              <hr>
-                                             
-                                                <div class="col-12 col-md-10">
-                                                  <label class="col-12 col-md-2 col-form-label pt-3" style="color: aliceblue;">Type  &nbsp;&nbsp;<i
-                                                    class="fa fa-question-circle"></i></label>
-                                                    <div class="form-check form-check-inline">
-                                                        <input required class="form-check-input" type="radio" name="type" id="gridRadios1" value="Goods">
-                                                        <label class="form-check-label text-white" for="gridRadios1">Goods</label>
-                                                    </div> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-                                                    <div class="form-check form-check-inline ml-md-3">
-                                                        <input required class="form-check-input" type="radio" name="type" id="gridRadios2" value="Services">
-                                                        <label class="form-check-label text-white" for="gridRadios2">Services</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                        <br>
-                                        <div class="form-group row">
-                                            <label  class="col-sm-2 col-form-label " style="color: aliceblue;">Name *</label>
-                                            <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
-                                              <input required type="text" class="form-control" name="name" id="nameInput" style="color: aliceblue;" placeholder="Enter Item Name">  
-                                            </div>
-                                          </div>
-                                          <br>
-                                          <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label" style="color: aliceblue;">Unit <i class="fa fa-question-circle"></i></label>
-                                            <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
-                                                <div class="d-flex align-items-center">
-                                                    <select name="unit" class="form-control" id="selunit"  style="background-color: black; color: white;border-radius: 5px;"  >
-                                                      {% for i in units %}
-                                                        <option value={{i.id}}>{{i.unit_name}}</option>
-                                                      {% endfor %}
-                                                    </select>
-                                                    <script>
-                                                      $(document).ready(function() {
-                                                        // Initialize select2
-                                                        $('#selunit').select2();
-                                                      });
-                                                      </script>                        
-                                                       <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer ></script>
-                                    <a class="btn btn-outline-warning py-2" style="cursor: pointer;" data-toggle="modal" data-target="#unitmodal" style="height: 38px; margin-right: 3px;">+</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label" style="color: aliceblue;">HSN Code</label>
-                                            <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
-                                                <input required type="text" class="form-control" name="hsn" required id="myInputField" style="color: aliceblue;" placeholder="Enter six digit HSN code" oninput="validateInput()">
-                                                <div id="validationResult"></div>
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <fieldset class="form-group" >
-                                            <div class="row">
-                                          
-                                                <div class="col-12 col-md-10">
-                                                  <label class="col-12 col-md-2 col-form-label pt-3" style="color: aliceblue;">Tax Preference: &nbsp;&nbsp;</label>
-                                                    <div class="form-check form-check-inline">
-                                                        <input required class="form-check-input" type="radio" name="radio" id="gridRadios1" onclick="showAllSelect()" value="taxable">
-                                                        <label class="form-check-label text-white" for="gridRadios1">Taxable</label>
-                                                    </div> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-                                                    <div class="form-check form-check-inline ml-md-3">
-                                                        <input required class="form-check-input" type="radio" name="radio" id="gridRadios2"  onclick="hideAllSelect()" value="None-Taxable">
-                                                        <label class="form-check-label text-white" for="gridRadios2"> None-Taxable</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                      
-                              <br>
-                                          <div class="row">
-                                            <div class="col-md-3">
-                                          
-                                              <div id="select1_div" style="display: none;">
-                                                <label for="select1">Intra-State TAX</label><br> <br>
-                                                <select name="intra" class="form-control" id="select1" style="background-color: black; color: white;">
-                                                    <option value="0">GST0[0%]</option>
-                                                    <option value="3">GST3[3%]</option>
-                                                    <option value="5">GST5[5%]</option>
-                                                    <option value="12">GST12[12%]</option>
-                                                    <option value="18">GST18[18%]</option>
-                                                    <option value="28">GST28[28%]</option>
-                                                </select>
-                                                
-                                              </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                              <div id="select2_div" style="display: none;">
-                                                <label for="select2">Inter-State TAX</label> <br><br>
-                                                <select name="inter" class="form-control " id="select2" style="background-color: black; color: white;">
-                                                  <option value="0">IGST0[0%]</option>
-                                                  <option value="5">IGST3[3%]</option>
-                                                  <option value="5">IGST5[5%]</option>
-                                                  <option value="12">IGST12[12%]</option>
-                                                  <option value="18">IGST18[18%]]</option>
-                                                  <option value="28">IGST28[28%]</option>
-                                                </select>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <br>
-                                          <div class="row">
-                                            <div class="col-md-6">
-                                              <input  type="checkbox" name="selling" checked> <label >selling  information</label><br><br>
-                                              <div class="form-group row">
-                                                <br>
-                                                <label class="col-sm-2 col-form-label" style="color: aliceblue;">Selling price </label>
-                                                <div class="col-sm-12 col-md-7 col-9 ml-5">
-                                                  <div class="input-group mb-2">
-                                                    <div class="input-group-prepend">
-                                                      <div class="input-group-text text-white" style="background-color: black;">INR</div>
-                                                    </div>
-                                                    <input required type="text" name="sel_price" style="color: #ede4e4;" class="form-control">
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <br>
-                                              <br>
-                                              <div class="form-group row">
-                                                <label  class="col-sm-2 col-form-label" style="color: aliceblue;">Account *</label>
-                                                <div class="col-sm-10 col-md-7 col-9 ml-5">
-                                                  <select name="sel_acc" class="form-control " style="background-color: black; color: white;">
-                                                    <option value=" ">--Select Account--</option>
-                                                    <option value="General Income">General Income</option>
-                                                    <option value="Interest Income">Interest Income</option>
-                                                    <option value="Late Fee  Income">Late Fee  Income</option>  
-                                                    <option value="Discount Income">Discount Income</option>
-                                                    <option value="Other Charges">Other Charges</option>
-                                                    <option value="Shipping Charge">Shipping Charge</option>
-                                                
-                                                  </select>                              
-                                                </div>
-                                              </div>
-                                              <br>
-                                              <br>
-                                              <div class="form-group row">
-                                                <label  class="col-sm-2 col-form-label" style="color: aliceblue;">Description </label>
-                                                <div class="col-sm-10 col-md-7 col-9 ml-5">
-                                                  <input  type="text" style="color: #ede4e4;" name="sel_desc" class="form-control " placeholder="Enter Discription">
-                                                </div>
-                                              </div>
-                                                                    
-                                            </div>
-                                            <div class="col-md-6">
-                                              <input type="checkbox" name="purchase" checked> <label for="">Purchase information</label><br><br>
-                                              <div class="form-group row">
-                                                <br>
-                                                <label  class="col-sm-2 col-form-label" style="color: aliceblue;">Cost Price*</label>
-                                                <div class="col-sm-10 col-md-7 col-9">
-                                                  <div class="input-group mb-2">
-                                                    <div class="input-group-prepend">
-                                                      <div class="input-group-text text-white" style="background-color: black;">INR</div>
-                                                    </div>
-                                                    <input required type="text" style="color: #ede4e4;" class="form-control " name="cost_price" >
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <br>
-                                              <div class="form-group row in">
-                                      
-                                                <label class="col-sm-2 col-form-label" style="color: aliceblue;">Account*</label>
-                                                <div class="col-sm-10 col-md-7 col-5">
-                                                    <div class="d-flex align-items-center">
-                                                        <select name="cost_acc" class="form-control " id="myaccount" style="color: #fefefe;background-color: #000;" required>
-                                                          <option value="">--Select Account--</option>
-                                                          <optgroup id="expensesel" label="Expense">
-                                                     
-                                                          {% for i in accounts %}
-                              
-                                                          {% if i.account_type == 'Expense' %}
-                                                        
-                                                            <option value="{{i.account_name}}">{{i.account_name}}</option>
-                                                    
-                                                          {% endif %}
-                                                          {% endfor %}
-                                                        </optgroup>
-                                                        <optgroup id="costofgoods" label="Cost Of Goods Sold">
-                                                          {% for i in accounts %}
-                                                          {% if i.account_type == 'Cost Of Goods Sold' %}
-                                                    
-                                                            <option value="{{i.account_name}}">{{i.account_name}}</option>
-                                                            
-                                                            {% endif %}
-                                                            {% endfor %}
-                                                          </optgroup>
-                                                          <optgroup id="otherexpensesel" label="Other Expense">
-                                                          {% for i in accounts %}
-                                                          {% if i.account_type == 'Other Expense' %}
-                                                    
-                                                            <option value="{{i.account_name}}">{{i.account_name}}</option>
-                                                            
-                                                            {% endif %}
-                                                            {% endfor %}
-                                                          </optgroup>
-                                              
-                                                         
-                                                      
-                                                        </select>
-                                                        <script>
-                                                          $(document).ready(function() {
-                                                            // Initialize select2
-                                                            $('#myaccount').select2();
-                                                          });
-                                                          </script>                        
-                                                           <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer ></script>
-                                                        <a class="btn btn-outline-warning py-2" style="cursor: pointer;" data-toggle="modal" data-target="#account" style="height: 38px; margin-right: 3px;">+</a>
-                                 
-                                                    </div>
-                                                   
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <div class="form-group row in">
-                                                <label class="col-sm-2 col-form-label" style="color: aliceblue;">Description</label>
-                                                <div class="col-sm-10 col-md-7 col-5">
-                                                    <div class="d-flex align-items-center">
-                                                        <input  type="text" style="color: #ede4e4;" name="pur_desc" class="form-control " placeholder="Enter Discription">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            </div>
-                                            </div>
-                                            <br>     <br>
-                                            <div class="form-group row text-center">
-                                                <label class="col-sm-2 col-form-label" style="color: aliceblue;">Minimum Stock to maintain :</label>
-                                                <div class="col-sm-10 col-md-7 col-9 d-flex align-items-center" style="margin-left: -2.2rem;">
-                                                  <input type="number" style="color: #ede4e4;" name="minimum_stock" class="form-control mx-auto" placeholder="Enter Minimum Stock">
-                                                </div>
-                                              </div>
-                                              <br>
-                                             
-                                            <br><br>     
-                                            <div class="row" >
-                                              <div class="col-md-10">
-                                                {% comment %} <label style="color: aliceblue;"><input type="checkbox" value="trackstate" name="trackstate" onclick="toggleForm()" style="display: none;">
-                                               Track Inventory for this item</label> {% endcomment %}
-                                                <!-- {% comment %} <input type="checkbox" name="trackState" id="trackStateCheckbox">{% endcomment %} -->
-                                                <label style="color: aliceblue;">
-                                               
-                                                  <input type="checkbox" name="trackstate" class=" "  onclick="toggleFormFields()">
-                                                  Track Inventory for this item
-                                                </label>   <br>   <br>
-                                                <div id="formFields" style="display: none;"> 
-                                                  <div class="form-group row" >
-                                                    <label class="col-sm-2 col-form-label" style="color: aliceblue;">Inventory Account *</label>
-                                                    <div class="col-sm-10 col-md-7 col-9" style="margin-left: -1rem;">
-                                                      <select class="form-select form-select-sm mt-3 " name="invacc" style="background-color: black; color: white;">
-                                                        <option value="">Choose..</option>
-                                                        <option value="inventory assets">Inventory Asset</option>
-                                                      </select>
-                                                    </div>
-                                                  </div>
-                                                  <br>
-                                                  <div class="form-group row ">
-                                                    <label class="col-sm-2 col-form-label" style="color: aliceblue;">Opening Stock</label>
-                                                    <div class=" col-md-5">
-                                                      <input  type="number" style="color: #ede4e4;" class="form-control "  name="openstock" value="0">
-                                                    </div>
-                                                    </div>
-                                                    <br>
-                                                    <div class="form-group row ">
-                                                        <label class="col-sm-2 col-form-label" style="color: aliceblue;">Opening Stock Rate per Unit</label>
-                                                        <div class=" col-md-5">
-                                                            <input type="number" style="color: #ede4e4;" class="form-control" name="rate"  value="0">
-                                                        </div>
-                                                        </div>
-                              
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              
-                                            <div class="form-inline " style="margin-bottom: 200px;padding-bottom: 20px;">
-                                                <button type="submit"  class="mr-3 btn" style="background-color: chocolate;color: aliceblue;" value="Save">Save</button>
-                                                <button type="button" class="mr-3 btn" onclick="resetForm()" value="Cancel" style="margin-left:10px;background-color: chocolate;color: aliceblue;">Cancel</button>
-                                              </div>   
-                                              
-                                              <div class="form-inline " style="margin-bottom: 200px;"></div>
-                                              <div class="form-inline " style="margin-bottom: 200px;"></div>
-                                              <div class="form-inline " style="margin-bottom: 200px;"></div>
-                                    </form>
-                                    </div>
-                                    </div>
-                                    </div>
-                                    
-                                    {% comment %} <div id="total-bill-amount" class="mt-3" style="color: white;"></div> {% endcomment %}
-                                    <div>
-                                        <div id="noDataMessage" style="display: none; color: white;">No data found for selected dates.</div>	
-                                        <br><br><br><br><br>
-                                    </div>
-                                
-                              </div>
-                              
-                              
-                              </div>
-
-
-
-
-
-
-
-                                </div>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
+                        
 
 
                            
@@ -824,7 +784,20 @@
             </form>
 
 
-            <!-- Modal -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Modal Customer Add-->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -1637,6 +1610,89 @@
     </div> 
 
     <!------------------- Payments  Section End -------------->
+
+
+
+
+
+
+
+
+
+    <!--------------- Payments Seciton Start ----------------->
+
+    <div class="modal fade" id="newpayment1">
+        <div class="modal-dialog modal-md">
+        <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+            <div class="modal-header " style="background: rgb(32, 35, 37);">
+                <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
+                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="background: rgb(32, 35, 37);">
+            <div class="card p-3 m-3" style="background-color: #141414a2;">
+                <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
+                
+    
+    
+                <div class="row mt-2">
+    
+                    <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                        <label for="termname" style="color: white">Term Name *</label>
+
+                    <input type="text " class="form-control mt-2" id="tname1" name="term_name" autocapitalize="characters" required> 
+                    <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
+                    <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
+                    </div>
+    
+                    <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                        <label for="termdays" style="color: white">Number of Days *</label>
+
+                    <input type="number" class="form-control mt-2" id="tdays1" name="term_days" autocapitalize="characters" required>
+                    </div>
+                    <div class="col-md-2 mt-2"></div>
+    
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="d-flex">
+                        <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
+                        type="submit" data-dismiss="modal" id="termSave1">Save
+                        </button> 
+                        
+    
+                        <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
+                        data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">Cancel</span>
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>  
+    </div> 
+
+    <!------------------- Payments  Section End -------------->
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+    
 
 
 
@@ -2499,12 +2555,121 @@ $('#mphone').on('input', function() {
         document.getElementsByName("tax")[0].value = tax;
         // document.getElementsByName("gst_number")[0].value = gst_number;
         // document.getElementsByName("place_of_supply")[0].value = place_of_supply;
-    }
+    
 
 
 
       
   </script>
+
+    <script>
+
+        $(document).on("click","#addItem",function(){
+   
+
+  $.ajax({
+    type : 'POST',
+    url:"{% url 'sales_estimate_new_item' %}",
+
+    data:{
+        type : $("input[name='type']").val(),
+        name : $("input[name='name']").val(),
+        unit : $("input[name='unit']").val(),
+        hsn : $("input[name='hsn']").val(),
+        radio  : $("input[name='radio']").val(),
+        intra : $("input[name='intra']").val(),
+        inter : $("input[name='inter']").val(),
+        sel_price : $("input[name='sel_price']").val(),
+        sel_acc : $("input[name='sel_acc']").val(),
+        sel_desc : $("input[name='sel_desc']"),
+        cost_price : $("input[name='cost_price']"),
+        cost_acc : $("input[name='cost_acc']"),
+        pur_desc : $("input[name='pur_desc']"),
+        trackstate : $("input[name='trackstate']"),
+        minimum_stock : $("input[name='minimum_stock']"),
+        
+
+
+
+
+        
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+        
+      },
+    
+      success: function(response) {
+        $("#tname1").val('')
+        $("#tdays1").val('')
+        var paytearmSelect = $('#paytearm-select1'); 
+          paytearmSelect.empty();  // Clear existing options
+          
+
+          // Add "Select" option
+          paytearmSelect.append('<option value="Due on Receipt" selected>Due on Receipt</option>');
+
+          // Add new options based on the Ajax response data-days="{{pay_terms.days}}"
+          $.each(response.payment_list, function(index, pay_terms) {
+            paytearmSelect.append('<option value="' + pay_terms.id + '" ' + 'data-days="' + pay_terms.days + '">' + pay_terms.name + '</option>');
+          });
+        // reloadPayment();
+      },
+  });        
+});
+
+
+
+    
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- TAXABLE SCRIPT0 -->
+<script>
+    function showAllSelect() {
+    var select1_div = document.getElementById("select1_div");
+    var select2_div = document.getElementById("select2_div");
+    select1_div.style.display = "block";
+    select2_div.style.display = "block";
+    }
+
+    function hideAllSelect() {
+    var select1_div = document.getElementById("select1_div");
+    var select2_div = document.getElementById("select2_div");
+    select1_div.style.display = "none";
+    select2_div.style.display = "none";
+    }
+    </script>
+
+<!-- TAXABLE SCRIPT0  end-->
+
+
+<!-- TRACK INVENTORY SCRIPT -->
+<script>
+    function toggleFormFields() {
+      var formFields = document.getElementById("formFields");
+      var checkbox = document.querySelector("input[name=trackstate]");
+
+      if (checkbox.checked) {
+        formFields.style.display = "block";
+      } else {
+        formFields.style.display = "none";
+      }
+    }
+  </script>
+
+      <!-- TRACK INVENTORY SCRIPT END -->
+
+
+
 
 
 
