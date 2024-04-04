@@ -247,7 +247,7 @@
                         
                         <div class="table-responsive">
                         
-                            <table id="tbl" class="table text-white">
+                            <table id="tbItem" class="table text-white">
                                 <thead>
                                     <tr>
                                         
@@ -300,13 +300,16 @@
                                 <td>
                                     <input type="number" class="form-control" name="total" required>
                                 </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button>
+                                </td>
                                 </tr>
                             </tbody>
                             </table>
                             
                         </div>
                         
-                        <div class="button add_another mt-3 ">
+                        <div class="button add_another_item mt-3 ">
                             <span class="text-small" style="margin-left: 0.30rem;">
                                 Add item
                             </span>
@@ -345,7 +348,7 @@
                   <p style="color: chocolate;">{{m}}</p>
                   {% endfor %}
           
-                  <form action="" method="POST" id="add" style="padding-left: 20px;">
+                  <form action="" method="POST" id="add" style="padding-left: 20px;" >
                     {% csrf_token%}
                     <br>  
                     <h3 class="mb-3 text-white mt-4" style="font-size: 2rem;"></h3>
@@ -746,24 +749,27 @@
                                 </div>
                             </div>
                           </div>
-                          </div>
+
                           <div class="row">
-                              <div class="col-md-7 mt-3">
-                                  <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required style="background-color: #eae13d;">
-                                      <label for="agreeTerms">Agree to terms and conditions</label>
-                                      <div class="invalid-feedback">You must agree before submitting.</div>
-                                  </div>
-                              </div>
-                              <div class="col-md-5 mt-3 d-flex">
-                                  <button type="submit" name="Draft" class="btn  text-white " 
-                            value="Draft" style="background-color:  rgb(199, 88, 37) ;">Save as Draft</button>
-                          <button type="submit" name="Save" class="btn  text-white" 
-                            value="Save" style="background-color: rgb(210, 132, 30);">Save and Send</button>
-                          <input class="btn  text-white"
-                            type="reset" value="Cancel" style="background-color:  rgb(59, 59, 58) ;">
-                              </div>
+                            <div class="col-md-7 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required style="background-color: #eae13d;">
+                                    <label for="agreeTerms">Agree to terms and conditions</label>
+                                    <div class="invalid-feedback">You must agree before submitting.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 mt-3 d-flex">
+                                <button type="submit" name="Draft" class="btn  text-white " 
+                          value="Draft" style="background-color:  rgb(199, 88, 37) ;">Save as Draft</button>
+                        <button type="submit" name="Save" class="btn  text-white" 
+                          value="Save" style="background-color: rgb(210, 132, 30);">Save and Send</button>
+                        <input class="btn  text-white"
+                          type="reset" value="Cancel" style="background-color:  rgb(59, 59, 58) ;">
+                            </div>
+                        </div>
+
                           </div>
+                          
 
 
 
@@ -2555,6 +2561,68 @@ $('#mphone').on('input', function() {
         document.getElementsByName("tax")[0].value = tax;
         // document.getElementsByName("gst_number")[0].value = gst_number;
         // document.getElementsByName("place_of_supply")[0].value = place_of_supply;
+
+    }
+
+
+
+    $('document').ready(function () {
+        $('.add_another_item').click(function () {
+          $("#tbItem").append(`<tr>
+            <td>
+
+            </td>
+            <td style="width: 160px;">
+                <div class="input-group">
+                    <select id="nameSelect" class="form-select" aria-label="Select name" onchange="update_Item(this)">
+                        <option selected>Select a item</option>
+                        {% for item in items %}
+                        <option value="{{ item.id }}" data-hsn="{{item.hsn_code}}" data-price="{{item.selling_price}}"
+                        data-tax="{{item.taxreference}}" data-tax-intrastate="{{item.intrastate_tax}}" 
+                        data-tax-interstate="{{item.interstate_tax}}"  >{{item.item_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <!-- Button to trigger modal -->
+                    <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addItem"><i class="fa fa-plus text-yellow"></i></button>
+                </div>
+            </td>
+            <td>
+                <input type="text" class="form-control" name="hsn_code" required>
+            </td>
+            <td>
+                <input type="number" class="form-control" name="qty" value="0" required>
+            </td>
+            <td>
+                <input type="number" class="form-control" name="price" required>
+            </td>
+            <td>
+                <input type="number" class="form-control" name="tax" required>
+            </td>
+            <td>
+                <input type="number" class="form-control" name="discount" required>
+            </td>
+            <td>
+                <input type="number" class="form-control" name="total" required>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button>
+            </td>
+        </tr>`);
+        });
+      })
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
 
@@ -2564,57 +2632,72 @@ $('#mphone').on('input', function() {
 
     <script>
 
-        $(document).on("click","#addItem",function(){
-   
+        $(document).on("click", "#addItem", function() {
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'sales_estimate_new_item' %}",
+        data: {
+            type: $("input[name='type']").val(),
+            name: $("input[name='name']").val(),
+            unit: $("select[name='unit']").val(), // Corrected to select element
+            hsn: $("input[name='hsn']").val(),
+            radio: $("input[name='radio']:checked").val(), // Corrected to select checked radio button
+            intra: $("select[name='intra']").val(), // Corrected to select element
+            inter: $("select[name='inter']").val(), // Corrected to select element
+            sel_price: $("input[name='sel_price']").val(),
+            sel_acc: $("select[name='sel_acc']").val(), // Corrected to select element
+            sel_desc: $("input[name='sel_desc']").val(),
+            cost_price: $("input[name='cost_price']").val(),
+            cost_acc: $("select[name='cost_acc']").val(), // Corrected to select element
+            pur_desc: $("input[name='pur_desc']").val(),
+            trackstate: $("input[name='trackstate']").prop('checked'), // Corrected to get checked state
+            minimum_stock: $("input[name='minimum_stock']").val(),
+            invacc: $("select[name='invacc']").val(), // Corrected to select element
+            openstock: $("input[name='openstock']").val(),
+            rate: $("input[name='rate']").val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+            // Clear input fields
+            $("input[name='type']").val('');
+            $("input[name='name']").val('');
+            $("select[name='unit']").val(''); // Corrected to select element
+            $("input[name='hsn']").val('');
+            $("input[name='radio']").val('');
+            $("select[name='intra']").val(''); // Corrected to select element
+            $("select[name='inter']").val(''); // Corrected to select element
+            $("input[name='sel_price']").val('');
+            $("select[name='sel_acc']").val(''); // Corrected to select element
+            $("input[name='sel_desc']").val('');
+            $("input[name='cost_price']").val('');
+            $("select[name='cost_acc']").val(''); // Corrected to select element
+            $("input[name='pur_desc']").val('');
+            $("input[name='trackstate']").prop('checked', false); // Corrected to uncheck checkbox
+            $("input[name='minimum_stock']").val('');
+            $("select[name='invacc']").val(''); // Corrected to select element
+            $("input[name='openstock']").val('');
+            $("input[name='rate']").val('');
 
-  $.ajax({
-    type : 'POST',
-    url:"{% url 'sales_estimate_new_item' %}",
+            // Update select element options
+            var itemSelect = $('#nameSelect'); // Corrected variable name
+            itemSelect.empty(); // Clear existing options
+            itemSelect.append('<option selected>Select a item</option>'); // Add "Select" option
 
-    data:{
-        type : $("input[name='type']").val(),
-        name : $("input[name='name']").val(),
-        unit : $("input[name='unit']").val(),
-        hsn : $("input[name='hsn']").val(),
-        radio  : $("input[name='radio']").val(),
-        intra : $("input[name='intra']").val(),
-        inter : $("input[name='inter']").val(),
-        sel_price : $("input[name='sel_price']").val(),
-        sel_acc : $("input[name='sel_acc']").val(),
-        sel_desc : $("input[name='sel_desc']"),
-        cost_price : $("input[name='cost_price']"),
-        cost_acc : $("input[name='cost_acc']"),
-        pur_desc : $("input[name='pur_desc']"),
-        trackstate : $("input[name='trackstate']"),
-        minimum_stock : $("input[name='minimum_stock']"),
-        
-
-
-
-
-        
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-        
-      },
-    
-      success: function(response) {
-        $("#tname1").val('')
-        $("#tdays1").val('')
-        var paytearmSelect = $('#paytearm-select1'); 
-          paytearmSelect.empty();  // Clear existing options
-          
-
-          // Add "Select" option
-          paytearmSelect.append('<option value="Due on Receipt" selected>Due on Receipt</option>');
-
-          // Add new options based on the Ajax response data-days="{{pay_terms.days}}"
-          $.each(response.payment_list, function(index, pay_terms) {
-            paytearmSelect.append('<option value="' + pay_terms.id + '" ' + 'data-days="' + pay_terms.days + '">' + pay_terms.name + '</option>');
-          });
-        // reloadPayment();
-      },
-  });        
+            // Add new options based on the Ajax response data
+            $.each(response.item_list, function(index, item) {
+                itemSelect.append('<option value="' + item.id + '" ' +
+                    'data-hsn="' + item.hsn_code + '" ' +
+                    'data-price="' + item.selling_price + '" ' +
+                    'data-tax="' + item.taxreference + '" ' +
+                    'data-tax-intrastate="' + item.intrastate_tax + '" ' +
+                    'data-tax-interstate="' + item.interstate_tax + '">' +
+                    item.item_name +
+                    '</option>');
+            });
+        },
+    });
 });
+
 
 
 

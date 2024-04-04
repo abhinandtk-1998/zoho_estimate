@@ -972,3 +972,34 @@ class EmployeeLoanRepaymentHistory(models.Model):
     repayment=models.ForeignKey(EmployeeLoanRepayment,on_delete=models.CASCADE,null=True,blank=True)
     date=models.DateField(default=date.today)
     action=models.CharField(max_length=255)
+
+
+
+
+
+class Estimate(models.Model):
+    company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True) 
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,null=True,blank=True)
+    customer_email = models.EmailField(max_length=220,null=True,blank=True)
+    customer_bill_address = models.CharField(max_length=255)
+    customer_gst_treatment = models.CharField(max_length=255)
+    customer_gst_number = models.CharField(max_length=255)
+    customer_place_of_supply = models.CharField(max_length=255)
+    estimate_date = models.DateField()
+    payment_term = models.ForeignKey(PaymentTerms,on_delete=models.CASCADE)
+    expiration_date = models.DateField()
+    reference_number = models.IntegerField()
+    description = models.CharField(max_length=255)
+    terms_and_condition = models.CharField(max_length=255)
+    document = models.FileField()
+    sub_total = models.FloatField()
+    cgst = models.FloatField()
+    sgst = models.FloatField()
+    tax_amount_igst = models.FloatField()
+    shipping_charge = models.FloatField()
+    adjustment = models.FloatField()
+    grand_total = models.FloatField()
+    status = models.CharField(max_length=255)
+    converted_to_invoice = models.ForeignKey(invoice,on_delete=models.CASCADE)
+    converted_to_recurring_invoice = models.ForeignKey(re)

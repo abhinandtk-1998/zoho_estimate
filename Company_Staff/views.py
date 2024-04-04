@@ -14806,6 +14806,7 @@ def sales_estimate_new(request):
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
 
 
 
@@ -14819,6 +14820,7 @@ def sales_estimate_new(request):
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
                 'units':units,
+                'accounts':accounts,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -14833,6 +14835,7 @@ def sales_estimate_new(request):
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
 
 
             context = {
@@ -14844,6 +14847,7 @@ def sales_estimate_new(request):
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
                 'units':units,
+                'accounts':accounts,
 
             }
 
@@ -15064,21 +15068,39 @@ def sales_estimate_new_item(request):
                 a.opening_stock_per_unit = request.POST.get("rate",None)
                 item_name= request.POST.get("name",None)
                 hsncode=request.POST.get("hsn",None)
+
+                a.save()    
+                t=Items.objects.get(id=a.id)
+                b.items=t
+                b.save()
+
+
+                item_obj = Items.objects.filter(company=company_id)
+
+
+                item_list = [{'id': items['id'], 'hsn_code': items['hsn_code'], 'selling_price': items['selling_price'], 
+                              'taxreference': items['taxreference'], 'intrastate_tax': items['intrastate_tax'], 'interstate_tax': 
+                              items['interstate_tax'], 'item_name': items['item_name']} for items in item_obj]
+                response_data = {
+                "message": "success",
+                'item_list':item_list,
+                }
+                return JsonResponse(response_data)
                 
-                if Items.objects.filter(item_name=item_name, company=c).exists():
-                    error='yes'
-                    messages.error(request,'Item with same name exsits !!!')
-                    return redirect('new_items')
-                elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
-                    error='yes'
-                    messages.error(request,'Item with same  hsn code exsits !!!')
-                    return redirect('new_items')
-                else:
-                    a.save()    
-                    t=Items.objects.get(id=a.id)
-                    b.items=t
-                    b.save()
-                    return redirect('items_list')
+                # if Items.objects.filter(item_name=item_name, company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same name exsits !!!')
+                #     return redirect('new_items')
+                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same  hsn code exsits !!!')
+                #     return redirect('new_items')
+                # else:
+                #     a.save()    
+                #     t=Items.objects.get(id=a.id)
+                #     b.items=t
+                #     b.save()
+                #     return redirect('items_list')
             
         else:
             staff_id = request.session['login_id']
@@ -15129,24 +15151,42 @@ def sales_estimate_new_item(request):
                 a.inventory_account = request.POST.get("invacc",None)
                 a.opening_stock = request.POST.get("openstock",None)
                 a.current_stock=request.POST.get("openstock",None)
+
+                a.save()    
+                t=Items.objects.get(id=a.id)
+                b.items=t
+                b.save()
+
+
+                item_obj = Items.objects.filter(company=company_id)
+
+
+                item_list = [{'id': items['id'], 'hsn_code': items['hsn_code'], 'selling_price': items['selling_price'], 
+                              'taxreference': items['taxreference'], 'intrastate_tax': items['intrastate_tax'], 'interstate_tax': 
+                              items['interstate_tax'], 'item_name': items['item_name']} for items in item_obj]
+                response_data = {
+                "message": "success",
+                'item_list':item_list,
+                }
+                return JsonResponse(response_data)
             
             
 
             
-                if Items.objects.filter(item_name=item_name,company=c).exists():
-                    error='yes'
-                    messages.error(request,'Item with same name exsits !!!')
-                    return redirect('new_items')
-                elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
-                    error='yes'
-                    messages.error(request,'Item with same  hsn code exsits !!!')
-                    return redirect('new_items')
-                else:
-                    a.save()    
-                    t=Items.objects.get(id=a.id)
-                    b.items=t
-                    b.save()
-                    return redirect('items_list')
+                # if Items.objects.filter(item_name=item_name,company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same name exsits !!!')
+                #     return redirect('new_items')
+                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same  hsn code exsits !!!')
+                #     return redirect('new_items')
+                # else:
+                #     a.save()    
+                #     t=Items.objects.get(id=a.id)
+                #     b.items=t
+                #     b.save()
+                #     return redirect('items_list')
 
     else:
         redirect('/')
