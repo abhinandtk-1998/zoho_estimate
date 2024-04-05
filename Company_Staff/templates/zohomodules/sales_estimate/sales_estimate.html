@@ -60,9 +60,20 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for est in estimate %}
                   <tr class="border-bottom border-dark">
-
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{forloop.counter}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_date}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_number}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer.customer_display_name}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
+                    <td></td>
+                    <td></td>
+                    </a>
                   </tr>
+                  {% endfor %}
                 </tbody>
               </table>
 

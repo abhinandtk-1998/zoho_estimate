@@ -14750,446 +14750,7 @@ def company_holiday_overview_email_send(request):
 
 
 
-# sales estimate
-        
-
-def sales_estimate(request):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        login_d = LoginDetails.objects.get(id=log_id)
-
-        if login_d.user_type == 'Company':
-            dash_details = CompanyDetails.objects.get(login_details=login_d,superadmin_approval=1,Distributor_approval=1)
-            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-
-
-
-
-            context = {
-                'details':dash_details,
-                'allmodules':allmodules,
-                'login_d':login_d,
-
-            }
-            return render(request,'zohomodules/sales_estimate/sales_estimate.html', context)
-
-        if login_d.user_type == 'Staff':
-            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
-            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-
-        
-            context = {
-                'details':dash_details,
-                'allmodules':allmodules,
-                'login_d':login_d,
-
-            }
-
-
-            return render(request,'zohomodules/sales_estimate/sales_estimate.html', context)
-    else:
-        return redirect('/')
-
-def sales_estimate_new(request):
-
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        login_d = LoginDetails.objects.get(id=log_id)
-
-        if login_d.user_type == 'Company':
-            dash_details = CompanyDetails.objects.get(login_details=login_d,superadmin_approval=1,Distributor_approval=1)
-            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-            customer_details = Customer.objects.filter(company=dash_details)
-            comp_details = CompanyDetails.objects.get(id=dash_details.id)
-
-            comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
-            price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
-            items=Items.objects.filter(company=comp_details)
-            units=Unit.objects.filter(company=comp_details)
-            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
-
-
-
-            
-            context = {
-                'details':dash_details,
-                'allmodules':allmodules,
-                'login_details':login_d,
-                'customer':customer_details,
-                'price_lists':price_lists,
-                'comp_payment_terms':comp_payment_terms,
-                'items':items,
-                'units':units,
-                'accounts':accounts,
-
-            }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
-
-        if login_d.user_type == 'Staff':
-            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
-            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-            customer_details = Customer.objects.filter(company=dash_details.company)
-            comp_details = CompanyDetails.objects.get(login_details=login_d)
-
-            comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
-            price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
-            items=Items.objects.filter(company=comp_details)
-            units=Unit.objects.filter(company=comp_details)
-            accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
-
-
-            context = {
-                'details':dash_details,
-                'allmodules':allmodules,
-                'login_details':login_d,
-                'customer':customer_details,
-                'price_lists':price_lists,
-                'comp_payment_terms':comp_payment_terms,
-                'items':items,
-                'units':units,
-                'accounts':accounts,
-
-            }
-
-
-            return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
-    else:
-        return redirect('/')
-
-
-
-def sales_estimate_new_customer(request):
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        login_d = LoginDetails.objects.get(id=log_id)
-
-        if login_d.user_type=='Staff':
-            dash_details = StaffDetails.objects.get(login_details=login_d)
-            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
-
-        else:    
-            dash_details = CompanyDetails.objects.get(login_details=login_d)
-            comp_details=CompanyDetails.objects.get(login_details=login_d)
-
-            
-        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
-
-
-
-        if request.method=="POST":
-            customer_data=Customer()
-            customer_data.login_details=login_d
-            customer_data.company=comp_details
-            customer_data.customer_type = request.POST.get('type')
-
-            customer_data.title = request.POST.get('salutation')
-            customer_data.first_name=request.POST['first_name']
-            customer_data.last_name=request.POST['last_name']
-            customer_data.company_name=request.POST['company_name']
-            customer_data.customer_display_name=request.POST['v_display_name']
-            customer_data.customer_email=request.POST['vendor_email']
-            customer_data.customer_phone=request.POST['w_phone']
-            customer_data.customer_mobile=request.POST['m_phone']
-            customer_data.skype=request.POST['skype_number']
-            customer_data.designation=request.POST['designation']
-            customer_data.department=request.POST['department']
-            customer_data.website=request.POST['website']
-            customer_data.GST_treatement=request.POST['gst']
-            customer_data.customer_status="Active"
-            customer_data.remarks=request.POST['remark']
-            customer_data.current_balance=request.POST['opening_bal']
-
-            x=request.POST['gst']
-            if x=="Unregistered Business-not Registered under GST":
-                customer_data.PAN_number=request.POST['pan_number']
-                customer_data.GST_number="null"
-            else:
-                customer_data.GST_number=request.POST['gst_number']
-                customer_data.PAN_number=request.POST['pan_number']
-
-            customer_data.place_of_supply=request.POST['source_supply']
-            customer_data.currency=request.POST['currency']
-            op_type=request.POST.get('op_type')
-            if op_type is not None:
-                customer_data.opening_balance_type=op_type
-            else:
-                customer_data.opening_balance_type='Opening Balance not selected'
-    
-            customer_data.opening_balance=request.POST['opening_bal']
-            customer_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_term'])
-            # customer_data.price_list=request.POST['plst']
-            plst=request.POST.get('plst')
-            if plst!=0:
-                 customer_data.price_list=plst
-            else:
-                customer_data.price_list='Price list not selected'
-
-
-
-
-            # customer_data.portal_language=request.POST['plang']
-            plang=request.POST.get('plang')
-            if plang!=0:
-                 customer_data.portal_language=plang
-            else:
-                customer_data.portal_language='Portal language not selected'
-
-            customer_data.facebook=request.POST['fbk']
-            customer_data.twitter=request.POST['twtr']
-            customer_data.tax_preference=request.POST['tax1']
-
-            type=request.POST.get('type')
-            if type is not None:
-                customer_data.customer_type=type
-            else:
-                customer_data.customer_type='Customer type not selected'
-    
-
-
-
-           
-            customer_data.billing_attention=request.POST['battention']
-            customer_data.billing_country=request.POST['bcountry']
-            customer_data.billing_address=request.POST['baddress']
-            customer_data.billing_city=request.POST['bcity']
-            customer_data.billing_state=request.POST['bstate']
-            customer_data.billing_pincode=request.POST['bzip']
-            customer_data.billing_mobile=request.POST['bphone']
-            customer_data.billing_fax=request.POST['bfax']
-            customer_data.shipping_attention=request.POST['sattention']
-            customer_data.shipping_country=request.POST['s_country']
-            customer_data.shipping_address=request.POST['saddress']
-            customer_data.shipping_city=request.POST['scity']
-            customer_data.shipping_state=request.POST['sstate']
-            customer_data.shipping_pincode=request.POST['szip']
-            customer_data.shipping_mobile=request.POST['sphone']
-            customer_data.shipping_fax=request.POST['sfax']
-            customer_data.save()
-           # ................ Adding to History table...........................
-            
-            vendor_history_obj=CustomerHistory()
-            vendor_history_obj.company=comp_details
-            vendor_history_obj.login_details=login_d
-            vendor_history_obj.customer=customer_data
-            vendor_history_obj.date=date.today()
-            vendor_history_obj.action='Completed'
-            vendor_history_obj.save()
-
-    # .......................................................adding to remaks table.....................
-            vdata=Customer.objects.get(id=customer_data.id)
-            vendor=vdata
-            rdata=Customer_remarks_table()
-            rdata.remarks=request.POST['remark']
-            rdata.company=comp_details
-            rdata.customer=vdata
-            rdata.save()
-
-
-     #...........................adding multiple rows of table to model  ........................................................  
-        
-            title =request.POST.getlist('salutation[]')
-            first_name =request.POST.getlist('first_name[]')
-            last_name =request.POST.getlist('last_name[]')
-            email =request.POST.getlist('email[]')
-            work_phone =request.POST.getlist('wphone[]')
-            mobile =request.POST.getlist('mobile[]')
-            skype_name_number =request.POST.getlist('skype[]')
-            designation =request.POST.getlist('designation[]')
-            department =request.POST.getlist('department[]') 
-            vdata=Customer.objects.get(id=customer_data.id)
-            vendor=vdata
-           
-            if title != ['Select']:
-                if len(title)==len(first_name)==len(last_name)==len(email)==len(work_phone)==len(mobile)==len(skype_name_number)==len(designation)==len(department):
-                    mapped2=zip(title,first_name,last_name,email,work_phone,mobile,skype_name_number,designation,department)
-                    mapped2=list(mapped2)
-                    print(mapped2)
-                    for ele in mapped2:
-                        created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
-                                work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
-                        
-    return redirect('sales_estimate_new')
-
-def sales_estimate_new_item(request):
-
-    if 'login_id' in request.session:
-        log_id = request.session['login_id']
-        login_d = LoginDetails.objects.get(id=log_id)
-
-        if login_d.user_type=='Company':
-            company_id = request.session['login_id']
-
-        
-            if request.method == 'POST':
-                a=Items()
-                b=Item_Transaction_History()
-                c = CompanyDetails.objects.get(login_details=company_id)
-                b.company=c
-                b.Date=date.today()
-                b.logindetails=login_d
-                a.login_details=login_d
-                a.company=c
-                a.item_type = request.POST.get("type",None)
-                a.item_name = request.POST.get("name",None)
-                unit_id = request.POST.get("unit")
-                uid=Unit.objects.get(id=unit_id)
-                # unit_instance = get_object_or_404(Unit, id=unit_id)
-                a.unit = uid
-                a.hsn_code = request.POST.get("hsn",None)
-                a.tax_reference = request.POST.get("radio",None)
-                a.intrastate_tax = request.POST.get("intra",None)
-                a.interstate_tax= request.POST.get("inter",None)
-                a.selling_price = request.POST.get("sel_price",None)
-                a.sales_account = request.POST.get("sel_acc",None)
-                a.sales_description = request.POST.get("sel_desc",None)
-                a.purchase_price = request.POST.get("cost_price",None)
-                a.purchase_account = request.POST.get("cost_acc",None)
-                a.purchase_description = request.POST.get("pur_desc",None)
-                # track = request.POST.get("trackState",None)
-                track_state_value = request.POST.get("trackstate", None)
-
-    # Check if the checkbox is checked
-                if track_state_value == "on":
-                    a.track_inventory = 1
-                else:
-                    a.track_inventory = 0
-
-                
-                minstock=request.POST.get("minimum_stock",None)
-                if minstock != "":
-                    a.minimum_stock_to_maintain = request.POST.get("minimum_stock",None)
-                else:
-                    a.minimum_stock_to_maintain = 0
-                a.activation_tag = 'Active'
-                a.type = 'Opening Stock'
-                a.inventory_account = request.POST.get("invacc",None)
-                a.opening_stock = request.POST.get("openstock",None)
-                a.current_stock=request.POST.get("openstock",None)
-                a.opening_stock_per_unit = request.POST.get("rate",None)
-                item_name= request.POST.get("name",None)
-                hsncode=request.POST.get("hsn",None)
-
-                a.save()    
-                t=Items.objects.get(id=a.id)
-                b.items=t
-                b.save()
-
-
-                item_obj = Items.objects.filter(company=company_id)
-
-
-                item_list = [{'id': items['id'], 'hsn_code': items['hsn_code'], 'selling_price': items['selling_price'], 
-                              'taxreference': items['taxreference'], 'intrastate_tax': items['intrastate_tax'], 'interstate_tax': 
-                              items['interstate_tax'], 'item_name': items['item_name']} for items in item_obj]
-                response_data = {
-                "message": "success",
-                'item_list':item_list,
-                }
-                return JsonResponse(response_data)
-                
-                # if Items.objects.filter(item_name=item_name, company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same name exsits !!!')
-                #     return redirect('new_items')
-                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same  hsn code exsits !!!')
-                #     return redirect('new_items')
-                # else:
-                #     a.save()    
-                #     t=Items.objects.get(id=a.id)
-                #     b.items=t
-                #     b.save()
-                #     return redirect('items_list')
-            
-        else:
-            staff_id = request.session['login_id']
-            if request.method=='POST':
-                a=Items()
-                b=Item_Transaction_History()
-                staff = LoginDetails.objects.get(id=staff_id)
-                sf = StaffDetails.objects.get(login_details=staff)
-                c=sf.company
-                b.Date=date.today()
-                b.company=c
-                b.logindetails=login_d
-                a.login_details=login_d
-                a.company=c
-                a.item_type = request.POST.get("type",None)
-                a.item_name = request.POST.get("name",None)
-                unit_id = request.POST.get("unit")
-                unit_instance = get_object_or_404(Unit, id=unit_id)
-                a.unit = unit_instance
-                a.hsn_code = request.POST.get("hsn",None)
-                a.tax_reference = request.POST.get("radio",None)
-                a.intrastate_tax = request.POST.get("intra",None)
-                a.interstate_tax= request.POST.get("inter",None)
-                a.selling_price = request.POST.get("sel_price",None)
-                a.sales_account = request.POST.get("sel_acc",None)
-                a.sales_description = request.POST.get("sel_desc",None)
-                a.purchase_price = request.POST.get("cost_price",None)
-                a.purchase_account = request.POST.get("cost_acc",None)
-                a.purchase_description = request.POST.get("pur_desc",None)
-                # track_state_value = request.POST.get("trackState", None)
-
-                track_state_value = request.POST.get("trackstate", None)
-
-                # Check if the checkbox is checked
-                if track_state_value == "on":
-                    a.track_inventory = 1
-                else:
-                    a.track_inventory = 0
-                minstock=request.POST.get("minimum_stock",None)
-                item_name= request.POST.get("name",None)
-                hsncode=request.POST.get("hsn",None)
-                
-                if minstock != "":
-                    a.minimum_stock_to_maintain = request.POST.get("minimum_stock",None)
-                else:
-                    a.minimum_stock_to_maintain = 0
-                # a.activation_tag = request.POST.get("status",None)
-                a.inventory_account = request.POST.get("invacc",None)
-                a.opening_stock = request.POST.get("openstock",None)
-                a.current_stock=request.POST.get("openstock",None)
-
-                a.save()    
-                t=Items.objects.get(id=a.id)
-                b.items=t
-                b.save()
-
-
-                item_obj = Items.objects.filter(company=company_id)
-
-
-                item_list = [{'id': items['id'], 'hsn_code': items['hsn_code'], 'selling_price': items['selling_price'], 
-                              'taxreference': items['taxreference'], 'intrastate_tax': items['intrastate_tax'], 'interstate_tax': 
-                              items['interstate_tax'], 'item_name': items['item_name']} for items in item_obj]
-                response_data = {
-                "message": "success",
-                'item_list':item_list,
-                }
-                return JsonResponse(response_data)
-            
-            
-
-            
-                # if Items.objects.filter(item_name=item_name,company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same name exsits !!!')
-                #     return redirect('new_items')
-                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same  hsn code exsits !!!')
-                #     return redirect('new_items')
-                # else:
-                #     a.save()    
-                #     t=Items.objects.get(id=a.id)
-                #     b.items=t
-                #     b.save()
-                #     return redirect('items_list')
-
-    else:
-        redirect('/')
+  
 
 
 
@@ -18731,3 +18292,545 @@ def get_loanaddition_data(request):                                             
                 last_name=option.login_details.last_name
                 options[option.id] = [date,action,first_name,last_name,f"{date}"]
             return JsonResponse(options)
+    
+
+
+
+# sales estimate
+        
+
+def sales_estimate(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d,superadmin_approval=1,Distributor_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            estimate = Estimate.objects.filter(company=dash_details)
+
+
+
+
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+
+            }
+            return render(request,'zohomodules/sales_estimate/sales_estimate.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            estimate = Estimate.objects.filter(company=dash_details.company)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+
+            }
+
+
+            return render(request,'zohomodules/sales_estimate/sales_estimate.html', context)
+    else:
+        return redirect('/')
+
+def sales_estimate_new(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d,superadmin_approval=1,Distributor_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            customer_details = Customer.objects.filter(company=dash_details)
+            comp_details = CompanyDetails.objects.get(id=dash_details.id)
+
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
+            price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
+            items=Items.objects.filter(company=comp_details)
+            units=Unit.objects.filter(company=comp_details)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+
+
+
+            
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_details':login_d,
+                'customer':customer_details,
+                'price_lists':price_lists,
+                'comp_payment_terms':comp_payment_terms,
+                'items':items,
+                'units':units,
+                'accounts':accounts,
+
+            }
+            return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            customer_details = Customer.objects.filter(company=dash_details.company)
+            comp_details = CompanyDetails.objects.get(login_details=login_d)
+
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
+            price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
+            items=Items.objects.filter(company=comp_details)
+            units=Unit.objects.filter(company=comp_details)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
+
+
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_details':login_d,
+                'customer':customer_details,
+                'price_lists':price_lists,
+                'comp_payment_terms':comp_payment_terms,
+                'items':items,
+                'units':units,
+                'accounts':accounts,
+
+            }
+
+
+            return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
+    else:
+        return redirect('/')
+
+
+
+def sales_estimate_new_customer(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type=='Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d)
+            comp_details=CompanyDetails.objects.get(id=dash_details.company.id)
+
+        else:    
+            dash_details = CompanyDetails.objects.get(login_details=login_d)
+            comp_details=CompanyDetails.objects.get(login_details=login_d)
+
+            
+        allmodules= ZohoModules.objects.get(company=comp_details,status='New')
+
+
+
+        if request.method=="POST":
+            customer_data=Customer()
+            customer_data.login_details=login_d
+            customer_data.company=comp_details
+            customer_data.customer_type = request.POST.get('type')
+
+            customer_data.title = request.POST.get('salutation')
+            customer_data.first_name=request.POST['first_name']
+            customer_data.last_name=request.POST['last_name']
+            customer_data.company_name=request.POST['company_name']
+            customer_data.customer_display_name=request.POST['v_display_name']
+            customer_data.customer_email=request.POST['vendor_email']
+            customer_data.customer_phone=request.POST['w_phone']
+            customer_data.customer_mobile=request.POST['m_phone']
+            customer_data.skype=request.POST['skype_number']
+            customer_data.designation=request.POST['designation']
+            customer_data.department=request.POST['department']
+            customer_data.website=request.POST['website']
+            customer_data.GST_treatement=request.POST['gst']
+            customer_data.customer_status="Active"
+            customer_data.remarks=request.POST['remark']
+            customer_data.current_balance=request.POST['opening_bal']
+
+            x=request.POST['gst']
+            if x=="Unregistered Business-not Registered under GST":
+                customer_data.PAN_number=request.POST['pan_number']
+                customer_data.GST_number="null"
+            else:
+                customer_data.GST_number=request.POST['gst_number']
+                customer_data.PAN_number=request.POST['pan_number']
+
+            customer_data.place_of_supply=request.POST['source_supply']
+            customer_data.currency=request.POST['currency']
+            op_type=request.POST.get('op_type')
+            if op_type is not None:
+                customer_data.opening_balance_type=op_type
+            else:
+                customer_data.opening_balance_type='Opening Balance not selected'
+    
+            customer_data.opening_balance=request.POST['opening_bal']
+            customer_data.company_payment_terms=Company_Payment_Term.objects.get(id=request.POST['payment_term'])
+            # customer_data.price_list=request.POST['plst']
+            plst=request.POST.get('plst')
+            if plst!=0:
+                 customer_data.price_list=plst
+            else:
+                customer_data.price_list='Price list not selected'
+
+
+
+
+            # customer_data.portal_language=request.POST['plang']
+            plang=request.POST.get('plang')
+            if plang!=0:
+                 customer_data.portal_language=plang
+            else:
+                customer_data.portal_language='Portal language not selected'
+
+            customer_data.facebook=request.POST['fbk']
+            customer_data.twitter=request.POST['twtr']
+            customer_data.tax_preference=request.POST['tax1']
+
+            type=request.POST.get('type')
+            if type is not None:
+                customer_data.customer_type=type
+            else:
+                customer_data.customer_type='Customer type not selected'
+    
+
+
+
+           
+            customer_data.billing_attention=request.POST['battention']
+            customer_data.billing_country=request.POST['bcountry']
+            customer_data.billing_address=request.POST['baddress']
+            customer_data.billing_city=request.POST['bcity']
+            customer_data.billing_state=request.POST['bstate']
+            customer_data.billing_pincode=request.POST['bzip']
+            customer_data.billing_mobile=request.POST['bphone']
+            customer_data.billing_fax=request.POST['bfax']
+            customer_data.shipping_attention=request.POST['sattention']
+            customer_data.shipping_country=request.POST['s_country']
+            customer_data.shipping_address=request.POST['saddress']
+            customer_data.shipping_city=request.POST['scity']
+            customer_data.shipping_state=request.POST['sstate']
+            customer_data.shipping_pincode=request.POST['szip']
+            customer_data.shipping_mobile=request.POST['sphone']
+            customer_data.shipping_fax=request.POST['sfax']
+            customer_data.save()
+           # ................ Adding to History table...........................
+            
+            vendor_history_obj=CustomerHistory()
+            vendor_history_obj.company=comp_details
+            vendor_history_obj.login_details=login_d
+            vendor_history_obj.customer=customer_data
+            vendor_history_obj.date=date.today()
+            vendor_history_obj.action='Completed'
+            vendor_history_obj.save()
+
+    # .......................................................adding to remaks table.....................
+            vdata=Customer.objects.get(id=customer_data.id)
+            vendor=vdata
+            rdata=Customer_remarks_table()
+            rdata.remarks=request.POST['remark']
+            rdata.company=comp_details
+            rdata.customer=vdata
+            rdata.save()
+
+
+     #...........................adding multiple rows of table to model  ........................................................  
+        
+            title =request.POST.getlist('salutation[]')
+            first_name =request.POST.getlist('first_name[]')
+            last_name =request.POST.getlist('last_name[]')
+            email =request.POST.getlist('email[]')
+            work_phone =request.POST.getlist('wphone[]')
+            mobile =request.POST.getlist('mobile[]')
+            skype_name_number =request.POST.getlist('skype[]')
+            designation =request.POST.getlist('designation[]')
+            department =request.POST.getlist('department[]') 
+            vdata=Customer.objects.get(id=customer_data.id)
+            vendor=vdata
+           
+            if title != ['Select']:
+                if len(title)==len(first_name)==len(last_name)==len(email)==len(work_phone)==len(mobile)==len(skype_name_number)==len(designation)==len(department):
+                    mapped2=zip(title,first_name,last_name,email,work_phone,mobile,skype_name_number,designation,department)
+                    mapped2=list(mapped2)
+                    print(mapped2)
+                    for ele in mapped2:
+                        created = CustomerContactPersons.objects.get_or_create(title=ele[0],first_name=ele[1],last_name=ele[2],email=ele[3],
+                                work_phone=ele[4],mobile=ele[5],skype=ele[6],designation=ele[7],department=ele[8],company=comp_details,customer=vendor)
+                        
+    return redirect('sales_estimate_new')
+
+def sales_estimate_new_item(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type=='Company':
+            company_id = request.session['login_id']
+
+        
+            if request.method == 'POST':
+                a=Items()
+                b=Item_Transaction_History()
+                c = CompanyDetails.objects.get(login_details=company_id)
+                b.company=c
+                b.Date=date.today()
+                b.logindetails=login_d
+                a.login_details=login_d
+                a.company=c
+                a.item_type = request.POST.get("type",None)
+                a.item_name = request.POST.get("name",None)
+                unit_id = request.POST.get("unit")
+                uid=Unit.objects.get(id=unit_id)
+                # unit_instance = get_object_or_404(Unit, id=unit_id)
+                a.unit = uid
+                a.hsn_code = request.POST.get("hsn",None)
+                a.tax_reference = request.POST.get("radio",None)
+                a.intrastate_tax = request.POST.get("intra",None)
+                a.interstate_tax= request.POST.get("inter",None)
+                a.selling_price = request.POST.get("sel_price",None)
+                a.sales_account = request.POST.get("sel_acc",None)
+                a.sales_description = request.POST.get("sel_desc",None)
+                a.purchase_price = request.POST.get("cost_price",None)
+                a.purchase_account = request.POST.get("cost_acc",None)
+                a.purchase_description = request.POST.get("pur_desc",None)
+                # track = request.POST.get("trackState",None)
+                track_state_value = request.POST.get("trackstate", None)
+
+    # Check if the checkbox is checked
+                if track_state_value == "on":
+                    a.track_inventory = 1
+                else:
+                    a.track_inventory = 0
+
+                
+                minstock=request.POST.get("minimum_stock",None)
+                if minstock != "":
+                    a.minimum_stock_to_maintain = request.POST.get("minimum_stock",None)
+                else:
+                    a.minimum_stock_to_maintain = 0
+                a.activation_tag = 'Active'
+                a.type = 'Opening Stock'
+                a.inventory_account = request.POST.get("invacc",None)
+                a.opening_stock = request.POST.get("openstock",None)
+                a.current_stock=request.POST.get("openstock",None)
+                a.opening_stock_per_unit = request.POST.get("rate",None)
+                item_name= request.POST.get("name",None)
+                hsncode=request.POST.get("hsn",None)
+
+                a.save()    
+                t=Items.objects.get(id=a.id)
+                b.items=t
+                b.save()
+
+
+                item_obj = Items.objects.filter(company=company_id)
+
+
+                item_list = [{'id': items['id'], 'hsn_code': items['hsn_code'], 'selling_price': items['selling_price'], 
+                              'taxreference': items['taxreference'], 'intrastate_tax': items['intrastate_tax'], 'interstate_tax': 
+                              items['interstate_tax'], 'item_name': items['item_name']} for items in item_obj]
+                response_data = {
+                "message": "success",
+                'item_list':item_list,
+                }
+                return JsonResponse(response_data)
+                
+                # if Items.objects.filter(item_name=item_name, company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same name exsits !!!')
+                #     return redirect('new_items')
+                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same  hsn code exsits !!!')
+                #     return redirect('new_items')
+                # else:
+                #     a.save()    
+                #     t=Items.objects.get(id=a.id)
+                #     b.items=t
+                #     b.save()
+                #     return redirect('items_list')
+            
+        else:
+            staff_id = request.session['login_id']
+            if request.method=='POST':
+                a=Items()
+                b=Item_Transaction_History()
+                staff = LoginDetails.objects.get(id=staff_id)
+                sf = StaffDetails.objects.get(login_details=staff)
+                c=sf.company
+                b.Date=date.today()
+                b.company=c
+                b.logindetails=login_d
+                a.login_details=login_d
+                a.company=c
+                a.item_type = request.POST.get("type",None)
+                a.item_name = request.POST.get("name",None)
+                unit_id = request.POST.get("unit")
+                unit_instance = get_object_or_404(Unit, id=unit_id)
+                a.unit = unit_instance
+                a.hsn_code = request.POST.get("hsn",None)
+                a.tax_reference = request.POST.get("radio",None)
+                a.intrastate_tax = request.POST.get("intra",None)
+                a.interstate_tax= request.POST.get("inter",None)
+                a.selling_price = request.POST.get("sel_price",None)
+                a.sales_account = request.POST.get("sel_acc",None)
+                a.sales_description = request.POST.get("sel_desc",None)
+                a.purchase_price = request.POST.get("cost_price",None)
+                a.purchase_account = request.POST.get("cost_acc",None)
+                a.purchase_description = request.POST.get("pur_desc",None)
+                # track_state_value = request.POST.get("trackState", None)
+
+                track_state_value = request.POST.get("trackstate", None)
+
+                # Check if the checkbox is checked
+                if track_state_value == "on":
+                    a.track_inventory = 1
+                else:
+                    a.track_inventory = 0
+                minstock=request.POST.get("minimum_stock",None)
+                item_name= request.POST.get("name",None)
+                hsncode=request.POST.get("hsn",None)
+                
+                if minstock != "":
+                    a.minimum_stock_to_maintain = request.POST.get("minimum_stock",None)
+                else:
+                    a.minimum_stock_to_maintain = 0
+                # a.activation_tag = request.POST.get("status",None)
+                a.inventory_account = request.POST.get("invacc",None)
+                a.opening_stock = request.POST.get("openstock",None)
+                a.current_stock=request.POST.get("openstock",None)
+
+                a.save()    
+                t=Items.objects.get(id=a.id)
+                b.items=t
+                b.save()
+
+
+                item_obj = Items.objects.filter(company=company_id)
+
+
+                item_list = [{'id': items['id'], 'hsn_code': items['hsn_code'], 'selling_price': items['selling_price'], 
+                              'taxreference': items['taxreference'], 'intrastate_tax': items['intrastate_tax'], 'interstate_tax': 
+                              items['interstate_tax'], 'item_name': items['item_name']} for items in item_obj]
+                response_data = {
+                "message": "success",
+                'item_list':item_list,
+                }
+                return JsonResponse(response_data)
+            
+            
+
+            
+                # if Items.objects.filter(item_name=item_name,company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same name exsits !!!')
+                #     return redirect('new_items')
+                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
+                #     error='yes'
+                #     messages.error(request,'Item with same  hsn code exsits !!!')
+                #     return redirect('new_items')
+                # else:
+                #     a.save()    
+                #     t=Items.objects.get(id=a.id)
+                #     b.items=t
+                #     b.save()
+                #     return redirect('items_list')
+
+    else:
+        redirect('/')
+
+def sales_estimate_new_add(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            company_id = request.session['login_id']
+            company = CompanyDetails.objects.get(id=company_id)
+            if request.method=='POST':
+                est = Estimate()
+                est.company = company
+                est.login_details = login_d
+                customer_id = request.POST['customer']
+                est.customer = Customer.objects.get(id=customer_id)
+                est.customer_email = request.POST['email']
+                est.customer_bill_address = request.POST['billingAddress']
+                est.customer_gst_treatment = request.POST['gst_treatment']
+                est.customer_gst_number = request.POST['gst_number']
+                est.customer_place_of_supply = request.POST['place_of_supply']
+                est.estimate_date = request.POST['estimate_date']
+                paymentterm_id = request.POST['payment_term']
+                est.payment_term = Company_Payment_Term.objects.get(id=paymentterm_id)
+                est.expiration_date = request.POST['exp_date']
+                est.reference_number = request.POST['reference_no']
+                est.estimate_number = request.POST['estimate_no']
+                est.description = request.POST['description']
+                est.document = request.FILES['file']
+                est.sub_total = request.POST['subtotal']
+                est.cgst = request.POST['cgst']
+                est.sgst = request.POST['sgst']
+                est.tax_amount_igst = request.POST['igst']
+                est.shipping_charge = request.POST['ship']
+                est.adjustment = request.POST['adj']
+                est.grand_total = request.POST['grandtotal']
+                est.status = request.POST['Draft']
+                est.save()
+
+            return redirect('sales_estimate')
+
+
+
+
+
+    else:
+        return('/')
+
+
+
+def sales_estimate_overview(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            estimate = Estimate.objects.get(id=pk)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+
+            }
+            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            estimate = Estimate.objects.get(id=pk)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+
+            }
+            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+
+
+    else:
+        return('/')
+
+
+
+
+  

@@ -987,9 +987,10 @@ class Estimate(models.Model):
     customer_gst_number = models.CharField(max_length=255)
     customer_place_of_supply = models.CharField(max_length=255)
     estimate_date = models.DateField()
-    payment_term = models.ForeignKey(PaymentTerms,on_delete=models.CASCADE)
+    payment_term = models.ForeignKey(Company_Payment_Term,on_delete=models.CASCADE)
     expiration_date = models.DateField()
     reference_number = models.IntegerField()
+    estimate_number = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     terms_and_condition = models.CharField(max_length=255)
     document = models.FileField()
@@ -1001,5 +1002,10 @@ class Estimate(models.Model):
     adjustment = models.FloatField()
     grand_total = models.FloatField()
     status = models.CharField(max_length=255)
-    converted_to_invoice = models.ForeignKey(invoice,on_delete=models.CASCADE)
-    converted_to_recurring_invoice = models.ForeignKey(re)
+    # converted_to_invoice = models.ForeignKey(invoice,on_delete=models.CASCADE)
+    # converted_to_recurring_invoice = models.ForeignKey()
+    # converted_to_sales_order = models.ForeignKey()
+
+
+# class EsimateItems(models.Model):
+#     item = models.ForeignKey(Items,on_delete=models.CASCADE)

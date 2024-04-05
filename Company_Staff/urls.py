@@ -376,11 +376,6 @@ urlpatterns = [
 
 
 
-    path('Zohomodule/Sales/Estimate',views.sales_estimate,name='sales_estimate'),
-    path('Zohomodule/Sales/Estimate/New',views.sales_estimate_new,name='sales_estimate_new'),
-    path('Zohomodule/Sales/Estimate/New/Customer_new',views.sales_estimate_new_customer,name='sales_estimate_new_customer'),
-    path('Zohomodule/Sales/Estimate/New/item_new',views.sales_estimate_new_item,name='sales_estimate_new_item'),
-
     
     
     #================================manual journal/NEW==============================
@@ -456,6 +451,22 @@ urlpatterns = [
     
 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+
+    path('Zohomodule/Sales/Estimate',views.sales_estimate,name='sales_estimate'),
+    path('Zohomodule/Sales/Estimate/New',views.sales_estimate_new,name='sales_estimate_new'),
+    path('Zohomodule/Sales/Estimate/New/Customer_new',views.sales_estimate_new_customer,name='sales_estimate_new_customer'),
+    path('Zohomodule/Sales/Estimate/New/item_new',views.sales_estimate_new_item,name='sales_estimate_new_item'),
+    path('Zohomodule/Sales/Estimate/New/Add',views.sales_estimate_new_add,name='sales_estimate_new_add'),
+    path('Zohomodule/Sales/Estimate/Overview/<int:pk>',views.sales_estimate_overview,name='sales_estimate_overview'),
+
+
+
+
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
+
+    
