@@ -1007,5 +1007,14 @@ class Estimate(models.Model):
     # converted_to_sales_order = models.ForeignKey()
 
 
-# class EsimateItems(models.Model):
-#     item = models.ForeignKey(Items,on_delete=models.CASCADE)
+class EstimateItems(models.Model):
+    item = models.ForeignKey(Items,on_delete=models.CASCADE)
+    hsn = models.CharField(max_length=255)
+    quantity = models.IntegerField()
+    price = models.FloatField()
+    tax_rate = models.FloatField()
+    discount = models.FloatField()
+    total = models.FloatField()
+    estimate = models.ForeignKey(Estimate,on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails,on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)

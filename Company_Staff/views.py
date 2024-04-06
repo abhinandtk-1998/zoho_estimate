@@ -18777,7 +18777,33 @@ def sales_estimate_new_add(request):
                 est.adjustment = request.POST['adj']
                 est.grand_total = request.POST['grandtotal']
                 est.status = request.POST['Draft']
+
+
+    #................Adding item table .......................
+
+                item = request.POST.getlist('sl_no[]')
+                hsn = request.POST.getlist('hsn_code[]')
+                quantity = request.POST.getlist('qty[]')
+                price = request.POST.getlist('price[]')
+                tax_rate = request.POST.getlist('tax[]')
+                discount = request.POST.getlist('discount[]')
+                total = request.POST.getlist('total[]')
                 est.save()
+
+
+                if item != ['Select']:
+                    if len(item)==len(hsn)==len(quantity)==len(price)==len(tax_rate)==len(discount)==len(total):
+                        mapped2=zip(item,hsn,quantity,price,tax_rate,discount,total)
+                        mapped2=list(mapped2)
+                        print(mapped2)
+                        for ele in mapped2:
+                            created = EstimateItems.objects.get_or_create(item=ele[0],hsn=ele[1],quantity=ele[2],price=ele[3],
+                                    tax_rate=ele[4],discount=ele[5],total=ele[6],estimate=est,login_details=login_d,company=company)
+
+
+
+
+                
 
             return redirect('sales_estimate')
 
@@ -18799,7 +18825,11 @@ def sales_estimate_overview(request,pk):
         if login_d.user_type == 'Company':
             dash_details = CompanyDetails.objects.get(login_details=login_d)
             allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-            estimate = Estimate.objects.get(id=pk)
+            estimate_c = Estimate.objects.get(id=pk)
+            estimate = Estimate.objects.filter(company=dash_details)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
 
         
             context = {
@@ -18807,6 +18837,9 @@ def sales_estimate_overview(request,pk):
                 'allmodules':allmodules,
                 'login_d':login_d,
                 'estimate':estimate,
+                'estimate_c':estimate_c,
+                'company':company,
+                
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
@@ -18814,7 +18847,10 @@ def sales_estimate_overview(request,pk):
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-            estimate = Estimate.objects.get(id=pk)
+            estimate_c = Estimate.objects.get(id=pk)
+            estimate = Estimate.objects.filter(company=dash_details.company)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
 
         
             context = {
@@ -18822,6 +18858,8 @@ def sales_estimate_overview(request,pk):
                 'allmodules':allmodules,
                 'login_d':login_d,
                 'estimate':estimate,
+                'estimate_c':estimate_c,
+                'company':company,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)

@@ -270,7 +270,7 @@
                                 </td>
                                 <td style="width: 160px;">
                                     <div class="input-group">
-                                        <select id="nameSelect" class="form-select" aria-label="Select name" onchange="update_Item(this)">
+                                        <select id="nameSelect" name="item" class="form-select" aria-label="Select name" onchange="update_Item(this)">
                                             <option selected>Select a item</option>
                                             {% for item in items %}
                                             <option value="{{ item.id }}" data-hsn="{{item.hsn_code}}" data-price="{{item.selling_price}}"
