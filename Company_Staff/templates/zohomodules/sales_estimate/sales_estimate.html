@@ -61,14 +61,14 @@
                 </thead>
                 <tbody>
                   {% for est in estimate %}
-                  <tr class="border-bottom border-dark">
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{forloop.counter}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_date}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_number}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer.customer_display_name}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
+                  <tr class="border-bottom border-dark" onclick="window.location.href=`{% url 'sales_estimate_overview' est.id %}`">
+                    <td>{{forloop.counter}}</td>
+                    <td>{{est.estimate_date}}</td>
+                    <td>{{est.estimate_number}}</td>
+                    <td>{{est.customer.customer_display_name}}</td>
+                    <td>{{est.customer_email}}</td>
+                    <td>{{est.grand_total}}</td>
+                    <td>{{est.status}}</td>
                     <td></td>
                     <td></td>
                     </a>
@@ -87,6 +87,82 @@
 
           </div>
 </body>
+
+<script>
+  // Get the input field and table rows
+  var input = document.getElementById("searchInput");
+  var tableRows = document.querySelectorAll("#myTable tbody tr");
+
+  // Add event listener to the search input
+  input.addEventListener("input", function() {
+      var filter = input.value.toLowerCase();
+      // Loop through all table rows and hide those that don't match the search query
+      tableRows.forEach(function(row) {
+          var rowData = row.textContent.toLowerCase();
+          if (rowData.includes(filter)) {
+              row.style.display = "";
+          } else {
+              row.style.display = "none";
+          }
+      });
+  });
+
+
+
+
+  // Get the sort dropdown and table body
+  var sortDropdown = document.getElementById("dropdown-menu2");
+    var tableBody = document.querySelector("#myTable tbody");
+
+    // Add event listener to the sort dropdown
+    sortDropdown.addEventListener("click", function(event) {
+        var target = event.target;
+        if (target && target.tagName === "A") {
+            var sortOption = target.getAttribute("data-sort");
+            if (sortOption === "all") {
+                // Reload the page to reset the sorting
+                window.location.reload();
+            } else {
+                sortTable(sortOption);
+            }
+        }
+    });
+
+    // Function to sort the table based on the selected option
+    function sortTable(sortOption) {
+        var rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        // Remove the header row from the sorting process
+        var headerRow = rows.shift();
+
+        rows.sort(function(row1, row2) {
+            var value1 = row1.cells[getColumnIndex(sortOption)].textContent.trim();
+            var value2 = row2.cells[getColumnIndex(sortOption)].textContent.trim();
+            return value1.localeCompare(value2);
+        });
+
+        // Re-append the header row to the sorted rows array
+        rows.unshift(headerRow);
+
+        // Append sorted rows back to the table
+        tableBody.innerHTML = '';
+        rows.forEach(function(row) {
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Function to get the index of the column based on the sort option
+    function getColumnIndex(sortOption) {
+        switch (sortOption) {
+            case "name":
+                return 3; // Index of Customer Name column
+            case "est":
+                return 2; // Index of EST No column
+            default:
+                return -1; // Default value
+        }
+    }
+</script>
 
 
 

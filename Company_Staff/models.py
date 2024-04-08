@@ -1018,3 +1018,15 @@ class EstimateItems(models.Model):
     estimate = models.ForeignKey(Estimate,on_delete=models.CASCADE)
     login_details = models.ForeignKey(LoginDetails,on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
+
+class EstimateReference(models.Model):
+    reference_number = models.CharField(max_length=255)
+    company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails,on_delete=models.CASCADE)
+
+class EstimateHistory(models.Model):
+    company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails,on_delete=models.CASCADE)
+    estimate = models.ForeignKey(Estimate,on_delete=models.CASCADE)
+    date = models.DateField()
+    action = models.CharField(max_length=255)

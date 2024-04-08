@@ -18776,10 +18776,20 @@ def sales_estimate_new_add(request):
                 est.shipping_charge = request.POST['ship']
                 est.adjustment = request.POST['adj']
                 est.grand_total = request.POST['grandtotal']
-                est.status = request.POST['Draft']
+                est.save()
+
+                if 'Draft' in request.POST:
+                    est.status = "Draft"
+
+                elif "Save" in request.POST:
+                    est.status = "Saved"
+
+                est.save()
+
+    #..................save 
 
 
-    #................Adding item table .......................
+    #................Adding item table .............................................
 
                 item = request.POST.getlist('sl_no[]')
                 hsn = request.POST.getlist('hsn_code[]')
@@ -18788,7 +18798,7 @@ def sales_estimate_new_add(request):
                 tax_rate = request.POST.getlist('tax[]')
                 discount = request.POST.getlist('discount[]')
                 total = request.POST.getlist('total[]')
-                est.save()
+                
 
 
                 if item != ['Select']:

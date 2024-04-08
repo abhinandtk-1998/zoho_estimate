@@ -404,7 +404,7 @@
                         <table class="table text-white" id="sidetable">
                           <tbody>
                             {% for est in estimate %}
-                            <tr onclick="window.location.href=``" style="cursor: pointer;">
+                            <tr onclick="window.location.href=`{% url 'sales_estimate_overview' est.id %}`" style="cursor: pointer;">
                               <td>
                                 <span class="name"><b>{{ est.customer.title }} {{ est.customer.first_name }} {{ est.customer.last_name }}</b></span><br><br>
                                 <span class="invNo">{{ inv.rec_invoice_no }}</span>
