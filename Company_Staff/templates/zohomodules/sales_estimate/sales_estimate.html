@@ -2,6 +2,15 @@
 {% block content %}
 {% load static %}
 
+
+<!-- bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Include jQuery from a CDN -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
 <style>
   #searchInput {
       background-color: white;
@@ -33,13 +42,20 @@
                     </button>
                     <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu2" aria-labelledby="sortButton2">
                         <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="all">All</a></li>
-                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="month">Name</a></li>
-                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="year">EST No</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="name">Name</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="est_no">EST No</a></li>
                     </ul>
                 </div>
                 <div>
-                  <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2"><i class="fa fa-filter"></i></button>
-                  <button class="btn btn-outline-warning mr-2 text-yellow m-2"><i class="fa fa-file-export"></i>Export</button>
+                  <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="filterButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-filter"></i>
+                  </button>
+                  <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu3" aria-labelledby="filterButton">
+                    <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="all">All</a></li>
+                    <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Saved">Saved</a></li>
+                    <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Draft">Draft</a></li>
+                  </ul>
+                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" onclick="exportToExcel()"><i class="fa fa-file-export"></i>Export</button>
                   <button class="btn btn-outline-warning mr-2 text-yellow m-2"><i class="fa fa-file-import"></i> Import </button>
                   <a href="{% url 'sales_estimate_new' %}" class="btn btn-outline-warning text-yellow m-2"><i class="fa fa-plus text-yellow"></i>New</a>
                 </div>
@@ -89,79 +105,172 @@
 </body>
 
 <script>
-  // Get the input field and table rows
-  var input = document.getElementById("searchInput");
-  var tableRows = document.querySelectorAll("#myTable tbody tr");
+  document.addEventListener('DOMContentLoaded', function () {
+    // Get the input field and table rows
+    var input = document.getElementById("searchInput");
+    var tableRows = document.querySelectorAll("#myTable tbody tr");
 
-  // Add event listener to the search input
-  input.addEventListener("input", function() {
-      var filter = input.value.toLowerCase();
-      // Loop through all table rows and hide those that don't match the search query
-      tableRows.forEach(function(row) {
-          var rowData = row.textContent.toLowerCase();
-          if (rowData.includes(filter)) {
-              row.style.display = "";
-          } else {
-              row.style.display = "none";
-          }
-      });
-  });
-
-
-
-
-  // Get the sort dropdown and table body
-  var sortDropdown = document.getElementById("dropdown-menu2");
-    var tableBody = document.querySelector("#myTable tbody");
-
-    // Add event listener to the sort dropdown
-    sortDropdown.addEventListener("click", function(event) {
-        var target = event.target;
-        if (target && target.tagName === "A") {
-            var sortOption = target.getAttribute("data-sort");
-            if (sortOption === "all") {
-                // Reload the page to reset the sorting
-                window.location.reload();
+    // Add event listener to the search input
+    input.addEventListener("input", function() {
+        var filter = input.value.toLowerCase();
+        // Loop through all table rows and hide those that don't match the search query
+        tableRows.forEach(function(row) {
+            var rowData = row.textContent.toLowerCase();
+            if (rowData.includes(filter)) {
+                row.style.display = "";
             } else {
-                sortTable(sortOption);
+                row.style.display = "none";
             }
+        });
+    });
+
+    // Sorting part
+    var sortButton = document.getElementById('sortButton2');
+    var sortDropdown = document.querySelector('dropdown-menu2'); // Corrected selector
+    var estimateTable = document.getElementById('myTable').getElementsByTagName('tbody')[0];
+    var rows = estimateTable.getElementsByTagName('tr');
+
+    sortButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        sortDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!sortButton.contains(event.target)) {
+            sortDropdown.classList.remove('show');
         }
     });
 
-    // Function to sort the table based on the selected option
-    function sortTable(sortOption) {
-        var rows = Array.from(tableBody.querySelectorAll("tr"));
-
-        // Remove the header row from the sorting process
-        var headerRow = rows.shift();
-
-        rows.sort(function(row1, row2) {
-            var value1 = row1.cells[getColumnIndex(sortOption)].textContent.trim();
-            var value2 = row2.cells[getColumnIndex(sortOption)].textContent.trim();
-            return value1.localeCompare(value2);
+    var dropdownItems = document.querySelectorAll('#dropdown-itemsort');
+    dropdownItems.forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            var sortValue = item.getAttribute('data-sort');
+            sortTable(sortValue);
+            sortDropdown.classList.remove('show');
         });
+    });
 
-        // Re-append the header row to the sorted rows array
-        rows.unshift(headerRow);
-
-        // Append sorted rows back to the table
-        tableBody.innerHTML = '';
-        rows.forEach(function(row) {
-            tableBody.appendChild(row);
-        });
-    }
-
-    // Function to get the index of the column based on the sort option
-    function getColumnIndex(sortOption) {
-        switch (sortOption) {
-            case "name":
-                return 3; // Index of Customer Name column
-            case "est":
-                return 2; // Index of EST No column
-            default:
-                return -1; // Default value
+    function sortTable(sortValue) {
+        if (sortValue === 'name') {
+            sortTableByColumn(3)
+        } else if (sortValue === 'est_no') {
+            sortTableByColumn(2); // Assuming year is in the third column (index 2)
+        } else if (sortValue === 'all') {
+            sortTableByColumn(0); // Sorting by the first column (Sl no.)
+        } else {
+            resetTable();
         }
     }
+
+    function sortTableByColumn(columnIndex) {
+        var rowsArray = Array.prototype.slice.call(rows);
+        rowsArray.sort(function (a, b) {
+            var valueA = a.cells[columnIndex].textContent.trim();
+            var valueB = b.cells[columnIndex].textContent.trim();
+
+            // If sorting by Estimate Number, convert values to numbers
+            if (columnIndex === 2) {
+                return parseInt(valueA) - parseInt(valueB);
+            }
+
+            return valueA.localeCompare(valueB);
+        });
+        reAppendRows(rowsArray);
+    }
+
+    function resetTable() {
+        for (var i = 0; i < rows.length; i++) {
+            estimateTable.appendChild(rows[i]);
+        }
+    }
+
+    function reAppendRows(sortedRows) {
+        for (var i = 0; i < sortedRows.length; i++) {
+            estimateTable.appendChild(sortedRows[i]);
+        }
+    }
+
+    // Filtering part
+    var filterButton = document.getElementById('filterButton');
+    var filterDropdown = document.getElementById('#dropdown-menu3');
+    var rows = estimateTable.getElementsByTagName('tr');
+
+    filterButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        filterDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!filterButton.contains(event.target)) {
+            filterDropdown.classList.remove('show');
+        }
+    });
+
+    var dropdownItemsFilter = document.querySelectorAll('#dropdown-itemfilter');
+    dropdownItemsFilter.forEach(function (item) {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
+            var filterValue = item.getAttribute('data-filter');
+            filterTable(filterValue);
+            filterDropdown.classList.remove('show');
+        });
+    });
+
+    function filterTable(filterValue) {
+    for (var i = 0; i < rows.length; i++) {
+        var statusCell = rows[i].querySelector('td:nth-child(7)'); // Assuming status is in the 7th column (index 6)
+        var status = statusCell.textContent.trim();
+
+        if (filterValue === 'all') {
+            rows[i].style.display = ''; // Show all rows if 'all' is selected
+        } else if (status === filterValue) {
+            rows[i].style.display = ''; // Show row if status matches filter value
+        } else {
+            rows[i].style.display = 'none'; // Hide row if status doesn't match filter value
+        }
+    }
+}
+});
+
+
+
+
+
+function exportToExcel() {
+    var table = document.getElementById("myTable");
+    var rows = table.rows;
+
+    var csv = [];
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cells = rows[i].cells;
+        for (var j = 0; j < cells.length - 1; j++) { // Exclude the last column
+            var cellValue = cells[j].textContent.trim();
+            if (j === 1) { // Assuming the second column contains dates
+                // Enclose date values within double quotes to handle commas
+                cellValue = '"' + cellValue + '"';
+            }
+            row.push(cellValue);
+        }
+        csv.push(row.join(','));
+    }
+    var csvString = csv.join('\n');
+
+    var blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "table_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+
+
+
+
+
 </script>
 
 

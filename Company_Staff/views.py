@@ -18357,6 +18357,16 @@ def sales_estimate_new(request):
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
             accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+            if Estimate.objects.all().exists():
+                est_last = Estimate.objects.last()
+                estimate_no = est_last.estimate_number 
+                est_no = int(estimate_no) + 1
+
+            else:
+                est_no  = False
+
+            Reference_no = EstimateReference.objects.last()
+            ref_no = int(Reference_no.reference_number) + 1
 
 
 
@@ -18371,6 +18381,8 @@ def sales_estimate_new(request):
                 'items':items,
                 'units':units,
                 'accounts':accounts,
+                'est_no':est_no,
+                'ref_no':ref_no,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -18386,6 +18398,21 @@ def sales_estimate_new(request):
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
             accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
+            if Estimate.objects.all().exists():
+                est_last = Estimate.objects.last()
+                estimate_no = est_last.estimate_number 
+                est_no = estimate_no + 1
+
+            else:
+                est_no  = False
+
+            if EstimateReference.objects.all().exists():
+                Reference_no = EstimateReference.objects.last()
+                ref_no =int(Reference_no.reference_number) + 1
+
+
+
+
 
 
             context = {
@@ -18398,6 +18425,8 @@ def sales_estimate_new(request):
                 'items':items,
                 'units':units,
                 'accounts':accounts,
+                'est_no':est_no,
+                'ref_no':ref_no,
 
             }
 
@@ -18786,12 +18815,30 @@ def sales_estimate_new_add(request):
 
                 est.save()
 
-    #..................save 
+    #..................save reference number.............................
+
+                reference = EstimateReference()
+                reference.reference_number = request.POST['reference_no']
+                reference.company = company
+                reference.login_details = login_d
+
+                reference.save()
+
+    #..................save estimate history............................
+
+                history = EstimateHistory()
+                history.company = company
+                history.login_details = login_d
+                history.estimate = est
+                history.date = datetime.today().date()
+                history.action = "Created"
+
+                history.save() 
 
 
     #................Adding item table .............................................
 
-                item = request.POST.getlist('sl_no[]')
+                item = request.POST.getlist('item[]')
                 hsn = request.POST.getlist('hsn_code[]')
                 quantity = request.POST.getlist('qty[]')
                 price = request.POST.getlist('price[]')
@@ -18807,8 +18854,12 @@ def sales_estimate_new_add(request):
                         mapped2=list(mapped2)
                         print(mapped2)
                         for ele in mapped2:
-                            created = EstimateItems.objects.get_or_create(item=ele[0],hsn=ele[1],quantity=ele[2],price=ele[3],
+                            created = EstimateItems(item=ele[0],hsn=ele[1],quantity=ele[2],price=ele[3],
                                     tax_rate=ele[4],discount=ele[5],total=ele[6],estimate=est,login_details=login_d,company=company)
+                            
+                            created.save()
+                            
+                        
 
 
 
