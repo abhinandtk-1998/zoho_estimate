@@ -18357,16 +18357,35 @@ def sales_estimate_new(request):
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
             accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+
+            numbers = ['1','2','3','4','5','6','7','8','9']
             if Estimate.objects.all().exists():
                 est_last = Estimate.objects.last()
                 estimate_no = est_last.estimate_number 
-                est_no = int(estimate_no) + 1
+
+                i = 0
+                for c in estimate_no:
+                    if c in numbers:
+                        break
+                    i = i + 1
+                
+                est_char = estimate_no[:i+1]
+                est_num = estimate_no[i+1:]
+
+                int_est_num = int(est_num)
+
+                est_no = est_char + str(int_est_num + 1)
+                print(est_no)
 
             else:
                 est_no  = False
 
-            Reference_no = EstimateReference.objects.last()
-            ref_no = int(Reference_no.reference_number) + 1
+            if EstimateReference.objects.all().exists():
+                Reference_no = EstimateReference.objects.last()
+                ref_no =int(Reference_no.reference_number) + 1
+
+            else:
+                ref_no = False
 
 
 
@@ -18398,10 +18417,25 @@ def sales_estimate_new(request):
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
             accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
+
+            numbers = ['1','2','3','4','5','6','7','8','9']
             if Estimate.objects.all().exists():
                 est_last = Estimate.objects.last()
                 estimate_no = est_last.estimate_number 
-                est_no = estimate_no + 1
+
+                i = 0
+                for c in estimate_no:
+                    if c in numbers:
+                        break
+                    i = i + 1
+                
+                est_char = estimate_no[:i+1]
+                est_num = estimate_no[i+1:]
+
+                int_est_num = int(est_num)
+
+                est_no = est_char + str(int_est_num + 1)
+                print(est_no)
 
             else:
                 est_no  = False
@@ -18409,6 +18443,9 @@ def sales_estimate_new(request):
             if EstimateReference.objects.all().exists():
                 Reference_no = EstimateReference.objects.last()
                 ref_no =int(Reference_no.reference_number) + 1
+
+            else:
+                ref_no = False
 
 
 
@@ -18805,7 +18842,6 @@ def sales_estimate_new_add(request):
                 est.shipping_charge = request.POST['ship']
                 est.adjustment = request.POST['adj']
                 est.grand_total = request.POST['grandtotal']
-                est.save()
 
                 if 'Draft' in request.POST:
                     est.status = "Draft"
@@ -18814,6 +18850,7 @@ def sales_estimate_new_add(request):
                     est.status = "Saved"
 
                 est.save()
+
 
     #..................save reference number.............................
 
@@ -18889,6 +18926,67 @@ def sales_estimate_overview(request,pk):
             estimate_c = Estimate.objects.get(id=pk)
             estimate = Estimate.objects.filter(company=dash_details)
             company = CompanyDetails.objects.get(login_details=login_d)
+            comments = EstimateComment.objects.filter(estimate=estimate_c)
+            history = EstimateHistory.objects.filter(estimate=estimate_c)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'estimate_c':estimate_c,
+                'company':company,
+                'comments':comments,
+                'history':history,
+                
+
+            }
+            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            estimate_c = Estimate.objects.get(id=pk)
+            estimate = Estimate.objects.filter(company=dash_details.company)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            comments = EstimateComment.objects.filter(estimate=estimate_c)
+            history = EstimateHistory.objects.filter(estimate=estimate_c)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'estimate_c':estimate_c,
+                'company':company,
+                'comments':comments,
+                'history':history,
+
+            }
+            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+
+
+    else:
+        return('/')
+
+
+def sales_estimate_edit(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            estimate_c = Estimate.objects.get(id=pk)
+            estimate = Estimate.objects.filter(company=dash_details)
+            company = CompanyDetails.objects.get(login_details=login_d)
             # est_items = EstimateItems.objects.get(estimate=estimate_c)
 
 
@@ -18903,7 +19001,7 @@ def sales_estimate_overview(request,pk):
                 
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+            return render(request,'zohomodules/sales_estimate/sales_estimate_edit.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -18923,7 +19021,48 @@ def sales_estimate_overview(request,pk):
                 'company':company,
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+            return render(request,'zohomodules/sales_estimate/sales_estimate_edit.html', context)
+
+
+    else:
+        return('/')
+
+
+def sales_estimate_comment(request,pk):
+
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+
+            comment=request.POST['comment']
+
+            estimate = Estimate.objects.get(id=pk)
+
+            c1 = EstimateComment(estimate=estimate,comment=comment,company=company,login_details=login_d)
+            c1.save()
+
+
+
+            return redirect(reverse('sales_estimate_overview', args=[pk]))
+
+        if login_d.user_type == 'Staff':
+            estimate_c = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+
+            comment=request.POST['comment']
+
+            estimate = Estimate.objects.get(id=pk)
+
+            c1 = EstimateComment(estimate=estimate,comment=comment,company=company,login_details=login_d)
+            c1.save()
+
+    
+            return redirect(reverse('sales_estimate_overview', args=[pk]))
 
 
     else:
@@ -18932,4 +19071,39 @@ def sales_estimate_overview(request,pk):
 
 
 
-  
+def sales_estimate_comment_delete(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        comment = EstimateComment.objects.get(id=pk)
+        c1 = comment.estimate.id
+        print(c1)
+        comment.delete()
+
+        return redirect(reverse('sales_estimate_overview', args=[c1]))
+
+    else:
+        return('/')
+
+
+
+def sales_estimate_delete(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        est = Estimate.objects.get(id=pk)
+        est.delete()
+
+        est_first = Estimate.objects.get
+
+        return redirect(reverse('sales_estimate_overview', args=[c1]))
+
+    else:
+        return('/')
+
+
+

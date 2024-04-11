@@ -1030,3 +1030,11 @@ class EstimateHistory(models.Model):
     estimate = models.ForeignKey(Estimate,on_delete=models.CASCADE)
     date = models.DateField()
     action = models.CharField(max_length=255)
+
+class EstimateComment(models.Model):
+    estimate = models.ForeignKey(Estimate,on_delete=models.CASCADE)
+    comment = models.CharField(max_length=255, null=True, blank=True)
+    company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
+    login_details = models.ForeignKey(LoginDetails,on_delete=models.CASCADE)
+    
+    

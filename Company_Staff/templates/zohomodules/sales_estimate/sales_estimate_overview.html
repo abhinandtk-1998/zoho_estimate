@@ -393,7 +393,7 @@
                       <a class="dropdown-item text-black" onclick="filterTable('Saved')">Saved</a>
                       <a class="dropdown-item text-black" onclick="filterTable('Draft')">Draft</a>
                     </div>
-                    <a class="btn btn-outline-warning small_btn mt-4" role="button" href="">
+                    <a class="btn btn-outline-warning small_btn mt-4" role="button" href="{% url 'sales_estimate_new' %}">
                       <i class="fa fa-plus"></i>
                     </a>
                   </div>
@@ -454,35 +454,35 @@
                       </div>
                       <div class="col-md-6">
                         <div class="d-sm-flex" style="float: right;">
-                          {% if invoice.status == 'Draft' %}
-                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" onclick="return confirm('Do you want to convert this Draft to Saved ?')" title="CONVERT" id="convert_btn" href="{% url 'convertRecurringInvoice' invoice.id %}">
+                          {% if estimate_c.status == 'Draft' %}
+                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" onclick="return confirm('Do you want to convert this Draft to Saved ?')" title="CONVERT" id="convert_btn" href="">
                             <i class="fa fa-exchange"></i>
                           </a>
                           {% endif %}
-                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="EDIT" id="edit_btn" href="">
+                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" title="EDIT" id="edit_btn" href="{% url 'sales_estimate_edit' estimate_c.id %}">
                             <i class="fa fa-pencil"></i>
                           </a>
-                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" href="" onclick="return confirm('Are you sure you want to delete this Recurring Invoice - {{invoice.rec_invoice_no}} ?')" title="DELETE" id="delete_btn">
+                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" href="{% url 'sales_estimate_delete' estimate_c.id %}" onclick="return confirm('Are you sure you want to delete this Estimate - {{estimate_c.estimate_number}} ?')" title="DELETE" id="delete_btn">
                             <i class="fa fa-trash"></i>
                           </a>
                           <a class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" title="SHARE" id="share_btn" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-share"></i>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="share_btn">
+                          </a>
+                          <div class="dropdown-menu" aria-labelledby="share_btn">
                             <li class="text-black">{% post_to_whatsapp object_or_url "WhatsApp" %}</li>
                             <!-- <a class="dropdown-item text-black">{% post_to_whatsapp object_or_url "WhatsApp" %}</a> -->
                             <a class="dropdown-item text-black" data-toggle="modal" data-target="#shareToEmail">Email</a>
-                        </div>
+                          </div>
                         
-                        <a class="btn btn-outline-warning small_btn mt-2 ms-1" id="attach_btn" data-bs-toggle="dropdown" aria-expanded="false">
+                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" id="attach_btn" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-paperclip"></i>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="attach_btn">
+                          </a>
+                          <div class="dropdown-menu" aria-labelledby="attach_btn">
                             <a class="dropdown-item text-black" data-toggle="modal" data-target="#bnk_files">Add Document</a>
                             {% if invoice.document != "" %} 
                             <a class="dropdown-item text-black" download href="{{invoice.document.url}}">Download Document</a>
                             {% endif %}
-                        </div>
+                          </div>
                         
                           <a href="" class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" title="PDF" id="pdf_btn"> 
                             <i class="fa fa-file-pdf"></i>
@@ -1444,7 +1444,7 @@
           </button>
         </div>
         <div class="modal-body mx-3" style="background-color: #000;">
-          <form action="" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+          <form action="{% url 'sales_estimate_comment' estimate_c.id %}" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
             {%csrf_token%}
             <div class="row mt-2">
               <div class="col-12">
@@ -1465,8 +1465,8 @@
                               {% for c in comments %}
                               <tr class="">
                                   <td class="text-center">{{forloop.counter }}</td>
-                                  <td class="text-center">{{c.comments}}</td>
-                                  <td class="text-center"><a class="text-danger" href="{% url 'deleteRecurringInvoiceComment' c.id %}" onclick="return confirm('Are you sure you want to delete.?')"><i class="fa fa-trash" style="font-size: 1.1rem;"></i></a></td>
+                                  <td class="text-center">{{c.comment}}</td>
+                                  <td class="text-center"><a class="text-danger" href="{% url 'sales_estimate_comment_delete' c.id %}" onclick="return confirm('Are you sure you want to delete.?')"><i class="fa fa-trash" style="font-size: 1.1rem;"></i></a></td>
                               </tr>
                               {% endfor %}
                           </tbody>
