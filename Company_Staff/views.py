@@ -18984,9 +18984,9 @@ def sales_estimate_edit(request,pk):
         if login_d.user_type == 'Company':
             dash_details = CompanyDetails.objects.get(login_details=login_d)
             allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-            estimate_c = Estimate.objects.get(id=pk)
-            estimate = Estimate.objects.filter(company=dash_details)
+            estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
             # est_items = EstimateItems.objects.get(estimate=estimate_c)
 
 
@@ -18996,8 +18996,8 @@ def sales_estimate_edit(request,pk):
                 'allmodules':allmodules,
                 'login_d':login_d,
                 'estimate':estimate,
-                'estimate_c':estimate_c,
                 'company':company,
+                'customer':customer_details,
                 
 
             }
@@ -19006,9 +19006,9 @@ def sales_estimate_edit(request,pk):
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-            estimate_c = Estimate.objects.get(id=pk)
-            estimate = Estimate.objects.filter(company=dash_details.company)
+            estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
             # est_items = EstimateItems.objects.get(estimate=estimate_c)
 
         
@@ -19017,8 +19017,8 @@ def sales_estimate_edit(request,pk):
                 'allmodules':allmodules,
                 'login_d':login_d,
                 'estimate':estimate,
-                'estimate_c':estimate_c,
                 'company':company,
+                'customer':customer_details,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_edit.html', context)
@@ -19098,12 +19098,29 @@ def sales_estimate_delete(request,pk):
         est = Estimate.objects.get(id=pk)
         est.delete()
 
-        est_first = Estimate.objects.get
+        est_first = Estimate.objects.first()
 
-        return redirect(reverse('sales_estimate_overview', args=[c1]))
+        return redirect(reverse('sales_estimate_overview', args=[est_first.id]))
 
     else:
         return('/')
+
+def sales_estimate_convert_saved(request,pk):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        estimate = Estimate.objects.get(id=pk)
+        estimate.status = "Saved"
+        estimate.save()
+
+
+        return redirect(reverse('sales_estimate_overview', args=[pk]))
+
+    else:
+        return('/')
+
+
 
 
 

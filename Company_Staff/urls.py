@@ -462,6 +462,7 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/Overview/Comment/<int:pk>',views.sales_estimate_comment,name='sales_estimate_comment'),
     path('Zohomodule/Sales/Estimate/Overview/Comment_delete/<int:pk>',views.sales_estimate_comment_delete,name='sales_estimate_comment_delete'),
     path('Zohomodule/Sales/Estimate/Overview/Delete/<int:pk>',views.sales_estimate_delete,name='sales_estimate_delete'),
+    path('Zohomodule/Sales/Estimate/Overview/Convert/<int:pk>',views.sales_estimate_convert_saved,name='sales_estimate_convert_saved'),
 
 
 

@@ -455,7 +455,7 @@
                       <div class="col-md-6">
                         <div class="d-sm-flex" style="float: right;">
                           {% if estimate_c.status == 'Draft' %}
-                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" onclick="return confirm('Do you want to convert this Draft to Saved ?')" title="CONVERT" id="convert_btn" href="">
+                          <a class="btn btn-outline-warning small_btn mt-2 ms-1" onclick="return confirm('Do you want to convert this Draft to Saved ?')" title="CONVERT" id="convert_btn" href="{% url 'sales_estimate_convert_saved' estimate_c.id %}">
                             <i class="fa fa-exchange"></i>
                           </a>
                           {% endif %}
