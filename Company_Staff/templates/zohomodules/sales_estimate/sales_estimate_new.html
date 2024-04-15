@@ -116,16 +116,45 @@
                 </script>
 
                 <div class="form-group row mt-4">
+                    <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
+                        <label for="" class="labels">Customer</label>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-7">
+                    
+                        <input type="hidden" name="customerId" id="customerId" value="">
+                        <div class="d-flex">
+                            <div class="w-100">
+                                <div class="p-0 border-0 bg-none position-relative drop-box">
+                                    <input required type="text" id="customer" value="" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
+                                    <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
+                                        <li class="dropdown-item customers-options text-white" onclick="get_customer_details('','')">Select Customer</li>
+                                        {% for cust in customer %}
+                                        <li class="dropdown-item customers-options text-white" onclick="get_customer_details(`{{cust.id}}`,this.innerHTML)">{{ cust.title }} {{ cust.first_name }} {{ cust.last_name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    
+                                </div>
+                            </div>
+                            <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-outline-warning py-2 ms-1"><i class="fa fa-plus text-yellow"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+
+
+                <div class="form-group row mt-4">
                   <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
                     <label>Name</label>
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-7">
                      
                     <div class="input-group">
-                        <select id="nameSelect" name="customer" class="form-select js-example-basic-single" aria-label="Select name" onchange="updateFields(this)">
+                        <select id="nameSelect" name="customer" class="form-select js-example-basic-single" aria-label="Select name" onkeyup="filterCustomers()">
                             <option selected>Select a customer</option>
                             {% for c in customer %}
-                            <option value="{{ c.id }}" data-email="{{ c.customer_email }}" data-address="{{ c.address }}" 
+                            <option onchange="updateFields(this)" value="{{ c.id }}" data-email="{{ c.customer_email }}" data-address="{{ c.address }}" 
                             data-gst-treatment="{{c.GST_treatement}}" data-gst-number="{{c.GST_number}}" data-place-of-supply="{{c.place_of_supply}}">{{ c.first_name }} {{ c.last_name }}</option>
                             {% endfor %}
                         </select>
@@ -337,8 +366,8 @@
                                 <tr id='tab_row1'>
                                 <td>1</td>
                                 <td style="width: 160px;">
-                                    <div class="input-group">
-                                        <select id="nameSelect" name="item" class="form-select" aria-label="Select name" onchange="update_Item(this)">
+                                    <div class="input-group" >
+                                        <select id="nameSelect1" name="item[]"  class="form-select" aria-label="Select name" onchange="update_Item(this)">
                                             <option value="Select">Select</option>
                                             {% for item in items %}
                                             <option value="{{ item.id }}" data-hsn="{{item.hsn_code}}" data-price="{{item.selling_price}}"
@@ -351,23 +380,40 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" name="hsn_code" required>
+                                    <input type="text" id="hsn1" class="form-control" name="hsn_code[]" style="width: 70px;"  required>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" name="qty" value="0" required>
+                                    <input type="number" id="qty1" class="form-control" name="qty[]" value="0" onchange="calc()" required>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" name="price" required>
+                                    <input type="number" id="price1" class="form-control" name="price[]" style="width: 70px;" required>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" name="tax" required>
-                                    {% if}
+                                    <select name='taxGST[]' style="width: 70px;" id="taxGST1"   class="form-control tax_ref tax_ref_gst" style="display: block; text-align: center;color: white; background-color:rgb(45, 44, 44);" onchange="taxchange(this.id)">
+                                        <option selected disabled hidden>Select GST</option>
+                                        <option value=28 >28.0% GST</option>
+                                        <option value=18 >18.0% GST</option>
+                                        <option value=12 >12.0% GST</option>
+                                        <option value=5 >05.0% GST</option>
+                                        <option value=3 >03.0% GST</option>
+                                        <option value=0 >0.0% GST</option>
+                                    </select>
+                                    <select name='taxIGST[]' id="taxIGST1"   class="form-control tax_ref tax_ref_igst" style="display: none; text-align: center;color: white;background-color:rgb(45, 44, 44);" onchange="taxchange(this.id)">
+                                        <option selected disabled hidden >Select IGST</option>
+                                        <option value=28 >28.0% IGST</option>
+                                        <option value=18 >18.0% IGST</option>
+                                        <option value=12 >12.0% IGST</option>
+                                        <option value=5 >05.0% IGST</option>
+                                        <option value=3 >03.0% IGST</option>
+                                        <option value=0 >0.0% IGST</option>
+                                    </select>
+                                    <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax1" style="display: none;"> Invalid Tax %</span> </div>    
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" name="discount" required>
+                                    <input type="number" id="discount1" class="form-control" name="discount[]" value="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" name="total" required>
+                                    <input type="number" id="total1" class="form-control" name="total[]" style="width: 70px;" required>
                                 </td>
                                 <td>
                                     <button id="1" type="button" class="btn btn-danger remove_row">Delete</button>
@@ -2561,22 +2607,76 @@ $('#mphone').on('input', function() {
     <script>
 
 
-      // search name
-      function filterNames(select) {
-          var input, filter, options, option, i, txtValue;
-          input = select.value.toUpperCase();
-          options = select.getElementsByTagName("option");
-          
-          for (i = 0; i < options.length; i++) {
-              option = options[i];
-              txtValue = option.textContent || option.innerText;
-              if (txtValue.toUpperCase().indexOf(input) > -1 || input === "SELECT A NAME") {
-                  option.style.display = "";
-              } else {
-                  option.style.display = "none";
-              }
-          }
-      }
+        function filterCustomers(){
+            var options = $('#cust_drop').children();
+            var search_text = $("#customer").val().toLowerCase();
+            options.each(function(){
+                if($(this).text().toLowerCase().includes(search_text)){
+                    $(this).show()
+                }else{
+                    $(this).hide()
+                }
+            })
+        }
+
+
+
+        function get_customer_details(custId, name){
+            $('#customer').val(name)
+            console.log('name',name);
+            if($('#customer').val() != ""){
+                $('#custErr').text('');
+                $.ajax({
+                    type : 'POST',
+                    url: "{% url 'get_customer_detailsAjax' %}",
+                    data: {
+                        id: custId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    
+                    success: function(data){
+                        console.log('AJAX-Response-->',data);
+                        document.getElementById('customerId').value = data.id;
+                        document.getElementById('customerEmail').value = data.email;
+                        document.getElementById('placeOfSupply').value = data.shipState;
+                        document.getElementById('customerGstType').value = data.gstType;
+                        if(data.street == "" && data.city == "" && data.state == ""){
+                            $("#billAddressSection").hide();
+                        }else{
+                            $('#billAddressSection').show();
+                            document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
+                        }
+                        if(data.gstin){
+                            document.getElementById('customerGstInDisplay').style.display = 'flex';
+                            document.getElementById('customerGSTIN').value = data.gstNo;
+                        }else{
+                            document.getElementById('customerGstInDisplay').style.display = 'none';
+                            document.getElementById('customerGSTIN').value = '';
+                        }
+                        $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+                        refreshTax();
+                        checkPriceList();
+                    }
+                });
+            }else{
+                document.getElementById('customerEmail').value = "";
+                document.getElementById('placeOfSupply').value = "";
+                document.getElementById('customerGstType').value = "";
+                document.getElementById('billAddress').value ="";
+                document.getElementById('customerGSTIN').value = "";
+                $('#custErr').text('Select a customer..');
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
 
       function updateFields(select) {
@@ -2924,63 +3024,96 @@ reloadItems();
 
 
 
-function getItemDetails(inpId, value){
-    var itm = value;
-    var exists = false;
-    var plc = $('#placeOfSupply').val();
-    var PLId = $('#customerPriceListId').val();
-    console.log('clicked',value);
+// function getItemDetails(inpId, value){
+//     var itm = value;
+//     var exists = false;
+//     var plc = $('#placeOfSupply').val();
+//     var PLId = $('#customerPriceListId').val();
+//     console.log('clicked',value);
 
-    $('#items-table-body tr').each(function () {
-        var html = $(this).html();
-        if (html != '') {
-            var itemName = $(this).find('.item-display').val();
-            console.log(itm,itemName);
-            if(itemName == itm){
-                exists = true;
-                console.log('exists',exists);
-            }
-        }
-    });
-    console.log('status',exists);
+//     $('#items-table-body tr').each(function () {
+//         var html = $(this).html();
+//         if (html != '') {
+//             var itemName = $(this).find('.item-display').val();
+//             console.log(itm,itemName);
+//             if(itemName == itm){
+//                 exists = true;
+//                 console.log('exists',exists);
+//             }
+//         }
+//     });
+//     console.log('status',exists);
 
-    if(!exists){
-        if(plc != ""){
-            var n = inpId.slice(4);
-            $.ajax({
-            url: "{% url 'getInvItemDetails' %}",
-            type : 'GET',
-            data:{
-                item : value,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
+//     if(!exists){
+//         if(plc != ""){
+//             var n = 
+//             inpId.slice(4);
+//             $.ajax({
+//             url: "{% url 'getInvItemDetails' %}",
+//             type : 'GET',
+//             data:{
+//                 item : value,
+//                 csrfmiddlewaretoken: '{{ csrf_token }}'
+//                 },
             
-            success: function(response) {
-                if (response.status){
-                    $('#'+inpId).val(value);
-                    document.getElementById('itemId'+n).value = response.id;
-                    document.getElementById('hsn'+n).value = response.hsn;
-                    document.getElementById('qtyspan'+n).innerHTML = response.avl;
-                    document.getElementById('avl'+n).innerHTML = response.avl;
-                    document.getElementById('price'+n).value = response.sales_rate;
-                    document.getElementById('priceListPrice'+n).value = response.PLPrice;
-                    document.getElementById('taxGST'+n).value = response.gst;
-                    document.getElementById('taxIGST'+n).value = response.igst;
+//             success: function(response) {
+//                 if (response.status){
+//                     $('#'+inpId).val(value);
+//                     document.getElementById('itemId'+n).value = response.id;
+//                     document.getElementById('hsn'+n).value = response.hsn;
+//                     document.getElementById('price'+n).innerHTML = response.sales_rate;
+//                     document.getElementById('tax'+n).value = response.sales_rate;
+//                     document.getElementById('discount'+n).value = response.PLPrice;
+//                     document.getElementById('total'+n).value = response.gst;
+//                     document.getElementById('taxIGST'+n).value = response.igst;
                     
 
-                    refreshTax();
-                    calc();
-                }
-            },
-            });
-        }else{
-            alert('Select Place of Supply.!')
-        }
-    }else{
-        alert('Item already exists in the INVOICE, choose another or change quantity.!')
-    }
+//                     refreshTax();
+//                     calc();
+//                 }
+//             },
+//             });
+//         }else{
+//             alert('Select Place of Supply.!')
+//         }
+//     }else{
+//         alert('Item already exists in the INVOICE, choose another or change quantity.!')
+//     }
 
+// }
+
+function calc() {
+    // Retrieve values from input fields and convert them to numbers
+    var price = parseFloat(document.getElementById('price').value);
+    var qty = parseInt(document.getElementById('qty').value);
+    var discount = parseFloat(document.getElementById('discount').value);
+
+    // Calculate the total
+    var tot = (price * qty) - discount;
+
+    // Set the total in the appropriate input field
+    document.getElementById('total').value = tot.toFixed(2);
+    calc_total()
 }
+
+function calc_total() { 
+      total = 0;
+      $('.total').each(function () {
+          total += parseFloat($(this).val());
+      });
+      taxamount = 0;
+      $('#sub_total').val(total.toFixed(2));
+      var ship = parseFloat($("#ship").val());
+      var adj_val = parseFloat($('#adj').val())
+      var gtot = taxamount + total + ship + adj_val;
+
+      $('#grandtotal').val(gtot.toFixed(2));
+      
+      var adv_val = parseFloat($('#advance').val())
+      var bal = gtot - adv_val
+      $('#balance').val(bal.toFixed(2));
+      splitTax();
+    }
 
 
 

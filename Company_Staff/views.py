@@ -18292,6 +18292,27 @@ def get_loanaddition_data(request):                                             
                 last_name=option.login_details.last_name
                 options[option.id] = [date,action,first_name,last_name,f"{date}"]
             return JsonResponse(options)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
 
@@ -18471,6 +18492,32 @@ def sales_estimate_new(request):
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
     else:
         return redirect('/')
+
+
+
+
+def get_customer_detailsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        custId = request.POST['id']
+        cust = Customer.objects.get(id = custId)
+
+        if cust:
+            context = {
+                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None or cust.GST_number == 'null' else True, 'gstNo':cust.GST_number,
+                'street':cust.billing_address, 'city':cust.billing_city, 'state':cust.billing_state, 'country':cust.billing_country, 'pincode':cust.billing_pincode
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
 
 
 
