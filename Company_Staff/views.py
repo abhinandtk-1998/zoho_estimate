@@ -18423,6 +18423,7 @@ def sales_estimate_new(request):
                 'accounts':accounts,
                 'est_no':est_no,
                 'ref_no':ref_no,
+                'cmp':comp_details,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
@@ -18485,6 +18486,7 @@ def sales_estimate_new(request):
                 'accounts':accounts,
                 'est_no':est_no,
                 'ref_no':ref_no,
+                'cmp':comp_details,
 
             }
 
@@ -18516,6 +18518,77 @@ def get_customer_detailsAjax(request):
             return JsonResponse(context)
         else:
             return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
+
+
+
+def get_item_detailsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        itemId = request.GET['id']
+        item = Items.objects.get(id=itemId)
+
+        # priceListId = request.GET['listId']
+        # item = Items.objects.filter(company = cmp, item_name = itemName).first()
+
+        # if priceListId != "":
+        #     priceList = PriceList.objects.get(id = int(priceListId))
+
+        #     if priceList.item_rate_type == 'Each Item':
+        #         try:
+        #             priceListPrice = float(PriceListItem.objects.get(company = cmp, price_list = priceList, item = item).custom_rate)
+        #         except:
+        #             priceListPrice = item.selling_price
+        #     else:
+        #         mark = priceList.percentage_type
+        #         percentage = float(priceList.percentage_value)
+        #         roundOff = priceList.round_off
+
+        #         if mark == 'Markup':
+        #             price = float(item.selling_price) + float((item.selling_price) * (percentage/100))
+        #         else:
+        #             price = float(item.selling_price) - float((item.selling_price) * (percentage/100))
+
+        #         if priceList.round_off != 'Never Mind':
+        #             if roundOff == 'Nearest Whole Number':
+        #                 finalPrice = round(price)
+        #             else:
+        #                 finalPrice = int(price) + float(roundOff)
+        #         else:
+        #             finalPrice = price
+
+        #         priceListPrice = finalPrice
+        # else:
+        #     priceListPrice = None
+
+        if item:
+
+            context = {
+                'status':True,
+                'id': item.id,
+                'hsn':item.hsn_code,
+                'sales_rate':item.selling_price,
+                'purchase_rate':item.purchase_price,
+                'avl':item.current_stock,
+                'tax': True if item.tax_reference == 'taxable' else False,
+                'gst':item.intrastate_tax,
+                'igst':item.interstate_tax,
+                # 'PLPrice':priceListPrice,
+
+            }
+            return JsonResponse(context)
+        
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+        
+        
     else:
        return redirect('/')
 
