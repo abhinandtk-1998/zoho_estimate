@@ -19240,6 +19240,103 @@ def sales_estimate_convert_saved(request,pk):
     else:
         return('/')
 
+def convert_estimate_to_sales_order(request,pk):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'company':company,
+                'customer':customer_details,
+                
+
+            }
+            return render(request,'zohomodules/sales_estimate/estimate_to_sales_order.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'company':company,
+                'customer':customer_details,
+
+            }
+            return render(request,'zohomodules/sales_estimate/estimate_to_sales_order.html', context)
+        
+
+def convert_estimate_to_invoice(request,pk):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'company':company,
+                'customer':customer_details,
+                
+
+            }
+            return render(request,'zohomodules/sales_estimate/estimate_to_invoice.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
+            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'company':company,
+                'customer':customer_details,
+
+            }
+            return render(request,'zohomodules/sales_estimate/estimate_to_invoice.html', context)
+
+
+
 
 
 

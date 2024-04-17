@@ -77,16 +77,26 @@
                 </thead>
                 <tbody>
                   {% for est in estimate %}
-                  <tr class="border-bottom border-dark" onclick="window.location.href=`{% url 'sales_estimate_overview' est.id %}`">
-                    <td>{{forloop.counter}}</td>
-                    <td>{{est.estimate_date}}</td>
-                    <td>{{est.estimate_number}}</td>
-                    <td>{{est.customer.customer_display_name}}</td>
-                    <td>{{est.customer_email}}</td>
-                    <td>{{est.grand_total}}</td>
-                    <td>{{est.status}}</td>
-                    <td></td>
-                    <td></td>
+                  <tr class="border-bottom border-dark">
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{forloop.counter}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_date}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_number}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer.customer_display_name}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}"></a></td>
+                    <td>
+                        <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="ConvertButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            Convert
+                          </button>
+                          <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
+                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
+                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
+                            <li><a class="dropdown-item" href="" >To Reccuring Invoice</a></li>
+                          </ul>
+
+                    </td>
                     </a>
                   </tr>
                   {% endfor %}

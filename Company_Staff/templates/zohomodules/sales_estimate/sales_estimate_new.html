@@ -105,6 +105,10 @@
           <div style="overflow-x:auto;background-color: black;border-radius: 10px;color: white;" class="m-3 p-5">
             <h1 class="text-white mb-3 mt-3">NEW ESTIMATE</h1>
             <hr style="color: yellow;" class="mb-5">
+
+            <input type="text" id="cmpstate" hidden value="{{cmp.state}}">
+
+
             <form  method="post" action="{% url 'sales_estimate_new_add' %}"  enctype="multipart/form-data" class="mb-3">
                 {% csrf_token %}
 
@@ -393,17 +397,17 @@
                                     <div class="d-flex">
                                         <div class="w-100">
                                             <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                                                <input required type="text" id="item" value="" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction()"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                                <input required type="text" id="item1" value="" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction()"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                                 <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu1"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                                     {% for i in items %}
-                                                    <li class="dropdown-item items-options text-white" onclick="get_item_details(`{{i.id}}`,this.innerHTML)">{{i.item_name}}</li>
+                                                    <li class="dropdown-item items-options text-white" onclick="get_item_details($(this).parent().prev().attr('id'),`{{i.item_name}}`,'{{i.id}}')">{{i.item_name}}</li>
                                                     {% endfor %}
                                                 </ul>
                                                 
                                             </div>
                                         </div>
                                         <a href="#">
-                                            <button type="button" class="btn btn-outline-warning ms-1" data-target="#newItem" data-toggle="modal"><i class="fa fa-plus text-yellow"></i></button>
+                                            <button type="button" class="btn btn-outline-warning ms-1" data-target="#addItem" data-toggle="modal"><i class="fa fa-plus text-yellow"></i></button>
                                         </a>
                                     </div>
                                 
@@ -932,12 +936,12 @@
                                             
                                         
                                             </select>
-                                            <script>
+                                            <!-- <script>
                                             $(document).ready(function() {
                                                 // Initialize select2
                                                 $('#myaccount').select2();
                                             });
-                                            </script>                        
+                                            </script>                         -->
                                             <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer ></script>
                                             <a class="btn btn-outline-warning py-2" style="cursor: pointer;" data-toggle="modal" data-target="#account" style="height: 38px; margin-right: 3px;">+</a>
                     
@@ -2682,6 +2686,33 @@ $('#mphone').on('input', function() {
     <script>
 
 
+
+
+
+function refreshTax(){
+        var cmpState = $('#cmpstate').val();
+        var plc = $('#placeOfSupply').val();
+        if(cmpState == plc){
+            $('.tax_ref').css('display','none');
+            $('.tax_ref_gst').css('display','block');
+            document.getElementById('taxamountCGST').style.display = 'flex';
+            document.getElementById('taxamountSGST').style.display = 'flex';
+            document.getElementById('taxamountIGST').style.display = 'none';
+        }else{
+            $('.tax_ref').css('display','none');
+            $('.tax_ref_igst').css('display','block');
+            document.getElementById('taxamountCGST').style.display = 'none';
+            document.getElementById('taxamountSGST').style.display = 'none';
+            document.getElementById('taxamountIGST').style.display = 'flex';
+        }
+    }
+
+
+
+
+
+
+
         function filterCustomers(){
             var options = $('#cust_drop').children();
             var search_text = $("#customer").val().toLowerCase();
@@ -2791,16 +2822,6 @@ $('#mphone').on('input', function() {
 
 
     function filterFunction(){
-        // var options = $('#'+ $("#"+id).next().attr('id')).children();
-        // var search_text = $("#"+id).val().toLowerCase();
-        // options.each(function(){
-        //     if($(this).text().toLowerCase().includes(search_text)){
-        //         $(this).show()
-        //     }else{
-        //         $(this).hide()
-        //     }
-        // })
-
         var options = $('#menu1').children();
         var search_text = $("#item").val().toLowerCase();
         options.each(function(){
@@ -2818,7 +2839,8 @@ $('#mphone').on('input', function() {
 
 
 
-    function get_item_details(itemId, value){
+    function get_item_details(inpId, value, itemId){
+     
       var itm = value;
       var exists = false;
       var plc = $('#placeOfSupply').val();
@@ -2834,11 +2856,11 @@ $('#mphone').on('input', function() {
               }
           }
       });
-      console.log('status',exists);
+      $('#item').val(value);
 
       if(!exists){
           if(plc != ""){
-                  var n = itemId
+                  var n = inpId.slice(4);
                   $.ajax({
                       url: "{% url 'get_item_detailsAjax' %}",
                       type : 'GET',
@@ -2849,8 +2871,9 @@ $('#mphone').on('input', function() {
                       
                       success: function(data) {
                           if (data.status){
-                              $('#'+n).val(value);
+                            //   $('#'+n).val(value);
                               console.log('AJAX-Response-->',data);
+                              document.getElementById('item'+n).value = value;
                               document.getElementById('itemId'+n).value = data.id;
                               document.getElementById('hsn'+n).value = data.hsn;
                               document.getElementById('qtyspan'+n).innerHTML = data.avl;
@@ -2859,6 +2882,8 @@ $('#mphone').on('input', function() {
                             //   document.getElementById('priceListPrice'+n).value = response.PLPrice;
                               document.getElementById('taxGST'+n).value = data.gst;
                               document.getElementById('taxIGST'+n).value = data.igst;
+                              refreshTax();
+                              calc();
                           }
                       },
                   });
@@ -2867,91 +2892,13 @@ $('#mphone').on('input', function() {
               alert('Select Place of Supply.!')
           }
       }else{
-          alert('Item already exists in the RECURRING INVOICE, choose another or change quantity.!')
+          alert('Item already exists in the Estimate, choose another or change quantity.!')
       }
 
     }
 
 
 
-
-    function update_Item(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var hsn_code = selectedOption.getAttribute('data-hsn');
-        var price = selectedOption.getAttribute('data-price');
-        var tax = selectedOption.getAttribute('data-tax');
-        var tax_intrastate = selectedOption.getAttribute('data-tax-intrastate');
-        var tax_interstate = selectedOption.getAttribute('data-tax-interstate');
-
-        // Update email and address fields
-        document.getElementsByName("hsn_code")[0].value = hsn_code;
-        document.getElementsByName("price")[0].value = price ;
-        document.getElementsByName("tax")[0].value = tax;
-        // document.getElementsByName("gst_number")[0].value = gst_number;
-        // document.getElementsByName("place_of_supply")[0].value = place_of_supply;
-
-    }
-
-
-
-    $('document').ready(function () {
-        $('.add_another_item').click(function () {
-          $("#tbItem").append(`<tr>
-            <td>
-
-            </td>
-            <td style="width: 160px;">
-                <div class="input-group">
-                    <select id="nameSelect" class="form-select" aria-label="Select name" onchange="update_Item(this)">
-                        <option selected>Select a item</option>
-                        {% for item in items %}
-                        <option value="{{ item.id }}" data-hsn="{{item.hsn_code}}" data-price="{{item.selling_price}}"
-                        data-tax="{{item.taxreference}}" data-tax-intrastate="{{item.intrastate_tax}}" 
-                        data-tax-interstate="{{item.interstate_tax}}"  >{{item.item_name}}</option>
-                        {% endfor %}
-                    </select>
-                    <!-- Button to trigger modal -->
-                    <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addItem"><i class="fa fa-plus text-yellow"></i></button>
-                </div>
-            </td>
-            <td>
-                <input type="text" class="form-control" name="hsn_code" required>
-            </td>
-            <td>
-                <input type="number" class="form-control" name="qty" value="0" required>
-            </td>
-            <td>
-                <input type="number" class="form-control" name="price" required>
-            </td>
-            <td>
-                <input type="number" class="form-control" name="tax" required>
-            </td>
-            <td>
-                <input type="number" class="form-control" name="discount" required>
-            </td>
-            <td>
-                <input type="number" class="form-control" name="total" required>
-            </td>
-            <td>
-                <button type="button" class="btn btn-danger" onclick="deleteContact(this)">Delete</button>
-            </td>
-        </tr>`);
-        });
-      })
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
 
 
@@ -2961,7 +2908,7 @@ $('#mphone').on('input', function() {
     <script>
 
         $(document).on("click", "#addItem", function() {
-    $.ajax({
+        $.ajax({
         type: 'POST',
         url: "{% url 'sales_estimate_new_item' %}",
         data: {
@@ -3095,128 +3042,92 @@ $(document).on('click','.remove_row',function(){
 
 
 
+
+
 $(document).ready(function(){
-$('#add').click(function(){
+      $('#add').click(function(){
+        var roinc = $("#items-table-body tr").length;
+        roinc++
+        $('#items-table-body').append(
+            `
+            <tr id='tab_row${roinc}'>
+              <td class="nnum  bg-black text-white" style="text-align: center;">${roinc}</td>
+              <td>
+                  <div class="d-flex">
+                      <div class="w-100">
+                          <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
+                              <input required type="text" id="item${roinc}" value="" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction()"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                              <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu${roinc}"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
+                                  {% for i in items %}
+                                  <li class="dropdown-item items-options text-white" onclick="get_item_details($(this).parent().prev().attr('id'),'{{i.item_name}}','{{i.id}}')">{{i.item_name}}</li>
+                                  {% endfor %}
+                              </ul>
+                              
+                          </div>
+                      </div>
+                      <a href="#">
+                          <button type="button" class="btn btn-outline-warning ms-1" data-target="#addItem" data-toggle="modal"><i class="fa fa-plus text-yellow"></i></button>
+                      </a>
+                  </div>
+              
+              </td>
+              <td>
+                  <input type="hidden" name="item_id[]" id="itemId${roinc}">
+                  <input type="text" name='hsn[]' id="hsn${roinc}" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
+              </td>
+              <td >
+                  <input type="number" name='qty[]' id="qty${roinc}"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
+                  <input type="text" id="avl${roinc}" style="display: none;">
+                  <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan${roinc}" class=''></span></div>
+              </td>
+              <td>
+                  <input type="number" name='price[]' id="price${roinc}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value=0 readonly />
+                  <input type="number" name='priceListPrice[]' id="priceListPrice${roinc}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value=0 readonly />
+              </td>
+              
+              <td>
+                  <select name='taxGST[]' id="taxGST${roinc}" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
+                      <option selected disabled hidden>Select GST</option>
+                      <option value=28 >28.0% GST</option>
+                      <option value=18 >18.0% GST</option>
+                      <option value=12 >12.0% GST</option>
+                      <option value=5 >05.0% GST</option>
+                      <option value=3 >03.0% GST</option>
+                      <option value=0 >0.0% GST</option>
+                  </select>
+                  <select name='taxIGST[]' id="taxIGST${roinc}" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
+                      <option selected disabled hidden >Select IGST</option>
+                      <option value=28 >28.0% IGST</option>
+                      <option value=18 >18.0% IGST</option>
+                      <option value=12 >12.0% IGST</option>
+                      <option value=5 >05.0% IGST</option>
+                      <option value=3 >03.0% IGST</option>
+                      <option value=0 >0.0% IGST</option>
+                  </select>
+                  <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax${roinc}" style="display: none;"> Invalid Tax %</span> </div>    
+              </td>
+              <td >
+                  <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc${roinc}" value=0 class="form-control bg-black text-white disc" step='any' min=0  />
+              </td>
+
+              <td><input type="number" name='total[]' id="total${roinc}" class="form-control bg-black text-white total" value=0 readonly /></td>
+              <td style="display: none;"><input type="hidden" id="taxamount${roinc}" class="form-control itemTaxAmount" /></td>
+              <td>
+                <i class="fa fa-trash text-danger remove_row" style="cursor: pointer;" title="Remove Row" id="${roinc}"></i>
+              </td>
+          </tr>
+            `);
+            reloadItems();
+            checkPriceList();
+        });
+    });
 
 
-var roinc = $("#items-table-body tr").length;
-roinc++
-
-$('#items-table-body').append(
-
-
-                            `
-                            <tr id='tab_row${roinc}'>
-                                <td>${roinc}</td>
-                                <td style="width: 160px;">
-                                    <div class="input-group">
-                                        <select id="item${roinc}" name="item" class="form-select" aria-label="Select name" onchange="update_Item(this)">
-                                            <option value="Select">Select</option>
-                                            {% for item in items %}
-                                            <option value="{{ item.id }}" data-hsn="{{item.hsn_code}}" data-price="{{item.selling_price}}"
-                                            data-tax="{{item.taxreference}}" data-tax-intrastate="{{item.intrastate_tax}}" 
-                                            data-tax-interstate="{{item.interstate_tax}}"  >{{item.item_name}}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <!-- Button to trigger modal -->
-                                        <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addItem"><i class="fa fa-plus text-yellow"></i></button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input type="text" id="hsn_code${roinc}" class="form-control" name="hsn_code" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="qty${roinc}" class="form-control" name="qty" value="0" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="price${roinc}" class="form-control" name="price" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="tax${roinc}" class="form-control" name="tax" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="discount${roinc}" class="form-control" name="discount" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="total${roinc}" class="form-control" name="total" required>
-                                </td>
-                                <td>
-                                    <button type="button" id="${roinc}" class="btn btn-danger remove_row" title="Remove Row">Delete</button>
-                                </td>
-                            </tr>
-
-    `);
-    reloadItems();
-
-
-    checkPriceList();
-
-
-});
-});
-reloadItems();
 
 
 
 
 
-// function getItemDetails(inpId, value){
-//     var itm = value;
-//     var exists = false;
-//     var plc = $('#placeOfSupply').val();
-//     var PLId = $('#customerPriceListId').val();
-//     console.log('clicked',value);
-
-//     $('#items-table-body tr').each(function () {
-//         var html = $(this).html();
-//         if (html != '') {
-//             var itemName = $(this).find('.item-display').val();
-//             console.log(itm,itemName);
-//             if(itemName == itm){
-//                 exists = true;
-//                 console.log('exists',exists);
-//             }
-//         }
-//     });
-//     console.log('status',exists);
-
-//     if(!exists){
-//         if(plc != ""){
-//             var n = 
-//             inpId.slice(4);
-//             $.ajax({
-//             url: "{% url 'getInvItemDetails' %}",
-//             type : 'GET',
-//             data:{
-//                 item : value,
-//                 csrfmiddlewaretoken: '{{ csrf_token }}'
-//                 },
-            
-//             success: function(response) {
-//                 if (response.status){
-//                     $('#'+inpId).val(value);
-//                     document.getElementById('itemId'+n).value = response.id;
-//                     document.getElementById('hsn'+n).value = response.hsn;
-//                     document.getElementById('price'+n).innerHTML = response.sales_rate;
-//                     document.getElementById('tax'+n).value = response.sales_rate;
-//                     document.getElementById('discount'+n).value = response.PLPrice;
-//                     document.getElementById('total'+n).value = response.gst;
-//                     document.getElementById('taxIGST'+n).value = response.igst;
-                    
-
-//                     refreshTax();
-//                     calc();
-//                 }
-//             },
-//             });
-//         }else{
-//             alert('Select Place of Supply.!')
-//         }
-//     }else{
-//         alert('Item already exists in the INVOICE, choose another or change quantity.!')
-//     }
-
-// }
 
 function calc() {
     // Retrieve values from input fields and convert them to numbers
