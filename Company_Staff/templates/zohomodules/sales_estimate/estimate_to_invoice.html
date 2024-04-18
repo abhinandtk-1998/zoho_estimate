@@ -258,17 +258,17 @@
                     <span class="text-danger" id="custErr"></span>
                   </div>
                   <div class="col-md-6">
-                    <input type="hidden" name="customerId" id="customerId" value="{{invoice.customer.id}}">
+                    <input type="hidden" name="customerId" id="customerId" value="{{estimate.customer.id}}">
                     <div class="d-flex">
                         <div class="w-100">
                             <div class="p-0 border-0 bg-none position-relative drop-box">
-                                <input required type="text" id="customer" value="{{ invoice.customer.title }} {{ invoice.customer.first_name }} {{ invoice.customer.last_name }}" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
-                                <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
+                                <input required type="text" id="customer" value="{{ estimate.customer.title }} {{ estimate.customer.first_name }} {{ estimate.customer.last_name }}" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
+                                <!-- <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>
-                                    {% for cust in customers %}
+                                    {% for cust in customer %}
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails(`{{cust.id}}`,this.innerHTML)">{{ cust.title }} {{ cust.first_name }} {{ cust.last_name }}</li>
                                     {% endfor %}
-                                </ul>
+                                </ul> -->
                                 
                             </div>
                         </div>
@@ -280,28 +280,28 @@
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Email</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" value="{{invoice.customer_email}}" id="customerEmail" name="customer_email" readonly>
+                    <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_email}}" id="customerEmail" name="customer_email" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">GST Type</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" value="{{invoice.gst_type}}" id="customerGstType" name="customer_gst_type" readonly>
+                    <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_gst_treatment}}" id="customerGstType" name="customer_gst_type" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2" id="customerGstInDisplay" style="display: flex;">
                   <label for="" class="col-md-3 labels">GSTIN</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" value="{{invoice.gstin}}" id="customerGSTIN" name="customer_gstin" readonly>
+                    <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_gst_number}}" id="customerGSTIN" name="customer_gstin" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
-                    <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{invoice.billing_address}}</textarea>
+                    <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{estimate.customer_bill_address}}</textarea>
                   </div>
                 </div>
 
@@ -363,7 +363,7 @@
                         <label for="" class="labels">Invoice No.</label>
                       </div>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" value="{{invoice.invoice_number}}" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.invoice_number}}" required>
+                        <input type="text" class="form-control bg-black text-white" value="{{estimate.invoice_number}}" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.invoice_number}}" required>
                         <span class="text-danger ml-1" id="invNoErr"></span>
                       </div>
                     </div>
@@ -373,7 +373,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Reference No.</label>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" name="reference_number" value="{{invoice.reference_number}}" readonly>
+                        <input type="text" class="form-control bg-black text-white" name="reference_number" value="{{estimate.reference_number}}" readonly>
                       </div>
                     </div>
                   </div>
@@ -384,7 +384,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Start Date</label>
                       <div class="col-md-9">
-                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{invoice.date|date:'Y-m-d'}}">
+                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.date|date:'Y-m-d'}}">
                       </div>
                     </div>
                   </div>
@@ -2509,131 +2509,131 @@
 </div>
 
 <script>
-    $(document).ready(function(){
-        getCustomerDetails(`{{invoice.customer.id}}`,`{{invoice.customer.title}} {{invoice.customer.first_name}} {{invoice.customer.last_name}}`);
-        console.log(`{{invoice.price_list_applied}}`)
-        if (`{{invoice.price_list_applied}}` == 'True'){
-            $('#applyPriceList').prop('checked', true);
-            $('#priceListDropdown').css('display','block');
-            $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
-            $('#custPriceListName').css('display','inline-flex');
-            checkPriceList();
-        }
-        var paymentMeth = `{{invoice.payment_method}}`;
-        // var entryType = `{{invoice.entry_type}}`;
+//     $(document).ready(function(){
+//         getCustomerDetails(`{{invoice.customer.id}}`,`{{invoice.customer.title}} {{invoice.customer.first_name}} {{invoice.customer.last_name}}`);
+//         console.log(`{{invoice.price_list_applied}}`)
+//         if (`{{invoice.price_list_applied}}` == 'True'){
+//             $('#applyPriceList').prop('checked', true);
+//             $('#priceListDropdown').css('display','block');
+//             $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
+//             $('#custPriceListName').css('display','inline-flex');
+//             checkPriceList();
+//         }
+//         var paymentMeth = `{{invoice.payment_method}}`;
+//         // var entryType = `{{invoice.entry_type}}`;
 
-        document.querySelector('#placeOfSupply').value = `{{invoice.customer_place_of_supply}}`;
-        paymentMeth == 'None' ? document.querySelector('#paymentMethod').value = "" : document.querySelector('#paymentMethod').value = `{{invoice.payment_method}}`;
-        // entryType == 'None' ? document.querySelector('#entryType').value ="" : document.querySelector('#entryType').value = `{{recInvoice.entry_type}}`;
+//         document.querySelector('#placeOfSupply').value = `{{invoice.customer_place_of_supply}}`;
+//         paymentMeth == 'None' ? document.querySelector('#paymentMethod').value = "" : document.querySelector('#paymentMethod').value = `{{invoice.payment_method}}`;
+//         // entryType == 'None' ? document.querySelector('#entryType').value ="" : document.querySelector('#entryType').value = `{{recInvoice.entry_type}}`;
 
-        var x='{{invoice.payment_method}}';
-        if(x==='Cash'){
-            $('#chequediv').hide()
-            $('#bnkdiv').hide()
-            $('#upidiv').hide()
-            document.getElementById('cheque_id').value=""
-            document.getElementById('upi_id').value=""
-            document.getElementById('bnk_id').value=""
-        }else if(x==='Cheque'){
-            $('#chequediv').show()
-            $('#bnkdiv').hide()
-            $('#upidiv').hide()
-            document.getElementById('upi_id').value=""
-            document.getElementById('bnk_id').value=""
-        }else if(x==='UPI'){
-            $('#upidiv').show()
-            $('#bnkdiv').hide()
-            $('#chequediv').hide()
-            document.getElementById('cheque_id').value=""
-            document.getElementById('bnk_id').value=""
-        }else{
-            $('#bnkdiv').show()
-            $('#chequediv').hide()
-            $('#upidiv').hide()
-            document.getElementById('cheque_id').value=""
-            document.getElementById('upi_id').value=""
+//         var x='{{invoice.payment_method}}';
+//         if(x==='Cash'){
+//             $('#chequediv').hide()
+//             $('#bnkdiv').hide()
+//             $('#upidiv').hide()
+//             document.getElementById('cheque_id').value=""
+//             document.getElementById('upi_id').value=""
+//             document.getElementById('bnk_id').value=""
+//         }else if(x==='Cheque'){
+//             $('#chequediv').show()
+//             $('#bnkdiv').hide()
+//             $('#upidiv').hide()
+//             document.getElementById('upi_id').value=""
+//             document.getElementById('bnk_id').value=""
+//         }else if(x==='UPI'){
+//             $('#upidiv').show()
+//             $('#bnkdiv').hide()
+//             $('#chequediv').hide()
+//             document.getElementById('cheque_id').value=""
+//             document.getElementById('bnk_id').value=""
+//         }else{
+//             $('#bnkdiv').show()
+//             $('#chequediv').hide()
+//             $('#upidiv').hide()
+//             document.getElementById('cheque_id').value=""
+//             document.getElementById('upi_id').value=""
 
-            // $.ajax({
-            //     type: "GET",
-            //     url: "",
-            //     data: {
-            //         id: $('#paymentMethod').find(':selected').attr('text'),
-            //     },
-            //     success: function (response) {
-            //         if (response.status){
-            //             document.getElementById('cheque_id').value="";
-            //             document.getElementById('upi_id').value="";
-            //             document.getElementById("bnk_id").value = response.account;
-            //         }else{
-            //             alert(response.message);
-            //         }
-            //     }
-            // });
-        }
-        // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
-    })
+//             // $.ajax({
+//             //     type: "GET",
+//             //     url: "",
+//             //     data: {
+//             //         id: $('#paymentMethod').find(':selected').attr('text'),
+//             //     },
+//             //     success: function (response) {
+//             //         if (response.status){
+//             //             document.getElementById('cheque_id').value="";
+//             //             document.getElementById('upi_id').value="";
+//             //             document.getElementById("bnk_id").value = response.account;
+//             //         }else{
+//             //             alert(response.message);
+//             //         }
+//             //     }
+//             // });
+//         }
+//         // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
+//     })
 
-    function filterCustomers(){
-        var options = $('#cust_drop').children();
-        var search_text = $("#customer").val().toLowerCase();
-        options.each(function(){
-            if($(this).text().toLowerCase().includes(search_text)){
-                $(this).show()
-            }else{
-                $(this).hide()
-            }
-        })
-    }
+//     function filterCustomers(){
+//         var options = $('#cust_drop').children();
+//         var search_text = $("#customer").val().toLowerCase();
+//         options.each(function(){
+//             if($(this).text().toLowerCase().includes(search_text)){
+//                 $(this).show()
+//             }else{
+//                 $(this).hide()
+//             }
+//         })
+//     }
 
-    function getCustomerDetails(custId, name){
-      $('#customer').val(name)
-      console.log('name',name);
-      if($('#customer').val() != ""){
-          $('#custErr').text('');
-          $.ajax({
-              type : 'POST',
-              url: "",
-              data: {
-                  id: custId,
-                  csrfmiddlewaretoken: '{{ csrf_token }}',
-              },
+//     function getCustomerDetails(custId, name){
+//       $('#customer').val(name)
+//       console.log('name',name);
+//       if($('#customer').val() != ""){
+//           $('#custErr').text('');
+//           $.ajax({
+//               type : 'POST',
+//               url: "",
+//               data: {
+//                   id: custId,
+//                   csrfmiddlewaretoken: '{{ csrf_token }}',
+//               },
               
-              success: function(data){
-                  console.log('AJAX-Response-->',data);
-                  document.getElementById('customerId').value = data.id;
-                  document.getElementById('customerEmail').value = data.email;
-                  document.getElementById('placeOfSupply').value = data.shipState;
-                  var placeOfSupplySelect = document.getElementById('placeOfSupply');
-                  var newOption = new Option(data.shipState, data.shipState); // Create a new option element
-                  placeOfSupplySelect.appendChild(newOption); // Append the new option to the select element
-                  placeOfSupplySelect.value = data.shipState; // Set the value of the select element to the desired value
+//               success: function(data){
+//                   console.log('AJAX-Response-->',data);
+//                   document.getElementById('customerId').value = data.id;
+//                   document.getElementById('customerEmail').value = data.email;
+//                   document.getElementById('placeOfSupply').value = data.shipState;
+//                   var placeOfSupplySelect = document.getElementById('placeOfSupply');
+//                   var newOption = new Option(data.shipState, data.shipState); // Create a new option element
+//                   placeOfSupplySelect.appendChild(newOption); // Append the new option to the select element
+//                   placeOfSupplySelect.value = data.shipState; // Set the value of the select element to the desired value
                  
-                  document.getElementById('customerGstType').value = data.gstType;
-                  document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
-                  if(data.gstin){
-                      document.getElementById('customerGstInDisplay').style.display = 'flex';
-                      document.getElementById('customerGSTIN').value = data.gstNo;
-                  }else{
-                      document.getElementById('customerGstInDisplay').style.display = 'none';
-                      document.getElementById('customerGSTIN').value = '';
-                  }
-                  if(`{{invoice.price_list_applied}}` != "True"){
-                        $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
-                    }
-                //   $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
-                  refreshTax();
-                  checkPriceList();
-              }
-          });
-      }else{
-          document.getElementById('customerEmail').value = "";
-          document.getElementById('placeOfSupply').value = "";
-          document.getElementById('customerGstType').value = "";
-          document.getElementById('billAddress').value ="";
-          document.getElementById('customerGSTIN').value = "";
-          $('#custErr').text('Select a customer..');
-      }
-  }
+//                   document.getElementById('customerGstType').value = data.gstType;
+//                   document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
+//                   if(data.gstin){
+//                       document.getElementById('customerGstInDisplay').style.display = 'flex';
+//                       document.getElementById('customerGSTIN').value = data.gstNo;
+//                   }else{
+//                       document.getElementById('customerGstInDisplay').style.display = 'none';
+//                       document.getElementById('customerGSTIN').value = '';
+//                   }
+//                   if(`{{invoice.price_list_applied}}` != "True"){
+//                         $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+//                     }
+//                 //   $('#applyPriceList').prop('checked') ? $('#applyPriceList').prop('checked', false) : $('#applyPriceList').prop('checked',false);
+//                   refreshTax();
+//                   checkPriceList();
+//               }
+//           });
+//       }else{
+//           document.getElementById('customerEmail').value = "";
+//           document.getElementById('placeOfSupply').value = "";
+//           document.getElementById('customerGstType').value = "";
+//           document.getElementById('billAddress').value ="";
+//           document.getElementById('customerGSTIN').value = "";
+//           $('#custErr').text('Select a customer..');
+//       }
+//   }
 
 
   $(document).ready(function() {

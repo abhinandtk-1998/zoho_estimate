@@ -18940,7 +18940,7 @@ def sales_estimate_new_add(request):
                 est = Estimate()
                 est.company = company
                 est.login_details = login_d
-                customer_id = request.POST['customer']
+                customer_id = request.POST['customerId']
                 est.customer = Customer.objects.get(id=customer_id)
                 est.customer_email = request.POST['email']
                 est.customer_bill_address = request.POST['billingAddress']
@@ -19015,6 +19015,26 @@ def sales_estimate_new_add(request):
                                     tax_rate=ele[4],discount=ele[5],total=ele[6],estimate=est,login_details=login_d,company=company)
                             
                             created.save()
+
+                # Save rec_invoice items.
+
+                itemId = request.POST.getlist("item_id[]")
+                itemName = request.POST.getlist("item_name[]")
+                hsn  = request.POST.getlist("hsn[]")
+                qty = request.POST.getlist("qty[]")
+                price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+                discount = request.POST.getlist("discount[]")
+                total = request.POST.getlist("total[]")
+
+                if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                    mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                    mapped = list(mapped)
+                    for ele in mapped:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                        itm.current_stock -= int(ele[3])
+                        itm.save()
                             
                         
 

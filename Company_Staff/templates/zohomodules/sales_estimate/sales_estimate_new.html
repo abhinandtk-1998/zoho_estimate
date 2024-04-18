@@ -106,12 +106,13 @@
             <h1 class="text-white mb-3 mt-3">NEW ESTIMATE</h1>
             <hr style="color: yellow;" class="mb-5">
 
-            <input type="text" id="cmpstate" hidden value="{{cmp.state}}">
+            
 
 
-            <form  method="post" action="{% url 'sales_estimate_new_add' %}"  enctype="multipart/form-data" class="mb-3">
+            <form  method="POST" action="{% url 'sales_estimate_new_add' %}"  enctype="multipart/form-data" class="mb-3">
                 {% csrf_token %}
 
+                <input type="text" id="cmpstate" hidden value="{{cmp.state}}">
 
                 <div class="form-group row mt-4">
                     <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
@@ -177,7 +178,7 @@
                         <label>GST Number</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control" name="gst_number" id="customerGSTIN" required readonly>     
+                        <input  type="text" class="form-control" name="gst_number" id="customerGSTIN" readonly>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -294,65 +295,7 @@
 
 
 
-                <!--------------- Payments Term modal ----------------->
-
-                    <div class="modal fade" id="newpaymentTerm">
-                        <div class="modal-dialog modal-md">
-                        <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
-                            <div class="modal-header " style="background: rgb(32, 35, 37);">
-                                <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
-                                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body" style="background: rgb(32, 35, 37);">
-                            <div class="card p-3 m-3" style="background-color: #141414a2;">
-                                <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
-                                
-                    
-                    
-                                <div class="row mt-2">
-                    
-                                    <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
-                                        <label for="termname" style="color: white">Term Name *</label>
-
-                                    <input type="text " class="form-control mt-2" id="tname1" name="term_name" autocapitalize="characters" required> 
-                                    <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
-                                    <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
-                                    </div>
-                    
-                                    <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
-                                        <label for="termdays" style="color: white">Number of Days *</label>
-
-                                    <input type="number" class="form-control mt-2" id="tdays1" name="term_days" autocapitalize="characters" required>
-                                    </div>
-                                    <div class="col-md-2 mt-2"></div>
-                    
-                                </div>
-                                
-                                <div class="row mt-5">
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <div class="d-flex">
-                                        <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
-                                        type="submit" data-dismiss="modal" id="termSave1">Save
-                                        </button> 
-                                        
-                    
-                                        <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
-                                        data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">Cancel</span>
-                                        </button>
-                                    </div>
-                                    </div>
-                                </div>
-                                </form>
-                            </div>
-                            </div>
-                        </div>
-                        </div>  
-                    </div> 
-
-                    <!------------------- Payments Term modal End -------------->
+                
 
 
 
@@ -375,7 +318,7 @@
 
                 <div class="row mt-4">
                     <div class="col-12 table-responsive">
-                      <table class="table table-bordered" id="invoiceItemsTable">
+                      <table class="table table-bordered" id="estimateItemsTable">
                         <thead>
                             <tr>
                                 <th class="text-center text-white" style="width: 3%;">#</th>
@@ -470,239 +413,158 @@
 
 
 
-
-
-
-
-
-
-
-                <!-- <div class="row">
-                    <div class="col-sm-12 ">
-                        
-                        <div class="table-responsive">
-                        
-                            <table id="tbItem" class="table text-white">
-                                <thead>
-                                    <tr>
-                                        
-                                    <th>Sl no</th>
-                                    <th>Item</th>
-                                    <th>HSN</th>
-                                    <th>Quantity</th>
-                                    <th>Rate</th>
-                                    <th>Tax</th>
-                                    <th>Discount</th>
-                                    <th>Total</th>
-                                    <th>Action</th>
-
-                                </tr>
-                            </thead>
-                            <tbody id="items-table-body">
-                                <tr id='tab_row1'>
-                                <td>1</td>
-                                <td style="width: 160px;">
-                                    <div class="input-group" >
-                                        <select id="nameSelect1" name="item[]"  class="form-select" aria-label="Select name" onchange="update_Item(this)">
-                                            <option value="Select">Select</option>
-                                            {% for item in items %}
-                                            <option value="{{ item.id }}" data-hsn="{{item.hsn_code}}" data-price="{{item.selling_price}}"
-                                            data-tax="{{item.taxreference}}" data-tax-intrastate="{{item.intrastate_tax}}" 
-                                            data-tax-interstate="{{item.interstate_tax}}"  >{{item.item_name}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    
-                                        <button class="btn btn-outline-warning text-yellow" type="button" data-bs-toggle="modal" data-bs-target="#addItem"><i class="fa fa-plus text-yellow"></i></button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input type="text" id="hsn1" class="form-control" name="hsn_code[]" style="width: 70px;"  required>
-                                </td>
-                                <td>
-                                    <input type="number" id="qty1" class="form-control" name="qty[]" value="0" onchange="calc()" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="price1" class="form-control" name="price[]" style="width: 70px;" required>
-                                </td>
-                                <td>
-                                    <select name='taxGST[]' style="width: 70px;" id="taxGST1"   class="form-control tax_ref tax_ref_gst" style="display: block; text-align: center;color: white; background-color:rgb(45, 44, 44);" onchange="taxchange(this.id)">
-                                        <option selected disabled hidden>Select GST</option>
-                                        <option value=28 >28.0% GST</option>
-                                        <option value=18 >18.0% GST</option>
-                                        <option value=12 >12.0% GST</option>
-                                        <option value=5 >05.0% GST</option>
-                                        <option value=3 >03.0% GST</option>
-                                        <option value=0 >0.0% GST</option>
-                                    </select>
-                                    <select name='taxIGST[]' id="taxIGST1"   class="form-control tax_ref tax_ref_igst" style="display: none; text-align: center;color: white;background-color:rgb(45, 44, 44);" onchange="taxchange(this.id)">
-                                        <option selected disabled hidden >Select IGST</option>
-                                        <option value=28 >28.0% IGST</option>
-                                        <option value=18 >18.0% IGST</option>
-                                        <option value=12 >12.0% IGST</option>
-                                        <option value=5 >05.0% IGST</option>
-                                        <option value=3 >03.0% IGST</option>
-                                        <option value=0 >0.0% IGST</option>
-                                    </select>
-                                    <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax1" style="display: none;"> Invalid Tax %</span> </div>    
-                                </td>
-                                <td>
-                                    <input type="number" id="discount1" class="form-control" name="discount[]" value="0" required>
-                                </td>
-                                <td>
-                                    <input type="number" id="total1" class="form-control" name="total[]" style="width: 70px;" required>
-                                </td>
-                                <td>
-                                    <button id="1" type="button" class="btn btn-danger remove_row">Delete</button>
-                                </td>
-                                </tr>
-                            </tbody>
-                            <tr>
-                                <td style="border: none;"><a class="btn btn-outline-warning ml-1" role="button" id="add" >+</a></td>
-                            </tr>
-                            </table>
-                            
-                        </div> -->
-                        
-
-
-
-
-
-
-
-
-
-                        
-
-
-
-
-
-
-
-
                         <div class="row clearfix" style="margin-top:20px">
                             <div class="col-md-6">
-                                <textarea class="form-control mt-3"  id="" name="description" placeholder="Note" style="height: 190px;"></textarea>
-                                <label for="file-upload" class="btn text-white border-0"
-                                style="background-color: rgb(210, 132, 30);">
-                                <i class="fas fa-upload text-white"></i> Upload File
-                            </label>
-                            <input class="pb-3"  id="file-upload" type="file" name="file" style="display:none;">
-                          </div>            
+                                <textarea class="form-control bg-black text-white mt-3"  id="" name="description" placeholder="Note" style="height: 190px;"></textarea>
+                                <input type="file" class="form-control" name="file"  style="margin-top: 10px;">
+                            </div>            
                             <div class="col-md-1"></div>
                             <div class="col-md-5 table-responsive-md mt-3 " id="invoiceItemsTableTotal" style="background-color:rgba(0,0,0,.4); border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh;">
                                 <div class="p-3">
                                     <div class="row container-fluid p-2 m-0">
-                                        <div class="col-sm-4 mt-2"><label class="text-center">Sub Total</label></div>
+                                        <div class="col-sm-4 mt-2"><label class="text-center text-white">Sub Total</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value=0.00 readonly  class="form-control" id="sub_total"></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value=0.00 readonly class="form-control bg-black text-white" id="sub_total"></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0" id="taxamountIGST" style="display: flex;">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">IGST</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">IGST</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount1" value=0.00 readonly  class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount" value=0.00 readonly class="form-control bg-black text-white"/></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountCGST">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">CGST</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">CGST</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount1" value=0.00 readonly  class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount" value=0.00 readonly class="form-control bg-black text-white"/></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountSGST">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">SGST</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-cente text-white">SGST</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount1" value=0.00 readonly class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount" value=0.00 readonly class="form-control bg-black text-white"/></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Tax Amount</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Tax Amount</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value=0.00 readonly  class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value=0.00 readonly class="form-control bg-black text-white"/></div>
                                     </div>
                                     
-                                    <div class="row container-fluid p-2 m-0" >
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Shipping Charge</label></div>
+                                    <div class="row container-fluid p-2 m-0">
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Ship Charge</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='ship' id="ship" value=0.00 class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='ship' id="ship" value=0.00 class="form-control bg-black text-white"/></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center">Adjustment</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Adjustment</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='adj' id="adj" value=0.00 class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='adj' id="adj" value=0.00 class="form-control bg-black text-white"/></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-warning">Total</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Grand Total</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" name='grandtotal' id="grandtotal" value=0.00 readonly  class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" name='grandtotal' id="grandtotal" value=0.00 readonly class="form-control bg-black text-white"/></div>
                                     </div>
                                 </div>
                             </div>
-                          </div>
-                          <div class="row">
+                        </div>
+                        <div class="row">
                             <div class="col-md-7"></div>
                             <div class="col-md-5 table-responsive-md mt-3 " id="invoiceItemsTablePaid" style="background-color:rgba(0,0,0,.4); border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh;">
                                 <div class="p-3">
                                     <div class="row container-fluid p-2 m-0">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-warning">Paid </label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Paid Off</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value=0.00 class="form-control"/></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value=0.00 class="form-control bg-black text-white"/></div>
                                     </div>
                                     <div class="row container-fluid p-2 m-0">
-                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-warning">Balance</label></div>
+                                        <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Balance</label></div>
                                         <div class="col-sm-1 mt-2">:</div>
-                                        <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value=0.00 readonly  class="form-control text-warning" readonly /></div>
+                                        <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value=0.00 readonly class="form-control bg-black text-white" readonly /></div>
                                     </div>
                                 </div>
-                            </div>
-                          </div>
-
-                          <div class="row">
-                            <div class="col-md-7 mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required style="background-color: #eae13d;">
-                                    <label for="agreeTerms">Agree to terms and conditions</label>
-                                    <div class="invalid-feedback">You must agree before submitting.</div>
-                                </div>
-                            </div>
-                            <div class="col-md-5 mt-3 d-flex">
-                                <button type="submit" name="Draft" class="btn  text-white " 
-                          value="Draft" style="background-color:  rgb(199, 88, 37) ;">Save as Draft</button>
-                        <button type="submit" name="Save" class="btn  text-white" 
-                          value="
-                          Save" style="background-color: rgb(210, 132, 30);">Save and Send</button>
-                        <input class="btn  text-white"
-                          type="reset" value="Cancel" style="background-color:  rgb(59, 59, 58) ;">
                             </div>
                         </div>
 
-                          </div>
-                          
 
 
 
 
 
-                        
-
-
-                           
-                        
-                    </div>
-                    
-                </div>
-
-
-
-                
+                        <br>
+                        <div class="mt-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required>
+                            <label for="agreeTerms">Agree to terms and conditions</label>
+                            <div class="invalid-feedback">You must agree before submitting.</div>
+                        </div>
+                        </div>
+                        <div class="mt-4">
+                        <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="Save" name="Save" id="Save">
+                        <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;"  value="Draft" name="Draft" id="Draft">
+                        <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'sales_estimate_new' %}`" value="CANCEL" id="cancel">
+                        </div>
             </form>
 
 
 
+            <!--------------- Payments Term modal ----------------->
 
+            <div class="modal fade" id="newpaymentTerm">
+                <div class="modal-dialog modal-md">
+                <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                    <div class="modal-header " style="background: rgb(32, 35, 37);">
+                        <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
+                        <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="background: rgb(32, 35, 37);">
+                    <div class="card p-3 m-3" style="background-color: #141414a2;">
+                        <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
+                        
+            
+            
+                        <div class="row mt-2">
+            
+                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                                <label for="termname" style="color: white">Term Name *</label>
 
+                            <input type="text " class="form-control mt-2" id="tname1" name="term_name" autocapitalize="characters" required> 
+                            <span id="message-id" class="mt-1 text-danger" style="font-size: 10px;"></span> 
+                            <span id="success-message-id" class=" mt-1 text-success" style="font-size: 10px;"></span>    
+                            </div>
+            
+                            <div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+                                <label for="termdays" style="color: white">Number of Days *</label>
 
+                            <input type="number" class="form-control mt-2" id="tdays1" name="term_days" autocapitalize="characters" required>
+                            </div>
+                            <div class="col-md-2 mt-2"></div>
+            
+                        </div>
+                        
+                        <div class="row mt-5">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="d-flex">
+                                <button class="btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning "
+                                type="submit" data-dismiss="modal" id="termSave1">Save
+                                </button> 
+                                
+            
+                                <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
+                                data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">Cancel</span>
+                                </button>
+                            </div>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+                </div>  
+            </div> 
 
-
-
+            <!------------------- Payments Term modal End -------------->
+                        
 
 
             <!-- Modal Add Item -->
@@ -3123,33 +2985,65 @@ $(document).ready(function(){
     });
 
 
+    function changeItemQty(id){
+        id_val = id.slice(3)
+        var qty = document.getElementById(id).value;
+        var avl_val = document.getElementById(`avl${id_val}`).innerText;
+    
+        if( parseInt(qty) > parseInt(avl_val) ){
+            alert("Quantity Greater than Available Quantity")
+            document.getElementById(id).value = avl_val;
+            calc();
+        }else{
+            document.getElementById(`qtyspan${id_val}`).textContent = parseInt(avl_val) - parseInt(qty);
+            calc();
+        }
+    }
+
+
+
+    function calc() {
+      $('#estimateItemsTable tbody tr').each(function () {
+        var html = $(this).html();
+        if (html != '') {
+          var qty = $(this).find('.qty').val();
+          if($('#applyPriceList').prop('checked') && $('#priceListIds').val() != ""){
+              var price = $(this).find('.priceListPrice').val();
+          }else{
+              var price = $(this).find('.price').val();
+          }
+          var dis = $(this).find('.disc').val();
+          var bc = $("#placeOfSupply").val();
+          var compstate = $("#cmpstate").val();
+
+          if(bc==compstate){
+              var tax = $(this).find('.tax_ref_gst').val();
+          }
+          else{
+              var tax = $(this).find('.tax_ref_igst').val();
+          }
+          $(this).find('.total').val((parseFloat(qty) * parseFloat(price)) - parseFloat(dis));
+          $(this).find('.itemTaxAmount').val(((qty * price)-dis) * (tax / 100));
+          calc_total();
+        }
+      });
+    }
 
 
 
 
 
-
-function calc() {
-    // Retrieve values from input fields and convert them to numbers
-    var price = parseFloat(document.getElementById('price').value);
-    var qty = parseInt(document.getElementById('qty').value);
-    var discount = parseFloat(document.getElementById('discount').value);
-
-    // Calculate the total
-    var tot = (price * qty) - discount;
-
-    // Set the total in the appropriate input field
-    document.getElementById('total').value = tot.toFixed(2);
-    calc_total()
-}
-
-function calc_total() { 
+    function calc_total() { 
       total = 0;
       $('.total').each(function () {
           total += parseFloat($(this).val());
       });
       taxamount = 0;
+      $('.itemTaxAmount').each(function () {
+          taxamount += parseFloat($(this).val());
+      });
       $('#sub_total').val(total.toFixed(2));
+      $('#tax_amount').val(taxamount.toFixed(2));
       var ship = parseFloat($("#ship").val());
       var adj_val = parseFloat($('#adj').val())
       var gtot = taxamount + total + ship + adj_val;
@@ -3161,6 +3055,63 @@ function calc_total() {
       $('#balance').val(bal.toFixed(2));
       splitTax();
     }
+
+    function splitTax(){
+    var bc = $("#placeOfSupply").val();
+    var compstate = $("#cmpstate").val();
+    d=0
+    if (bc == compstate  ) {
+        var gst = taxamount/2
+        $('#cgstAmount').val(parseFloat(gst.toFixed(2)));
+        $('#sgstAmount').val(parseFloat(gst.toFixed(2)));
+        $('#igstAmount').val(parseFloat(d.toFixed(2)));
+    }else{
+        $('#igstAmount').val(taxamount.toFixed(2));
+        $('#cgstAmount').val(d.toFixed(2));
+        $('#sgstAmount').val(d.toFixed(2));
+    }   
+  }
+
+
+
+
+
+
+
+
+
+// function calc() {
+//     // Retrieve values from input fields and convert them to numbers
+//     var price = parseFloat(document.getElementById('price').value);
+//     var qty = parseInt(document.getElementById('qty').value);
+//     var discount = parseFloat(document.getElementById('discount').value);
+
+//     // Calculate the total
+//     var tot = (price * qty) - discount;
+
+//     // Set the total in the appropriate input field
+//     document.getElementById('total').value = tot.toFixed(2);
+//     calc_total()
+// }
+
+// function calc_total() { 
+//       total = 0;
+//       $('.total').each(function () {
+//           total += parseFloat($(this).val());
+//       });
+//       taxamount = 0;
+//       $('#sub_total').val(total.toFixed(2));
+//       var ship = parseFloat($("#ship").val());
+//       var adj_val = parseFloat($('#adj').val())
+//       var gtot = taxamount + total + ship + adj_val;
+
+//       $('#grandtotal').val(gtot.toFixed(2));
+      
+//       var adv_val = parseFloat($('#advance').val())
+//       var bal = gtot - adv_val
+//       $('#balance').val(bal.toFixed(2));
+//       splitTax();
+//     }
 
 
 
