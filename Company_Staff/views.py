@@ -18995,45 +18995,46 @@ def sales_estimate_new_add(request):
 
     #................Adding item table .............................................
 
-                item = request.POST.getlist('item[]')
-                hsn = request.POST.getlist('hsn_code[]')
-                quantity = request.POST.getlist('qty[]')
-                price = request.POST.getlist('price[]')
-                tax_rate = request.POST.getlist('tax[]')
-                discount = request.POST.getlist('discount[]')
-                total = request.POST.getlist('total[]')
+                # item = request.POST.getlist('item[]')
+                # hsn = request.POST.getlist('hsn_code[]')
+                # quantity = request.POST.getlist('qty[]')
+                # price = request.POST.getlist('price[]')
+                # tax_rate = request.POST.getlist('tax[]')
+                # discount = request.POST.getlist('discount[]')
+                # total = request.POST.getlist('total[]')
                 
 
 
-                if item != ['Select']:
-                    if len(item)==len(hsn)==len(quantity)==len(price)==len(tax_rate)==len(discount)==len(total):
-                        mapped2=zip(item,hsn,quantity,price,tax_rate,discount,total)
-                        mapped2=list(mapped2)
-                        print(mapped2)
-                        for ele in mapped2:
-                            created = EstimateItems(item=ele[0],hsn=ele[1],quantity=ele[2],price=ele[3],
-                                    tax_rate=ele[4],discount=ele[5],total=ele[6],estimate=est,login_details=login_d,company=company)
+                # if item != ['Select']:
+                #     if len(item)==len(hsn)==len(quantity)==len(price)==len(tax_rate)==len(discount)==len(total):
+                #         mapped2=zip(item,hsn,quantity,price,tax_rate,discount,total)
+                #         mapped2=list(mapped2)
+                #         print(mapped2)
+                #         for ele in mapped2:
+                #             created = EstimateItems(item=ele[0],hsn=ele[1],quantity=ele[2],price=ele[3],
+                #                     tax_rate=ele[4],discount=ele[5],total=ele[6],estimate=est,login_details=login_d,company=company)
                             
-                            created.save()
+                #             created.save()
 
                 # Save rec_invoice items.
 
-                itemId = request.POST.getlist("item_id[]")
-                itemName = request.POST.getlist("item_name[]")
+                itemId = request.POST.getlist("itemId[]")
+                # itemName = request.POST.getlist("item_name[]")
                 hsn  = request.POST.getlist("hsn[]")
                 qty = request.POST.getlist("qty[]")
-                price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
-                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+                price = request.POST.getlist("price[]")
+                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == company.state else request.POST.getlist("taxIGST[]")
                 discount = request.POST.getlist("discount[]")
                 total = request.POST.getlist("total[]")
 
-                if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
-                    mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                if len(itemId)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and hsn and qty and price and tax and discount and total:
+                    mapped = zip(itemId,hsn,qty,price,tax,discount,total)
                     mapped = list(mapped)
                     for ele in mapped:
                         itm = Items.objects.get(id = int(ele[0]))
-                        Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
-                        itm.current_stock -= int(ele[3])
+                        EstimateItems.objects.create(item=itm, hsn=ele[1], quantity=int(ele[2]), price = float(ele[3]), tax_rate = float(ele[4]),
+                        discount=float(ele[5]), total=float(ele[6]), estimate=est, login_details=login_d, company=company)
+                        itm.current_stock -= int(ele[2])
                         itm.save()
                             
                         
@@ -19063,12 +19064,12 @@ def sales_estimate_overview(request,pk):
         if login_d.user_type == 'Company':
             dash_details = CompanyDetails.objects.get(login_details=login_d)
             allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-            estimate_c = Estimate.objects.get(id=pk)
-            estimate = Estimate.objects.filter(company=dash_details)
+            estimate = Estimate.objects.get(id=pk)
+            estimates = Estimate.objects.filter(company=dash_details)
             company = CompanyDetails.objects.get(login_details=login_d)
-            comments = EstimateComment.objects.filter(estimate=estimate_c)
-            history = EstimateHistory.objects.filter(estimate=estimate_c)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            comments = EstimateComment.objects.filter(estimate=estimate)
+            history = EstimateHistory.objects.filter(estimate=estimate)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
 
 
         
@@ -19077,10 +19078,11 @@ def sales_estimate_overview(request,pk):
                 'allmodules':allmodules,
                 'login_d':login_d,
                 'estimate':estimate,
-                'estimate_c':estimate_c,
+                'estimates':estimates,
                 'company':company,
                 'comments':comments,
                 'history':history,
+                'est_items':est_items,
                 
 
             }
@@ -19089,12 +19091,12 @@ def sales_estimate_overview(request,pk):
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
-            estimate_c = Estimate.objects.get(id=pk)
-            estimate = Estimate.objects.filter(company=dash_details.company)
+            estimate = Estimate.objects.get(id=pk)
+            estimates = Estimate.objects.filter(company=dash_details.company)
             company = CompanyDetails.objects.get(login_details=login_d)
-            comments = EstimateComment.objects.filter(estimate=estimate_c)
-            history = EstimateHistory.objects.filter(estimate=estimate_c)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            comments = EstimateComment.objects.filter(estimate=estimate)
+            history = EstimateHistory.objects.filter(estimate=estimate)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
 
         
             context = {
@@ -19102,10 +19104,11 @@ def sales_estimate_overview(request,pk):
                 'allmodules':allmodules,
                 'login_d':login_d,
                 'estimate':estimate,
-                'estimate_c':estimate_c,
+                'estimates':estimates,
                 'company':company,
                 'comments':comments,
                 'history':history,
+                'est_items':est_items,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
@@ -19127,7 +19130,8 @@ def sales_estimate_edit(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
 
 
         
@@ -19138,6 +19142,8 @@ def sales_estimate_edit(request,pk):
                 'estimate':estimate,
                 'company':company,
                 'customer':customer_details,
+                'est_items':est_items,
+                'comp_payment_terms':comp_payment_terms,
                 
 
             }
@@ -19149,7 +19155,8 @@ def sales_estimate_edit(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
 
         
             context = {
@@ -19159,6 +19166,8 @@ def sales_estimate_edit(request,pk):
                 'estimate':estimate,
                 'company':company,
                 'customer':customer_details,
+                'est_items':est_items,
+                'comp_payment_terms':comp_payment_terms,
 
             }
             return render(request,'zohomodules/sales_estimate/sales_estimate_edit.html', context)
