@@ -18317,7 +18317,7 @@ def get_loanaddition_data(request):                                             
 
 
 
-# sales estimate
+#estimate
         
 
 def sales_estimate(request):
@@ -18340,7 +18340,7 @@ def sales_estimate(request):
                 'estimate':estimate,
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -18357,7 +18357,7 @@ def sales_estimate(request):
             }
 
 
-            return render(request,'zohomodules/sales_estimate/sales_estimate.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate.html', context)
     else:
         return redirect('/')
 
@@ -18426,7 +18426,7 @@ def sales_estimate_new(request):
                 'cmp':comp_details,
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate_new.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -18491,7 +18491,7 @@ def sales_estimate_new(request):
             }
 
 
-            return render(request,'zohomodules/sales_estimate/sales_estimate_new.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate_new.html', context)
     else:
         return redirect('/')
 
@@ -18995,28 +18995,7 @@ def sales_estimate_new_add(request):
 
     #................Adding item table .............................................
 
-                # item = request.POST.getlist('item[]')
-                # hsn = request.POST.getlist('hsn_code[]')
-                # quantity = request.POST.getlist('qty[]')
-                # price = request.POST.getlist('price[]')
-                # tax_rate = request.POST.getlist('tax[]')
-                # discount = request.POST.getlist('discount[]')
-                # total = request.POST.getlist('total[]')
-                
-
-
-                # if item != ['Select']:
-                #     if len(item)==len(hsn)==len(quantity)==len(price)==len(tax_rate)==len(discount)==len(total):
-                #         mapped2=zip(item,hsn,quantity,price,tax_rate,discount,total)
-                #         mapped2=list(mapped2)
-                #         print(mapped2)
-                #         for ele in mapped2:
-                #             created = EstimateItems(item=ele[0],hsn=ele[1],quantity=ele[2],price=ele[3],
-                #                     tax_rate=ele[4],discount=ele[5],total=ele[6],estimate=est,login_details=login_d,company=company)
-                            
-                #             created.save()
-
-                # Save rec_invoice items.
+                # Save estimate items.
 
                 itemId = request.POST.getlist("itemId[]")
                 # itemName = request.POST.getlist("item_name[]")
@@ -19086,7 +19065,7 @@ def sales_estimate_overview(request,pk):
                 
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate_overview.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -19111,7 +19090,7 @@ def sales_estimate_overview(request,pk):
                 'est_items':est_items,
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_overview.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate_overview.html', context)
 
 
     else:
@@ -19147,7 +19126,7 @@ def sales_estimate_edit(request,pk):
                 
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_edit.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate_edit.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -19170,7 +19149,7 @@ def sales_estimate_edit(request,pk):
                 'comp_payment_terms':comp_payment_terms,
 
             }
-            return render(request,'zohomodules/sales_estimate/sales_estimate_edit.html', context)
+            return render(request,'zohomodules/estimate/sales_estimate_edit.html', context)
 
 
     else:
@@ -19294,7 +19273,7 @@ def convert_estimate_to_sales_order(request,pk):
                 
 
             }
-            return render(request,'zohomodules/sales_estimate/estimate_to_sales_order.html', context)
+            return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -19314,7 +19293,7 @@ def convert_estimate_to_sales_order(request,pk):
                 'customer':customer_details,
 
             }
-            return render(request,'zohomodules/sales_estimate/estimate_to_sales_order.html', context)
+            return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
         
 
 def convert_estimate_to_invoice(request,pk):
@@ -19342,7 +19321,7 @@ def convert_estimate_to_invoice(request,pk):
                 
 
             }
-            return render(request,'zohomodules/sales_estimate/estimate_to_invoice.html', context)
+            return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -19362,7 +19341,58 @@ def convert_estimate_to_invoice(request,pk):
                 'customer':customer_details,
 
             }
-            return render(request,'zohomodules/sales_estimate/estimate_to_invoice.html', context)
+            return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
+
+
+def convert_estimate_to_reccuring_invoice(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            dash_details = CompanyDetails.objects.get(login_details=login_d)
+            allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
+            est_items = EstimateItems.objects.get(estimate=estimate)
+
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'company':company,
+                'customer':customer_details,
+                'est_items':est_items,
+                
+
+            }
+            return render(request,'zohomodules/estimate/estimate_to_reccuring_invoice.html', context)
+
+        if login_d.user_type == 'Staff':
+            dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
+            allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(login_details=login_d)
+            customer_details = Customer.objects.filter(company=dash_details)
+            est_items = EstimateItems.objects.get(estimate=estimate)
+
+        
+            context = {
+                'details':dash_details,
+                'allmodules':allmodules,
+                'login_d':login_d,
+                'estimate':estimate,
+                'company':company,
+                'customer':customer_details,
+                'est_items':est_items,
+
+            }
+            return render(request,'zohomodules/estimate/estimate_to_reccuring_invoice.html', context)
 
 
 

@@ -93,7 +93,7 @@
                           <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
                             <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
                             <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
-                            <li><a class="dropdown-item" href="" >To Reccuring Invoice</a></li>
+                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_reccuring_invoice' est.id %}" >To Reccuring Invoice</a></li>
                           </ul>
 
                     </td>

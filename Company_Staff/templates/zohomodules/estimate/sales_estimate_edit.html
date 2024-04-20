@@ -287,7 +287,11 @@
                                 
                                         <option selected>Select a payment_term</option>
                                         {% for pay_terms in comp_payment_terms %}
+                                        {% if pay_terms.id == estimate.payment_term.id %}
+                                        <option value="{{pay_terms.id}}" data-days="{{pay_terms.days}}" selected >{{pay_terms.term_name}}</option>
+                                        {% else %}
                                         <option value="{{pay_terms.id}}" data-days="{{pay_terms.days}}" >{{pay_terms.term_name}}</option>
+                                        {% endif %}
                                         {% endfor %}
                                         
                                     </select>
@@ -343,7 +347,7 @@
                             <tbody id="items-table-body">
                                 {% for i in est_items %}
                                 <tr id='tab_row1'>
-                                    <td class="nnum  bg-black text-white" style="text-align: center;">1</td>
+                                    <td class="nnum  bg-black text-white" style="text-align: center;">{{forloop.counter}}</td>
                                     <td>
                                         <input type="hidden" name="itemId[]" id="itemId1" value="{{i.id}}">
                                         <div class="d-flex">
@@ -434,7 +438,7 @@
                                         <div class="row container-fluid p-2 m-0">
                                             <div class="col-sm-4 mt-2"><label class="text-center text-white">Sub Total</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value=0.00 readonly class="form-control bg-black text-white" id="sub_total"></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value="{{estimate.sub_total}}" readonly class="form-control bg-black text-white" id="sub_total"></div>
                                         </div>
                                         <div class="row container-fluid p-2 m-0" id="taxamountIGST" style="display: flex;">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">IGST</label></div>
@@ -460,17 +464,17 @@
                                         <div class="row container-fluid p-2 m-0">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Ship Charge</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='ship' id="ship" value=0.00 class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='ship' id="ship" value="{{estimate.shipping_charge}}" class="form-control bg-black text-white"/></div>
                                         </div>
                                         <div class="row container-fluid p-2 m-0">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Adjustment</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='adj' id="adj" value=0.00 class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='adj' id="adj" value="{{estimate.adjustment}}" class="form-control bg-black text-white"/></div>
                                         </div>
                                         <div class="row container-fluid p-2 m-0">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Grand Total</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" name='grandtotal' id="grandtotal" value=0.00 readonly class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" name='grandtotal' id="grandtotal" value="{{estimate.grand_total}}" readonly class="form-control bg-black text-white"/></div>
                                         </div>
                                     </div>
                                 </div>
@@ -507,9 +511,8 @@
                             </div>
                             </div>
                             <div class="mt-4">
-                            <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="Save" name="Save" id="Save">
-                            <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;"  value="Draft" name="Draft" id="Draft">
-                            <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'sales_estimate_new' %}`" value="CANCEL" id="cancel">
+                            <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="Edit" name="Save" id="Save">
+                            <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'sales_estimate_overview' estimate.id %}`" value="CANCEL" id="cancel">
                             </div>
                 </form>
     
@@ -3114,24 +3117,11 @@
     }
 
 
+    
 
 
-    // Assuming estimate.customer_place_of_supply contains the default value for place of supply
-    const defaultPaymentTerm = '{{ estimate.payment_term }}';
 
-    // Select the select element by its ID
-    const selectTearm = document.getElementById('paytearm-select1');
 
-    // Find the option that matches the default value and set it as selected
-    if (selectTearm) {
-        const options = selectTearm.options;
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value === defaultPaymentTerm) {
-                options[i].selected = true;
-                break;
-            }
-        }
-    }
     
     
     
