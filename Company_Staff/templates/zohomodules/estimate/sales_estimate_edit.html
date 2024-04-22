@@ -112,7 +112,7 @@
                 
     
     
-                <form  method="POST" action=""  enctype="multipart/form-data" class="mb-3">
+                <form  method="POST" action="{% url 'estimate_edit_op' estimate.id %}"  enctype="multipart/form-data" class="mb-3">
                     {% csrf_token %}
     
                     <input type="text" id="cmpstate" hidden value="{{cmp.state}}">
@@ -349,11 +349,11 @@
                                 <tr id='tab_row1'>
                                     <td class="nnum  bg-black text-white" style="text-align: center;">{{forloop.counter}}</td>
                                     <td>
-                                        <input type="hidden" name="itemId[]" id="itemId1" value="{{i.id}}">
+                                        <input type="hidden" name="itemId[]" id="itemId{{forloop.counter}}" value="{{i.id}}">
                                         <div class="d-flex">
                                             <div class="w-100">
                                                 <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                                                    <input required type="text" id="item1" value="{{i.item.item_name}}" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction()"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                                    <input required type="text" id="item{{forloop.counter}}" value="{{i.item.item_name}}" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction()"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                                     <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu1"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                                         {% for i in items %}
                                                         <li class="dropdown-item items-options text-white" onclick="get_item_details($(this).parent().prev().attr('id'),`{{i.item_name}}`,'{{i.id}}')">{{i.item_name}}</li>
@@ -370,45 +370,47 @@
                                     </td>
                                     <td>
                                         <input type="hidden" name="item_id[]" id="itemId1">
-                                        <input type="text" name='hsn[]' id="hsn1" placeholder='HSN' value="{{i.hsn}}" class="form-control bg-black text-white HSNCODE" readonly />
+                                        <input type="text" name='hsn[]' id="hsn{{forloop.counter}}" placeholder='HSN' value="{{i.hsn}}" class="form-control bg-black text-white HSNCODE" readonly />
                                     </td>
                                     <td >
-                                        <input type="number" name='qty[]' id="qty1" value="{{i.quantity}}"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
-                                        <input type="text" id="avl1" style="display: none;">
+                                        <input type="number" name='qty[]' id="qty{{forloop.counter}}" value="{{i.quantity}}"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value=0 onchange="changeItemQty(this.id)" required/>
+                                        <input type="text" id="avl{{forloop.counter}}" style="display: none;">
                                         <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan1" class=''></span></div>
                                     </td>
                                     <td>
-                                        <input type="number" name='price[]' id="price1" value="{{i.price}}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" readonly />
-                                        <input type="number" name='priceListPrice[]' id="priceListPrice1" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value=0 readonly />
+                                        <input type="number" name='price[]' id="price{{forloop.counter}}" value="{{i.price}}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" readonly />
+                                        <input type="number" name='priceListPrice[]' id="priceListPrice{{forloop.counter}}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value=0 readonly />
                                     </td>
                                     
                                     <td>
                                         <!-- <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex"> -->
-                                        <select name='taxGST[]' id="taxGST1" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
+                                        <select name='taxGST[]' id="taxGST{{forloop.counter}}" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
                                             <option selected disabled hidden>Select GST</option>
-                                            <option value=28 >28.0% GST</option>
-                                            <option value=18 >18.0% GST</option>
-                                            <option value=12 >12.0% GST</option>
-                                            <option value=5 >05.0% GST</option>
-                                            <option value=3 >03.0% GST</option>
-                                            <option value=0 >0.0% GST</option>
+                                            <!-- <option value={{i.tax_rate}}>{{i.tax_rate}}% GST</option> -->
+                                            <option value=28 {% if i.tax_rate == 28 %}selected{% endif %} >28.0% GST</option>
+                                            <option value=18 {% if i.tax_rate == 18 %}selected{% endif %} >18.0% GST</option>
+                                            <option value=12 {% if i.tax_rate == 12 %}selected{% endif %} >12.0% GST</option>
+                                            <option value=5 {% if i.tax_rate == 5 %}selected{% endif %} >05.0% GST</option>
+                                            <option value=3 {% if i.tax_rate == 3 %}selected{% endif %} >03.0% GST</option>
+                                            <option value=0 {% if i.tax_rate == 0 %}selected{% endif %} >0.0% GST</option>
                                         </select>
-                                        <select name='taxIGST[]' id="taxIGST1" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
+                                        <select name='taxIGST[]' id="taxIGST{{forloop.counter}}" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
                                             <option selected disabled hidden >Select IGST</option>
-                                            <option value=28 >28.0% IGST</option>
-                                            <option value=18 >18.0% IGST</option>
-                                            <option value=12 >12.0% IGST</option>
-                                            <option value=5 >05.0% IGST</option>
-                                            <option value=3 >03.0% IGST</option>
-                                            <option value=0 >0.0% IGST</option>
+                                            <!-- <option value={{i.tax_rate}}>{{i.tax_rate}}% IGST</option> -->
+                                            <option value=28 {% if i.tax_rate == 28 %}selected{% endif %} >28.0% IGST</option>
+                                            <option value=18 {% if i.tax_rate == 28 %}selected{% endif %} >18.0% IGST</option>
+                                            <option value=12 {% if i.tax_rate == 28 %}selected{% endif %} >12.0% IGST</option>
+                                            <option value=5 {% if i.tax_rate == 28 %}selected{% endif %} >05.0% IGST</option>
+                                            <option value=3 {% if i.tax_rate == 28 %}selected{% endif %} >03.0% IGST</option>
+                                            <option value=0 {% if i.tax_rate == 28 %}selected{% endif %} >0.0% IGST</option>
                                         </select>
                                         <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax1" style="display: none;"> Invalid Tax %</span> </div>    
                                     </td>
                                     <td >
-                                        <input type="number" name='discount[]' value="{{i.discount}}"  placeholder='Enter Discount' id="disc1" class="form-control bg-black text-white disc" step='any' min=0  />
+                                        <input type="number" name='discount[]' value="{{i.discount}}"  placeholder='Enter Discount' id="disc{{forloop.counter}}" class="form-control bg-black text-white disc" step='any' min=0  />
                                     </td>
         
-                                    <td><input type="number" name='total[]' id="total1" class="form-control bg-black text-white total" value={{i.total}} readonly /></td>
+                                    <td><input type="number" name='total[]' id="total{{forloop.counter}}" class="form-control bg-black text-white total" value={{i.total}} readonly /></td>
                                     <td style="display: none;"><input type="hidden" id="taxamount1" class="form-control itemTaxAmount" /></td>
                                     <td>
                                       <i class="fa fa-trash text-danger remove_row" style="cursor: pointer;" title="Remove Row" id="1"></i>
@@ -429,7 +431,7 @@
     
                             <div class="row clearfix" style="margin-top:20px">
                                 <div class="col-md-6">
-                                    <textarea class="form-control bg-black text-white mt-3"  id="" name="description" placeholder="Note" style="height: 190px;"></textarea>
+                                    <textarea class="form-control bg-black text-white mt-3"  id="" name="description" style="height: 190px;">{{estimate.description}}</textarea>
                                     <input type="file" class="form-control" name="file"  style="margin-top: 10px;">
                                 </div>            
                                 <div class="col-md-1"></div>
@@ -503,13 +505,6 @@
     
     
                             <br>
-                            <div class="mt-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required>
-                                <label for="agreeTerms">Agree to terms and conditions</label>
-                                <div class="invalid-feedback">You must agree before submitting.</div>
-                            </div>
-                            </div>
                             <div class="mt-4">
                             <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="Edit" name="Save" id="Save">
                             <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'sales_estimate_overview' estimate.id %}`" value="CANCEL" id="cancel">
@@ -2904,6 +2899,24 @@
     
     
     <script>
+
+
+    function refreshIndex(){
+        var slNo = 1;
+        var $rows = $("#items-table-body tr");
+
+        for (var i = 0; i < $rows.length; i++) {
+            $rows.eq(i).attr('id', 'tab_row'+slNo)
+            $rows.eq(i).find('[id]').each(function() {
+                var oldId = $(this).attr('id');
+                var newId = oldId.replace(/\d+/, slNo);
+                $(this).attr('id', newId );
+            });
+
+            $rows.eq(i).find('.nnum').text(slNo);
+            slNo++;
+        }
+        }
     
     
     
@@ -3115,6 +3128,35 @@
             }
         }
     }
+
+
+
+    // // Assuming estimate.customer_place_of_supply contains the default value for place of supply
+    // const taxrate = '{{ i.tax_rate }}';
+
+    // const placeofsupply = document.getElementById('placeOfSupply');
+    // const cmpState = document.getElementById('cmpstate');
+
+    // if (placeofsupply == cmpState){
+    //     const selectTax = document.getElementById('taxGST');
+    // }else{
+    //     const selectTax = document.getElementById('taxIGST');
+    // }
+
+
+    
+
+    // // Find the option that matches the default value and set it as selected
+    // if (selectTax) {
+    //     const options = selectTax.options;
+    //     for (let i = 0; i < options.length; i++) {
+    //         if (options[i].value === taxrate) {
+    //             options[i].selected = true;
+    //             break;
+    //         }
+    //     }
+    // }
+
 
 
     

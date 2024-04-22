@@ -461,6 +461,7 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/New/Add',views.sales_estimate_new_add,name='sales_estimate_new_add'),
     path('Zohomodule/Sales/Estimate/Overview/<int:pk>',views.sales_estimate_overview,name='sales_estimate_overview'),
     path('Zohomodule/Sales/Estimate/Overview/Edit/<int:pk>',views.sales_estimate_edit,name='sales_estimate_edit'),
+    path('Zohomodule/Sales/Estimate/Overview/Edit_operation/<int:pk>',views.estimate_edit_op,name='estimate_edit_op'),
     path('Zohomodule/Sales/Estimate/Overview/Comment/<int:pk>',views.sales_estimate_comment,name='sales_estimate_comment'),
     path('Zohomodule/Sales/Estimate/Overview/Comment_delete/<int:pk>',views.sales_estimate_comment_delete,name='sales_estimate_comment_delete'),
     path('Zohomodule/Sales/Estimate/Overview/Delete/<int:pk>',views.sales_estimate_delete,name='sales_estimate_delete'),

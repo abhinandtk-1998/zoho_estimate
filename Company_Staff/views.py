@@ -19111,6 +19111,8 @@ def sales_estimate_edit(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            items=Items.objects.filter(company=company)
+
 
 
         
@@ -19123,6 +19125,7 @@ def sales_estimate_edit(request,pk):
                 'customer':customer_details,
                 'est_items':est_items,
                 'comp_payment_terms':comp_payment_terms,
+                'items':items,
                 
 
             }
@@ -19136,6 +19139,7 @@ def sales_estimate_edit(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            items=Items.objects.filter(company=company)
 
         
             context = {
@@ -19147,6 +19151,7 @@ def sales_estimate_edit(request,pk):
                 'customer':customer_details,
                 'est_items':est_items,
                 'comp_payment_terms':comp_payment_terms,
+                'items':items,
 
             }
             return render(request,'zohomodules/estimate/sales_estimate_edit.html', context)
@@ -19154,6 +19159,111 @@ def sales_estimate_edit(request,pk):
 
     else:
         return('/')
+
+def estimate_edit_op(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        login_d = LoginDetails.objects.get(id=log_id)
+
+        if login_d.user_type == 'Company':
+            company_id = request.session['login_id']
+            company = CompanyDetails.objects.get(id=company_id)
+            if request.method=='POST':
+                est = Estimate.objects.get(id=pk)
+                customer_id = request.POST['customerId']
+                est.customer = Customer.objects.get(id=customer_id)
+                est.customer_email = request.POST['email']
+
+                if 'billingAddress' in request.POST:
+                    est.customer_bill_address = request.POST['billingAddress']
+
+
+                est.customer_gst_treatment = request.POST['gst_treatment']
+
+                if 'gst_number' in request.POST:
+                    est.customer_gst_number = request.POST['gst_number']
+                
+                est.customer_place_of_supply = request.POST['place_of_supply']
+                est.estimate_date = request.POST['estimate_date']
+                paymentterm_id = request.POST['payment_term']
+                est.payment_term = Company_Payment_Term.objects.get(id=paymentterm_id)
+                est.expiration_date = request.POST['exp_date']
+                est.description = request.POST['description']
+                if 'file' in request.FILES:
+                    est.document = request.FILES['file']
+
+
+                est.sub_total = request.POST['subtotal']
+                est.cgst = request.POST['cgst']
+                est.sgst = request.POST['sgst']
+                est.tax_amount_igst = request.POST['igst']
+                est.shipping_charge = request.POST['ship']
+                est.adjustment = request.POST['adj']
+                est.grand_total = request.POST['grandtotal']
+
+
+                est.save()
+
+    #..................save estimate history............................
+
+                history = EstimateHistory()
+                history.company = company
+                history.login_details = login_d
+                history.estimate = est
+                history.date = datetime.today().date()
+                history.action = "Edited"
+                history.save() 
+
+
+    #................Adding item table .............................................
+
+
+                old_items = EstimateItems.objects.filter(estimate=est)
+                old_items.delete()
+                # Save estimate items.
+
+                itemId = request.POST.getlist("itemId[]")
+                # itemName = request.POST.getlist("item_name[]")
+                hsn  = request.POST.getlist("hsn[]")
+                qty = request.POST.getlist("qty[]")
+                price = request.POST.getlist("price[]")
+                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == company.state else request.POST.getlist("taxIGST[]")
+                discount = request.POST.getlist("discount[]")
+                total = request.POST.getlist("total[]")
+
+                if len(itemId)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and hsn and qty and price and tax and discount and total:
+                    mapped = zip(itemId,hsn,qty,price,tax,discount,total)
+                    mapped = list(mapped)
+                    for ele in mapped:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        EstimateItems.objects.create(item=itm, hsn=ele[1], quantity=int(ele[2]), price = float(ele[3]), tax_rate = float(ele[4]),
+                        discount=float(ele[5]), total=float(ele[6]), estimate=est, login_details=login_d, company=company)
+                        itm.current_stock -= int(ele[2])
+                        itm.save()
+
+                            
+                        
+
+
+
+
+                
+
+            return redirect('sales_estimate')
+        
+        if login_d.user_type == 'Staff':
+            company_id = request.session['login_id']
+            company = CompanyDetails.objects.get(id=company_id)
+
+
+
+
+
+    else:
+        return('/')
+
+
 
 
 def sales_estimate_comment(request,pk):
