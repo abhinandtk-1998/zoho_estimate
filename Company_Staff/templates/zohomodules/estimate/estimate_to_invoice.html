@@ -251,7 +251,7 @@
             <div class="card mb-5 px-3 py-4" style="background-color: black; border-radius: 1vh;">
               <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">CONVERT TO  INVOICE</h1><br>
               <hr class="text-warning">
-              <form action="" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
+              <form action="{% url 'convert_estimate_to_invoice_op' estimate.id %}" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="row">
                   <div class="col-md-3">
@@ -370,7 +370,7 @@
                         <label for="" class="labels">Invoice No.</label>
                       </div>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" value="" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.invoice_number}}" required>
+                        <input type="text" class="form-control bg-black text-white" value="{{nxtInv}}" name="invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.invoice_number}}" required>
                         <span class="text-danger ml-1" id="invNoErr"></span>
                       </div>
                     </div>
@@ -380,7 +380,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Reference No.</label>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" name="reference_number" value="" readonly>
+                        <input type="text" class="form-control bg-black text-white" name="reference_number" value="{{new_ref_num}}" readonly>
                       </div>
                     </div>
                   </div>
@@ -391,7 +391,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Start Date</label>
                       <div class="col-md-9">
-                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.date|date:'Y-m-d'}}">
+                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.estimate_date|date:'Y-m-d'}}">
                       </div>
                     </div>
                   </div>
@@ -403,8 +403,8 @@
                         <div class="d-flex">
                           <select class="form-control bg-black text-white" name="payment_term" id="paymentTerm" required>
                               <option value="" selected> Select Payment Term</option>
-                              {% for term in pTerms %}
-                                {% if invoice.payment_terms.id == term.id %}
+                              {% for term in comp_payment_terms %}
+                                {% if estimate.payment_term == term %}
                                   <option value="{{term.id}}" text="{{term.days}}" selected>{{term.term_name}}</option>
                                 {% else %}
                                   <option value="{{term.id}}" text="{{term.days}}">{{term.term_name}}</option>
@@ -423,7 +423,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">End Date</label>
                       <div class="col-md-9">
-                        <input type="text" id="endDate" value="{{invoice.expiration_date|date:'d-m-Y'}}" class="form-control bg-black text-white" name="end_date" readonly>
+                        <input type="text" id="endDate" value="{{estimate.expiration_date|date:'d-m-Y'}}" class="form-control bg-black text-white" name="end_date" readonly>
                       </div>
                     </div>
                   </div>
@@ -562,16 +562,16 @@
                         </tr>
                     </thead>
                     <tbody id="items-table-body">
-                        {% for i in invItems %}
+                        {% for i in est_items %}
                         <tr id='tab_row{{forloop.counter}}'>
                             <td class="nnum  bg-black text-white" style="text-align: center;">{{forloop.counter}}</td>
                             <td>
                                 <div class="d-flex">
                                     <div class="w-100">
                                         <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
-                                            <input required type="text" id="item{{forloop.counter}}" value="{{i.Items.item_name}}" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
+                                            <input required type="text" id="item{{forloop.counter}}" value="{{i.item.item_name}}" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                             <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu{{forloop.counter}}"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
-                                                {% for i in items %}
+                                                {% for itm in items %}
                                                 <li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),`{{i.item_name}}`)">{{i.item_name}}</li>
                                                 {% endfor %}
                                             </ul>
@@ -596,7 +596,7 @@
                             </td>
                             <td>
                                 <input type="number" name='price[]' id="price{{forloop.counter}}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value={{i.Items.selling_price}} readonly />
-                                <input type="number" name='priceListPrice[]' id="priceListPrice{{forloop.counter}}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value={{i.price}} readonly />
+                                <input type="number" name='priceListPrice[]' id="priceListPrice{{forloop.counter}}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value="{{i.price}}" readonly />
                             </td>
                             
                             <td>
@@ -624,10 +624,10 @@
                                 <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax1" style="display: none;"> Invalid Tax %</span> </div>    
                             </td>
                             <td >
-                                <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc{{forloop.counter}}" value={{i.discount}} class="form-control bg-black text-white disc" step='any' min=0  />
+                                <input type="number" name='discount[]'  placeholder='Enter Discount' id="disc{{forloop.counter}}" value="{{i.discount}}" class="form-control bg-black text-white disc" step='any' min=0  />
                             </td>
 
-                            <td><input type="number" name='total[]' id="total{{forloop.counter}}" class="form-control bg-black text-white total" value={{i.total}} readonly /></td>
+                            <td><input type="number" name='total[]' id="total{{forloop.counter}}" class="form-control bg-black text-white total" value="{{i.total}}" readonly /></td>
                             <td style="display: none;"><input type="hidden" id="taxamount1" class="form-control itemTaxAmount" /></td>
                             <td>
                               <i class="fa fa-trash text-danger remove_row" style="cursor: pointer;" title="Remove Row" id="{{forloop.counter}}"></i>
@@ -645,9 +645,9 @@
 
               <div class="row clearfix" style="margin-top:20px">
                 <div class="col-md-6">
-                    <textarea class="form-control bg-black text-white mt-3"  id="" name="note" placeholder="Note" style="height: 190px;"></textarea>
+                    <textarea class="form-control bg-black text-white mt-3"  id="" name="note" placeholder="Note" style="height: 190px;">{{estimate.description}}</textarea>
                     <input type="file" class="form-control" name="file"  style="margin-top: 10px;">
-                    <textarea class="form-control bg-black text-white mt-3"  id="" name="terms" placeholder="Terms & conditions" style="height: 130px;"></textarea>
+                    <textarea class="form-control bg-black text-white mt-3"  id="" name="terms" placeholder="Terms & conditions" style="height: 130px;">{{estimate.terms_and_condition}}</textarea>
                 </div>            
                 <div class="col-md-1"></div>
                 <div class="col-md-5 table-responsive-md mt-3 " id="invoiceItemsTableTotal" style="background-color:rgba(0,0,0,.4); border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh;">
@@ -655,43 +655,43 @@
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label class="text-center text-white">Sub Total</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value={{invoice.sub_total}} readonly class="form-control bg-black text-white" id="sub_total"></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value={{estimate.sub_total}} readonly class="form-control bg-black text-white" id="sub_total"></div>
                         </div>
                         <div class="row container-fluid p-2 m-0" id="taxamountIGST" style="display: flex;">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">IGST</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount" value={{invoice.IGST}} readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount" value={{estimate.tax_amount_igst}} readonly class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountCGST">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">CGST</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount" value={{invoice.CGST}} readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount" value={{estimate.cgst}} readonly class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountSGST">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-cente text-white">SGST</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount" value={{invoice.SGST}} readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount" value={{estimate.sgst}} readonly class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Tax Amount</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value={{invoice.tax_amount}} readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value={{estimate.tax_amount_igst}} readonly class="form-control bg-black text-white"/></div>
                         </div>
                         
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Ship Charge</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='ship' id="ship" value={{invoice.shipping_charge}} class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='ship' id="ship" value={{estimate.shipping_charge}} class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Adjustment</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='adj' id="adj" value={{invoice.adjustment}} class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='adj' id="adj" value={{estimate.adjustment}} class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Grand Total</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" name='grandtotal' id="grandtotal" value={{invoice.grand_total}} readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" name='grandtotal' id="grandtotal" value={{estimate.grand_total}} readonly class="form-control bg-black text-white"/></div>
                         </div>
                     </div>
                 </div>

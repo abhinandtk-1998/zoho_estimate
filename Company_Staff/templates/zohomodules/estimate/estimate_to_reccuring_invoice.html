@@ -249,9 +249,9 @@
       <div class="row mt-5">
           <div class="col-md-12">
             <div class="card mb-5 px-3 py-4" style="background-color: black; border-radius: 1vh;">
-              <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">EDIT RECURRING INVOICE</h1><br>
+              <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">CONVERT TO RECURRING INVOICE</h1><br>
               <hr class="text-warning">
-              <form action="{% url 'updateRecurringInvoice' invoice.id %}" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
+              <form action="" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="row">
                   <div class="col-md-3">
@@ -260,11 +260,11 @@
                     <span class="text-danger" id="custErr"></span>
                   </div>
                   <div class="col-md-6">
-                    <input type="hidden" name="customerId" id="customerId" value="{{invoice.customer.id}}">
+                    <input type="hidden" name="customerId" id="customerId" value="{{estimate.customer.id}}">
                     <div class="d-flex">
                         <div class="w-100">
                             <div class="p-0 border-0 bg-none position-relative drop-box">
-                                <input required type="text" id="customer" value="{{ invoice.customer.title }} {{ invoice.customer.first_name }} {{ invoice.customer.last_name }}" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
+                                <input required type="text" id="customer" value="{{ estimate.customer.title }} {{ estimate.customer.first_name }} {{ estimate.customer.last_name }}" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
                                 <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>
                                     {% for cust in customers %}
@@ -282,28 +282,28 @@
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Email</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" value="{{invoice.customer_email}}" id="customerEmail" name="customer_email" readonly>
+                    <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_email}}" id="customerEmail" name="customer_email" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">GST Type</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" value="{{invoice.gst_type}}" id="customerGstType" name="customer_gst_type" readonly>
+                    <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_gst_treatment}}" id="customerGstType" name="customer_gst_type" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2" id="customerGstInDisplay" style="display: flex;">
                   <label for="" class="col-md-3 labels">GSTIN</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" value="{{invoice.gstin}}" id="customerGSTIN" name="customer_gstin" readonly>
+                    <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_gst_number}}" id="customerGSTIN" name="customer_gstin" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
-                    <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{invoice.billing_address}}</textarea>
+                    <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{estimate.billing_address}}</textarea>
                   </div>
                 </div>
 
@@ -753,7 +753,7 @@
                 </div>
                 <div class="mt-4">
                   <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save">
-                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'viewRecurringInvoice' invoice.id %}`" value="CANCEL" id="cancel">
+                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=``" value="CANCEL" id="cancel">
                 </div>
               </form>
             </div>
@@ -2541,71 +2541,71 @@
 </div>
 
 <script>
-    $(document).ready(function(){
-        getCustomerDetails(`{{invoice.customer.id}}`,`{{invoice.customer.title}} {{invoice.customer.first_name}} {{invoice.customer.last_name}}`);
-        console.log(`{{invoice.price_list_applied}}`)
-        if (`{{invoice.price_list_applied}}` == 'True'){
-            $('#applyPriceList').prop('checked', true);
-            $('#priceListDropdown').css('display','block');
-            $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
-            $('#custPriceListName').css('display','inline-flex');
-            checkPriceList();
-        }
-        var paymentMeth = `{{invoice.payment_method}}`;
-        // var entryType = `{{invoice.entry_type}}`;
-        var plc = `{{invoice.place_of_supply}}`
-        if(plc != "" && plc != null && plc != 'None'){
-            document.querySelector('#placeOfSupply').value = plc;
-        }
-        paymentMeth == 'None' ? document.querySelector('#paymentMethod').value = "" : document.querySelector('#paymentMethod').value = `{{invoice.payment_method}}`;
-        // entryType == 'None' ? document.querySelector('#entryType').value ="" : document.querySelector('#entryType').value = `{{recInvoice.entry_type}}`;
+    // $(document).ready(function(){
+    //     getCustomerDetails(`{{invoice.customer.id}}`,`{{invoice.customer.title}} {{invoice.customer.first_name}} {{invoice.customer.last_name}}`);
+    //     console.log(`{{invoice.price_list_applied}}`)
+    //     if (`{{invoice.price_list_applied}}` == 'True'){
+    //         $('#applyPriceList').prop('checked', true);
+    //         $('#priceListDropdown').css('display','block');
+    //         $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
+    //         $('#custPriceListName').css('display','inline-flex');
+    //         checkPriceList();
+    //     }
+    //     var paymentMeth = `{{invoice.payment_method}}`;
+    //     // var entryType = `{{invoice.entry_type}}`;
+    //     var plc = `{{invoice.place_of_supply}}`
+    //     if(plc != "" && plc != null && plc != 'None'){
+    //         document.querySelector('#placeOfSupply').value = plc;
+    //     }
+    //     paymentMeth == 'None' ? document.querySelector('#paymentMethod').value = "" : document.querySelector('#paymentMethod').value = `{{invoice.payment_method}}`;
+    //     // entryType == 'None' ? document.querySelector('#entryType').value ="" : document.querySelector('#entryType').value = `{{recInvoice.entry_type}}`;
 
-        var x='{{invoice.payment_method}}';
-        if(x==='Cash'){
-            $('#chequediv').hide()
-            $('#bnkdiv').hide()
-            $('#upidiv').hide()
-            document.getElementById('cheque_id').value=""
-            document.getElementById('upi_id').value=""
-            document.getElementById('bnk_id').value=""
-        }else if(x==='Cheque'){
-            $('#chequediv').show()
-            $('#bnkdiv').hide()
-            $('#upidiv').hide()
-            document.getElementById('upi_id').value=""
-            document.getElementById('bnk_id').value=""
-        }else if(x==='UPI'){
-            $('#upidiv').show()
-            $('#bnkdiv').hide()
-            $('#chequediv').hide()
-            document.getElementById('cheque_id').value=""
-            document.getElementById('bnk_id').value=""
-        }else{
-            $('#bnkdiv').show()
-            $('#chequediv').hide()
-            $('#upidiv').hide()
-            document.getElementById('cheque_id').value=""
-            document.getElementById('upi_id').value=""
+    //     var x='{{invoice.payment_method}}';
+    //     if(x==='Cash'){
+    //         $('#chequediv').hide()
+    //         $('#bnkdiv').hide()
+    //         $('#upidiv').hide()
+    //         document.getElementById('cheque_id').value=""
+    //         document.getElementById('upi_id').value=""
+    //         document.getElementById('bnk_id').value=""
+    //     }else if(x==='Cheque'){
+    //         $('#chequediv').show()
+    //         $('#bnkdiv').hide()
+    //         $('#upidiv').hide()
+    //         document.getElementById('upi_id').value=""
+    //         document.getElementById('bnk_id').value=""
+    //     }else if(x==='UPI'){
+    //         $('#upidiv').show()
+    //         $('#bnkdiv').hide()
+    //         $('#chequediv').hide()
+    //         document.getElementById('cheque_id').value=""
+    //         document.getElementById('bnk_id').value=""
+    //     }else{
+    //         $('#bnkdiv').show()
+    //         $('#chequediv').hide()
+    //         $('#upidiv').hide()
+    //         document.getElementById('cheque_id').value=""
+    //         document.getElementById('upi_id').value=""
 
-            $.ajax({
-                type: "GET",
-                url: "{% url 'getBankAccountNumberAjax' %}",
-                data: {
-                    id: $('#paymentMethod').find(':selected').attr('text'),
-                },
-                success: function (response) {
-                    if (response.status){
-                        document.getElementById('cheque_id').value="";
-                        document.getElementById('upi_id').value="";
-                        document.getElementById("bnk_id").value = response.account;
-                    }else{
-                        alert(response.message);
-                    }
-                }
-            });
-        }
-        // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
-    })
+    //         $.ajax({
+    //             type: "GET",
+    //             url: "",
+    //             data: {
+    //                 id: $('#paymentMethod').find(':selected').attr('text'),
+    //             },
+    //             success: function (response) {
+    //                 if (response.status){
+    //                     document.getElementById('cheque_id').value="";
+    //                     document.getElementById('upi_id').value="";
+    //                     document.getElementById("bnk_id").value = response.account;
+    //                 }else{
+    //                     alert(response.message);
+    //                 }
+    //             }
+    //         });
+    //     }
+    //     // $('#placeOfSupply').val('{{invoice.place_of_supply}}')
+    // })
 
     function filterCustomers(){
         var options = $('#cust_drop').children();
@@ -2626,7 +2626,7 @@
           $('#custErr').text('');
           $.ajax({
               type : 'POST',
-              url: "{% url 'getCustomerDetailsAjax' %}",
+              url: "",
               data: {
                   id: custId,
                   csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -2701,7 +2701,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "{% url 'getBankAccountNumberAjax' %}",
+                    url: "",
                     data: {
                         id: $('#paymentMethod').find(':selected').attr('text'),
                     },
@@ -2725,7 +2725,7 @@
         if (! isNaN(duration) && type !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newRepeatEveryTypeAjax' %}",
+                url:"",
                 data:{
                     'duration' : duration,
                     'type' : type,
@@ -2765,7 +2765,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newPaymentTermAjax' %}",
+                url:"",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -2889,7 +2889,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "{% url 'getItemDetailsAjax' %}",
+                    url: "",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2949,7 +2949,7 @@
             console.log(inv_num);
             $.ajax({
                 type: "GET",
-                url: "{% url 'checkRecurringInvoiceNumber' %}",
+                url: "",
                 data: {
                     RecInvNum : inv_num,
                 },
@@ -3007,7 +3007,7 @@
               }else{
                   var n = inpId.slice(4);
                   $.ajax({
-                      url: "{% url 'getItemDetailsAjax' %}",
+                      url: "",
                       type : 'GET',
                       data:{
                           item : value,
@@ -4004,7 +4004,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newPaymentTermAjax' %}",
+                url:"",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -4130,7 +4130,7 @@ $('#mphone').on('input', function() {
       if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" && tax_ref != undefined){
           $.ajax({
               type : 'POST',
-              url:"{% url 'newSalesCustomerAjax' %}",
+              url:"",
               data:{
                 'type': type,
                 'salutation' : title,
@@ -4210,7 +4210,7 @@ $('#mphone').on('input', function() {
   function reloadCustomer(title,fName,lName) {
       const fullName = title+' '+fName+' '+lName
       $.ajax({
-          url: "{% url 'getCustomersAjax' %}",
+          url: "",
           type: "GET",
           dataType: "json",
           data: {},
@@ -4286,7 +4286,7 @@ $('#mphone').on('input', function() {
       function reloadUnit(unit) {
       
         $.ajax({
-                url: "{% url 'getUnitsAjax' %}",
+                url: "",
                 type: "GET",
                 dataType: "json",
                 data: $(this).serialize(),
@@ -4390,7 +4390,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != "" && purAccount != ""){
         $.ajax({
             type : 'POST',
-            url:"{% url 'createNewItemAjax' %}",
+            url:"",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4436,7 +4436,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "{% url 'getAllItemsAjax' %}",
+        url: "",
         type: "GET",
         dataType: "json",
         data: {},
@@ -4611,7 +4611,7 @@ function reloadItems() {
           $.ajax({
             
             type : 'POST',
-            url:"{% url 'createNewAccountAjax' %}",
+            url:"",
         
             data:{
                 
@@ -4646,7 +4646,7 @@ function reloadItems() {
         
         function reloadAccounts(account) {
             $.ajax({
-                url: "{% url 'getAllAccountsAjax' %}",
+                url: "",
                 type: "GET",
                 dataType: "json", 
                 data: {},

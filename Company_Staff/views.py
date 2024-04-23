@@ -19417,7 +19417,57 @@ def convert_estimate_to_invoice(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+
+            latest_inv = invoice.objects.filter(company = company).order_by('-id').first()
+
+            new_number = int(latest_inv.reference_number) + 1 if latest_inv else 1
+
+            if invoiceReference.objects.filter(company = company).exists():
+
+                last_ref_num = invoiceReference.objects.filter(company = company).last()
+                new_ref_num = last_ref_num.reference_number + 1
+
+            else:
+                new_ref_num = 1
+
+            # if invoiceReference.objects.filter(company = company).exists():
+            #     deleted = invoiceReference.objects.get(company = company)
+                
+            #     if deleted:
+            #         while int(deleted.reference_number) >= new_number:
+            #             new_ref_num += 1
+
+
+            nxtInv = ""
+            lastInv = invoice.objects.filter(company = company).last()
+            if lastInv:
+                inv_no = str(lastInv.invoice_number)
+                numbers = []
+                stri = []
+                for word in inv_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
+                
+                num=''
+                for i in numbers:
+                    num +=i
+                
+                st = ''
+                for j in stri:
+                    st = st+j
+
+                inv_num = int(num)+1
+
+                padding_length = len(num) - 1
+
+                        
+                nxtInv = f"{st}{num[0]}{inv_num:0{padding_length}d}"
+            else:
+                nxtInv = 'in-01'
 
 
         
@@ -19428,6 +19478,10 @@ def convert_estimate_to_invoice(request,pk):
                 'estimate':estimate,
                 'company':company,
                 'customer':customer_details,
+                'nxtInv':nxtInv,
+                'new_ref_num':new_ref_num,
+                'est_items':est_items,
+                'comp_payment_terms':comp_payment_terms
                 
 
             }
@@ -19439,7 +19493,61 @@ def convert_estimate_to_invoice(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+
+
+
+            latest_inv = invoice.objects.filter(company = company).order_by('-id').first()
+
+            new_number = int(latest_inv.reference_number) + 1 if latest_inv else 1
+
+            if invoiceReference.objects.filter(company = company).exists():
+
+                last_ref_num = invoiceReference.objects.filter(company = company).last()
+                new_ref_num = last_ref_num.reference_number + 1
+
+            else:
+                new_ref_num = 1
+
+
+                # deleted = invoiceReference.objects.get(company = company)
+                
+                # if deleted:
+                #     while int(deleted.reference_number) >= new_number:
+                #         new_ref_num += 1
+
+
+
+
+            nxtInv = ""
+            lastInv = invoice.objects.filter(company = company).last()
+            if lastInv:
+                inv_no = str(lastInv.invoice_number)
+                numbers = []
+                stri = []
+                for word in inv_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
+                
+                num=''
+                for i in numbers:
+                    num +=i
+                
+                st = ''
+                for j in stri:
+                    st = st+j
+
+                inv_num = int(num)+1
+
+                padding_length = len(num) - 1
+
+                        
+                nxtInv = f"{st}{num[0]}{inv_num:0{padding_length}d}"
+            else:
+                nxtInv = 'in-01'
 
         
             context = {
@@ -19449,9 +19557,118 @@ def convert_estimate_to_invoice(request,pk):
                 'estimate':estimate,
                 'company':company,
                 'customer':customer_details,
+                'nxtInv':nxtInv,
+                'new_ref_num':new_ref_num,
+                'est_items':est_items,
+                'comp_payment_terms':comp_payment_terms,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
+
+def convert_estimate_to_invoice_op(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        if request.method == 'POST':
+            invNum = request.POST['invoice_no']
+            if invoice.objects.filter(company = com, invoice_number__iexact = invNum).exists():
+                res = f'<script>alert("Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
+                return HttpResponse(res)
+
+            inv = invoice(
+                company = com,
+                login_details = com.login_details,
+                customer = Customer.objects.get(id = request.POST['customerId']),
+                customer_email = request.POST['customer_email'],
+                customer_billingaddress = None if request.POST['bill_address'] == "" else request.POST['bill_address'],
+                customer_GSTtype = request.POST['customer_gst_type'],
+                customer_GSTnumber = None if request.POST['customer_gstin'] == "" else request.POST['customer_gstin'],
+                customer_place_of_supply = request.POST['place_of_supply'],
+                reference_number = request.POST['reference_number'],
+                invoice_number = request.POST['invoice_no'],
+                payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term']),
+                date = request.POST['start_date'],
+                expiration_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date(),
+                # Order_number = request.POST['order_number'],
+                price_list_applied = True if 'priceList' in request.POST else False,
+                price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id']),
+                payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method'],
+                cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id'],
+                UPI_number = None if request.POST['upi_id'] == "" else request.POST['upi_id'],
+                bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id'],
+                sub_total = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal']),
+                IGST = 0.0 if request.POST['igst'] == "" else float(request.POST['igst']),
+                CGST = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst']),
+                SGST = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst']),
+                tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount']),
+                adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj']),
+                shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship']),
+                grand_total = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal']),
+                advanced_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance']),
+                balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance']),
+                description = request.POST['note'],
+                terms_and_condition = request.POST['terms']
+            )
+
+            inv.save()
+
+            if len(request.FILES) != 0:
+                inv.document=request.FILES.get('file')
+            inv.save()
+
+            if 'Draft' in request.POST:
+                inv.status = "Draft"
+            elif "Saved" in request.POST:
+                inv.status = "Saved" 
+            inv.save()
+
+            # Save rec_invoice items.
+
+            itemId = request.POST.getlist("item_id[]")
+            itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    invoiceitems.objects.create(company = com, logindetails = com.login_details, invoice = inv, Items = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                    itm.current_stock -= int(ele[3])
+                    itm.save()
+
+            # Save transaction
+                    
+            invoiceHistory.objects.create(
+                company = com,
+                login_details = com.login_details,
+                invoice = inv,
+                action = 'Created'
+            )
+
+            est = Estimate.objects.filter(id=pk)
+            est.converted_to_invoice = inv
+            est.save()
+
+
+            return redirect(sales_estimate)
+        else:
+            return redirect(sales_estimate)
+    else:
+       return redirect('/')
+
+
 
 
 def convert_estimate_to_reccuring_invoice(request,pk):
@@ -19466,7 +19683,7 @@ def convert_estimate_to_reccuring_invoice(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            est_items = EstimateItems.objects.get(estimate=estimate)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
 
 
         
@@ -19489,7 +19706,7 @@ def convert_estimate_to_reccuring_invoice(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            est_items = EstimateItems.objects.get(estimate=estimate)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
 
         
             context = {

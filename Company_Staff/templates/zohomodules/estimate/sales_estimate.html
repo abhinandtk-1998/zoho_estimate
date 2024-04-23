@@ -17,6 +17,10 @@
       color: black;
       border: 1px solid orange;
   }
+
+  a{
+    color: white;
+  }
 </style>
 
 
@@ -87,14 +91,23 @@
                     <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
                     <td><a href="{% url 'sales_estimate_overview' est.id %}"></a></td>
                     <td>
+                        {% if est.converted_to_invoice %}
+                        Converted To Invoice
+                        {% elif est.converted_to_recurring_invoice %}
+                        Converted To Recurring Invoice
+                        {% elif est.converted_to_sales_order %}
+                        Converted To Sales Order
+                        {% else %}
+
                         <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="ConvertButton" data-bs-toggle="dropdown" aria-expanded="false">
                             Convert
-                          </button>
-                          <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
-                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
-                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
-                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_reccuring_invoice' est.id %}" >To Reccuring Invoice</a></li>
-                          </ul>
+                        </button>
+                        <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_reccuring_invoice' est.id %}" >To Reccuring Invoice</a></li>
+                        </ul>
+                        {% endif %}
 
                     </td>
                     </a>

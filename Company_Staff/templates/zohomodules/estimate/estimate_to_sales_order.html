@@ -240,17 +240,17 @@
   <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'salesorder_list' %}" class="text-warning-emphasis">salesorder List</a></li>
-        <li class="breadcrumb-item" aria-current="page">add salesorder</li>
+        <li class="breadcrumb-item"><a {% if login_d.user_type == 'Company' %} href="{% url 'company_dashboard' %}" {% else %} href="{% url 'staff_dashboard' %}" {% endif %} class="text-warning-emphasis">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'sales_estimate' %}" class="text-warning-emphasis">Estimate</a></li>
+        <li class="breadcrumb-item" aria-current="page">Convert To Sales Order</li>
       </ol>
     </nav>
       <div class="row mt-5">
           <div class="col-md-12">
             <div class="card mb-5 px-3 py-4" style="background-color: black; border-radius: 1vh;">
-              <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">SALES ORDER</h1><br>
+              <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">CONVERT TO SALES ORDER</h1><br>
               <hr class="text-warning">
-              <form action="{% url 'add_salesorder' %}" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
+              <form action="" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="row">
                   <div class="col-md-3">
@@ -259,11 +259,11 @@
                     <span class="text-danger" id="custErr"></span>
                   </div>
                   <div class="col-md-6">
-                    <input type="hidden" name="customerId" id="customerId" value="">
+                    <input type="hidden" name="customerId" id="customerId" value="{{estimate.customer.id}}">
                     <div class="d-flex">
                         <div class="w-100">
                             <div class="p-0 border-0 bg-none position-relative drop-box">
-                                <input required type="text" id="customer" value="" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
+                                <input required type="text" id="customer" value="{{ estimate.customer.title }} {{ estimate.customer.first_name }} {{ estimate.customer.last_name }}" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
                                 <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>
                                     {% for cust in customer %}
@@ -281,30 +281,34 @@
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Email</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" id="customerEmail" name="customer_email" readonly>
+                    <input type="text" class="form-control text-white bg-black" id="customerEmail" name="customer_email" value="{{estimate.customer_email}}" readonly>
                   </div>
                 </div>
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">GST Type</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" id="customerGstType" name="customer_gst_type" readonly>
+                    <input type="text" class="form-control text-white bg-black" id="customerGstType" name="customer_gst_type" value="{{estimate.customer_gst_treatment}}" readonly>
                   </div>
                 </div>
 
+                {% if estimate.customer_gst_number %}
                 <div class="row mt-2" id="customerGstInDisplay" style="display: flex;">
                   <label for="" class="col-md-3 labels">GSTIN</label>
                   <div class="col-md-6">
-                    <input type="text" class="form-control text-white bg-black" id="customerGSTIN" name="customer_gst_number" readonly>
+                    <input type="text" class="form-control text-white bg-black" id="customerGSTIN" name="customer_gst_number" value="{{estimate.customer_gst_number}}" readonly>
                   </div>
                 </div>
+                {% endif %}
 
+                {% if estimate.customer_bill_address %}
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
-                    <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" readonly></textarea>
+                    <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" value="{{estimate.customer_bill_address}}" readonly></textarea>
                   </div>
                 </div>
+                {% endif %}
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Place of Supply</label>
@@ -2434,7 +2438,7 @@
           $('#custErr').text('');
           $.ajax({
               type : 'POST',
-              url: "{% url 'getselCustomerDetails' %}",
+              url: "",
               data: {
                   id: custId,
                   csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -2505,7 +2509,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "{% url 'getselBankAccountNumber' %}",
+                    url: "",
                     data: {
                         id: $('#paymentMethod').find(':selected').attr('text'),
                     },
@@ -2531,7 +2535,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newselPaymentTerm' %}",
+                url:"",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -2657,7 +2661,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "{% url 'getselItemDetails' %}",
+                    url: "",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2720,7 +2724,7 @@
         console.log(sel_num);
         $.ajax({
             type: "GET",
-            url: "{% url 'checksalesorderNumber' %}",
+            url: "",
             data: {
                 RecSelNum : sel_num,
             },
@@ -2778,7 +2782,7 @@ function getItemDetails(inpId, value) {
         if (plc != "") {
             var n = inpId.slice(4);
             $.ajax({
-                url: "{% url 'getselItemDetails' %}",
+                url: "",
                 type: 'GET',
                 data: {
                     item: value,
@@ -2994,7 +2998,7 @@ function getItemDetails(inpId, value) {
             console.log(sel_num);
             $.ajax({
                 type: "GET",
-                url: "{% url 'checksalesorderNumber' %}",
+                url: "",
                 data: {
                     selNum : sel_num,
                 },
@@ -3778,7 +3782,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newselPaymentTerm' %}",
+                url:"",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -3883,7 +3887,7 @@ $('#mphone').on('input', function() {
     if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" ){
           $.ajax({
               type : 'POST',
-              url:"{% url 'createsalesCustomer' %}",
+              url:"",
               data:{
                 'type': type,
                 'salutation' : title,
@@ -3963,7 +3967,7 @@ $('#mphone').on('input', function() {
   function reloadCustomer(title,fName,lName) {
       const fullName = title+' '+fName+' '+lName
       $.ajax({
-          url: "{% url 'getsalesCustomers' %}",
+          url: "",
           type: "GET",
           dataType: "json",
           data: {},
@@ -4017,7 +4021,7 @@ $('#mphone').on('input', function() {
         var uName = $("#unitName").val();
         $.ajax({
           type: 'POST',
-          url: "{% url 'addsel_unit' %}",
+          url: "",
           data: {
             units: uName,
             csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -4039,7 +4043,7 @@ $('#mphone').on('input', function() {
       function reloadUnit(unit) {
       
         $.ajax({
-                url: "{% url 'show_unit_dropdownsel' %}",
+                url: "",
                 type: "GET",
                 dataType: "json",
                 data: $(this).serialize(),
@@ -4138,7 +4142,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != ""){
         $.ajax({
             type : 'POST',
-            url:"{% url 'createNewItemsel' %}",
+            url:"",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4185,7 +4189,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "{% url 'getAllItemssel' %}",
+        url: "",
         type: "GET",
         dataType: "json",
         data: {},
@@ -4365,7 +4369,7 @@ function reloadItems() {
           $.ajax({
             
             type : 'POST',
-            url:"{% url 'createNewselAccountFromItems' %}",
+            url:"",
         
             data:{
                 
@@ -4400,7 +4404,7 @@ function reloadItems() {
         
         function reloadAccounts(account) {
             $.ajax({
-                url: "{% url 'getAllselAccounts' %}",
+                url: "",
                 type: "GET",
                 dataType: "json", 
                 data: {},
