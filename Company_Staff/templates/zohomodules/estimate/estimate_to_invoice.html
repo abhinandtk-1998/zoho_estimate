@@ -566,6 +566,7 @@
                         <tr id='tab_row{{forloop.counter}}'>
                             <td class="nnum  bg-black text-white" style="text-align: center;">{{forloop.counter}}</td>
                             <td>
+                                <input type="hidden" name="item_id[]" id="itemId{{forloop.counter}}" value="{{i.item.id}}">
                                 <div class="d-flex">
                                     <div class="w-100">
                                         <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">

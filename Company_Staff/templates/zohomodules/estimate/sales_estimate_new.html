@@ -605,12 +605,12 @@
                                     <label class="col-12 col-md-2 col-form-label pt-3" style="color: aliceblue;">Type  &nbsp;&nbsp;<i
                                         class="fa fa-question-circle"></i></label>
                                         <div class="form-check form-check-inline">
-                                            <input required class="form-check-input" type="radio" name="type" id="gridRadios1" value="Goods">
-                                            <label class="form-check-label text-white" for="gridRadios1">Goods</label>
+                                            <input required class="form-check-input" type="radio" name="type" id="gridRadios3" value="Goods">
+                                            <label class="form-check-label text-white" for="gridRadios3">Goods</label>
                                         </div> &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
                                         <div class="form-check form-check-inline ml-md-3">
-                                            <input required class="form-check-input" type="radio" name="type" id="gridRadios2" value="Services">
-                                            <label class="form-check-label text-white" for="gridRadios2">Services</label>
+                                            <input required class="form-check-input" type="radio" name="type" id="gridRadios4" value="Services">
+                                            <label class="form-check-label text-white" for="gridRadios4">Services</label>
                                         </div>
                                     </div>
                                 </div>
@@ -839,7 +839,7 @@
                                     <!-- {% comment %} <input type="checkbox" name="trackState" id="trackStateCheckbox">{% endcomment %} -->
                                     <label style="color: aliceblue;">
                                 
-                                    <input type="checkbox" name="trackstate" class=" "  onclick="toggleFormFields()">
+                                    <input type="checkbox" name="trackstate" id="trackInv" class=" "  onclick="toggleFormFields()">
                                     Track Inventory for this item
                                     </label>   <br>   <br>
                                     <div id="formFields" style="display: none;"> 
@@ -872,7 +872,7 @@
                                 </div>
                                 
                                 <div class="form-inline " style="margin-bottom: 200px;padding-bottom: 20px;">
-                                    <button type="submit" id="addItem"  class="mr-3 btn" style="background-color: chocolate;color: aliceblue;" value="Save">Save</button>
+                                    <button type="submit" id="addItemNew"  class="mr-3 btn" style="background-color: chocolate;color: aliceblue;" value="Save">Save</button>
                                     <button type="button" class="mr-3 btn" onclick="resetForm()" value="Cancel" style="margin-left:10px;background-color: chocolate;color: aliceblue;">Cancel</button>
                                 </div>   
                                 
@@ -2852,7 +2852,7 @@ function refreshTax(){
 
 
 
-        $(document).on("click", "#addItem", function() {
+        $(document).on("click", "#addItemNew", function() {
         $.ajax({
         type: 'POST',
         url: "{% url 'sales_estimate_new_item' %}",
@@ -2917,6 +2917,127 @@ function refreshTax(){
         },
     });
 });
+
+
+
+$(document).on("click","#addItemNew1",function(){
+    var name = $("#nameInput").val();
+    var type = $("input[name='type']:checked").val();
+    var unit = $("#selunit").val();
+    var hsn = $("#hsn").val();
+    var purAccount = $("#myaccount").val();
+    var trck;
+    if($('#trackInv').prop('checked')){
+        trck = 1
+    }else{
+        trck = 0
+    }
+    if(type == undefined){
+        alert('Please select item type')
+        return
+    }
+    if($('#gridRadios1').prop('checked') || $('#gridRadios2').prop('checked')){
+        if($('#gridRadios1').prop('checked')){
+            var tax = 'taxable'
+        }else{
+            var tax = 'None-Taxable'
+        }
+    }else{
+        alert("Should select any of tax reference")
+        return
+    }
+
+    if (name !="" && type !="" && unit != "" && hsn != "" && tax != "" && purAccount != ""){
+        $.ajax({
+            type : 'POST',
+            url:"{% url 'sales_estimate_new_item' %}",
+            data:{
+                'name' : name,
+                'type' : type,
+                'unit' : unit,
+                'hsn' : hsn,
+                'taxref' : tax,
+                'intra_st' : $("#intraStateTax").val(),
+                'inter_st' : $("#interStateTax").val(),
+                'pcost' : $("#purprice").val(),
+                'pur_account' : purAccount,
+                'pur_desc' : $("#purchaseDescription").val(),
+                'salesprice' : $("#salesprice").val(),
+                'sale_account' : $("#salesAccount").val(),
+                'sale_desc' : $("#salesDescription").val(),
+                'invacc' : $("#invAcc").val(),
+                'stock' : $("#stockOnHand").val(),
+                'stock_rate' : $("#stockRate").val(),
+                'min_stock' : $("#minStock").val(),
+                'trackInv' : trck,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            
+            success: function(response) {
+                if(response.status){
+                    console.log("AJAX Success",response)
+                    document.getElementById("newItemForm").reset();
+
+                    if($('#newItem').hasClass('show')){
+                        $('#newItem .close_item_modal').click()
+                    }
+                    // reloadItems();
+                }else{
+                    alert(response.message)
+                }
+            },         
+        });
+    }
+    else{
+        alert('Fill all required fields.!')
+        return;
+    }
+});
+
+
+
+
+function reloadItems() {
+    $.ajax({
+        url: "",
+        type: "GET",
+        dataType: "json",
+        data: {},
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+
+        success: function(data) {
+            $('#items-table-body tr').each(function () {
+                var currentRow = $(this);
+                var html = currentRow.html();
+                
+                if (html !== '') {
+                    currentRow.find(".items-available").find("li").remove();
+
+                    $.each(data, function(key, value) {
+                        console.log(value[1]);
+                        currentRow.find(".items-available").append(`<li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),'${value[1]}')">${value[1]}</li>`);
+                    });
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+
+    });
+    if ($('#newAccount').hasClass('show')){
+        $('#newAccount .close_account_modal').click();
+    }
+
+    if ($('#unitmodal').hasClass('show')){
+        $('#unitmodal .close_unit_modal').click();
+    }
+}
+
+
+
+
+
 
 
 

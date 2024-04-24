@@ -924,6 +924,9 @@ class invoice(models.Model):
     CGST=models.FloatField(default=0.0, null=True, blank=True)
     SGST=models.FloatField(default=0.0, null=True, blank=True)
     IGST = models.FloatField(default=0.0, null=True, blank=True)
+    price_list_applied = models.BooleanField(null=True, default=False)
+    price_list = models.ForeignKey(PriceList, on_delete = models.SET_NULL,null=True)
+
 
     tax_amount=models.FloatField(default=0.0, null=True, blank=True)
     shipping_charge=models.FloatField(default=0.0, null=True, blank=True)
@@ -931,7 +934,10 @@ class invoice(models.Model):
     grand_total=models.FloatField(default=0.0, null=True, blank=True)
     advanced_paid=models.FloatField(default=0.0, null=True, blank=True)
     balance=models.FloatField(default=0.0, null=True, blank=True)
-    status=models.CharField(max_length=220,null=True,blank=True)  
+    status=models.CharField(max_length=220,null=True,blank=True)
+
+    def getNumFieldName(self):
+        return 'invoice_number'    
 
 class invoiceHistory(models.Model):
     login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
