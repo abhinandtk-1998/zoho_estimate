@@ -433,6 +433,7 @@
                                 <div class="col-md-6">
                                     <textarea class="form-control bg-black text-white mt-3"  id="" name="description" style="height: 190px;">{{estimate.description}}</textarea>
                                     <input type="file" class="form-control" name="file"  style="margin-top: 10px;">
+                                    <textarea class="form-control bg-black text-white mt-3"  id="" name="terms" placeholder="Terms & conditions" style="height: 130px;">{{estimate.terms_and_condition}}</textarea>
                                 </div>            
                                 <div class="col-md-1"></div>
                                 <div class="col-md-5 table-responsive-md mt-3 " id="invoiceItemsTableTotal" style="background-color:rgba(0,0,0,.4); border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh;">
@@ -481,29 +482,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-7"></div>
-                                <div class="col-md-5 table-responsive-md mt-3 " id="invoiceItemsTablePaid" style="background-color:rgba(0,0,0,.4); border: 1px solid rgba(128, 128, 128, 0.6); margin-left: -2vh;">
-                                    <div class="p-3">
-                                        <div class="row container-fluid p-2 m-0">
-                                            <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Paid Off</label></div>
-                                            <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value=0.00 class="form-control bg-black text-white"/></div>
-                                        </div>
-                                        <div class="row container-fluid p-2 m-0">
-                                            <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Balance</label></div>
-                                            <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value=0.00 readonly class="form-control bg-black text-white" readonly /></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-    
-    
-    
-    
-    
                             <br>
                             <div class="mt-4">
                             <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="Edit" name="Save" id="Save">
@@ -3026,6 +3004,14 @@
                 calc();
             }
         }
+
+
+        $(document).ready(function(){
+        $('#items-table-body').on('keyup change', function () {
+            refreshTax();
+            calc();
+        });
+        });
     
     
     

@@ -566,7 +566,6 @@
                         <tr id='tab_row{{forloop.counter}}'>
                             <td class="nnum  bg-black text-white" style="text-align: center;">{{forloop.counter}}</td>
                             <td>
-                                <input type="hidden" name="item_id[]" id="itemId{{forloop.counter}}" value="{{i.item.id}}">
                                 <div class="d-flex">
                                     <div class="w-100">
                                         <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
@@ -586,7 +585,7 @@
                             
                             </td>
                             <td>
-                                <input type="hidden" name="item_id[]" value="{{i.Items.id}}" id="itemId{{forloop.counter}}">
+                                <input type="hidden" name="item_id[]" value="{{i.item.id}}" id="itemId{{forloop.counter}}">
                                 <input type="hidden" name="id[]" value="{{i.id}}" >
                                 <input type="text" name='hsn[]' id="hsn{{forloop.counter}}" value="{{i.hsn}}" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
                             </td>
@@ -596,7 +595,7 @@
                                 <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan{{forloop.counter}}" class=''>{{i.Items.current_stock}}</span></div>
                             </td>
                             <td>
-                                <input type="number" name='price[]' id="price{{forloop.counter}}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value={{i.Items.selling_price}} readonly />
+                                <input type="number" name='price[]' id="price{{forloop.counter}}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value={{i.price}} readonly />
                                 <input type="number" name='priceListPrice[]' id="priceListPrice{{forloop.counter}}" class="form-control bg-black text-white priceListPrice" step="0.00" min="0" style="display: none;" value="{{i.price}}" readonly />
                             </td>
                             
@@ -704,12 +703,12 @@
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Paid Off</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value={{invoice.advanced_paid}} class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value=0.00 class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Balance</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value={{invoice.balance}} readonly class="form-control bg-black text-white" readonly /></div>
+                            <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value={{estimate.grand_total}} readonly class="form-control bg-black text-white" readonly /></div>
                         </div>
                     </div>
                 </div>

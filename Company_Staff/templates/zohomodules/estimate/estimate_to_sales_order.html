@@ -305,7 +305,7 @@
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
-                    <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" value="{{estimate.customer_bill_address}}" readonly></textarea>
+                    <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" readonly>{{estimate.customer_bill_address}}</textarea>
                   </div>
                 </div>
                 {% endif %}
@@ -544,7 +544,7 @@
                             
                             </td>
                             <td>
-                                <input type="hidden" name="item_id[]" id="itemId1">
+                                <input type="hidden" name="item_id[]" id="itemId1" value="{{i.item.id}}">
                                 <input type="text" name='hsn[]' id="hsn1" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
                             </td>
                             <td >
@@ -5527,6 +5527,25 @@ if (vals == "Other Expense") {
     }
 }
 }
+</script>
+
+<script>
+    // Assuming estimate.customer_place_of_supply contains the default value for place of supply
+    const defaultPlaceOfSupply = '{{ estimate.customer_place_of_supply }}';
+
+    // Select the select element by its ID
+    const selectElement = document.getElementById('placeOfSupply');
+
+    // Find the option that matches the default value and set it as selected
+    if (selectElement) {
+        const options = selectElement.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === defaultPlaceOfSupply) {
+                options[i].selected = true;
+                break;
+            }
+        }
+    }
 </script>
 
 {%endblock%}

@@ -19041,6 +19041,7 @@ def sales_estimate_new_add(request):
                 est.estimate_number = request.POST['estimate_no']
                 est.description = request.POST['description']
                 est.document = request.FILES['file']
+                est.terms_and_condition = request.POST['terms']
                 est.sub_total = request.POST['subtotal']
                 est.cgst = request.POST['cgst']
                 est.sgst = request.POST['sgst']
@@ -19279,7 +19280,7 @@ def estimate_edit_op(request,pk):
                 if 'file' in request.FILES:
                     est.document = request.FILES['file']
 
-
+                est.terms_and_condition = request.POST['terms']
                 est.sub_total = request.POST['subtotal']
                 est.cgst = request.POST['cgst']
                 est.sgst = request.POST['sgst']
@@ -19455,7 +19456,56 @@ def convert_estimate_to_sales_order(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
+
+
+        
+            customer=Customer.objects.all()
+            item=Items.objects.all()
+            units = Unit.objects.filter(company=company)
+            accounts=Chart_of_Accounts.objects.filter(company=company)
+            bnk = Banking.objects.filter(company = company)
+            
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+            
+
+            latest_sel = SaleOrder.objects.filter(company = company).order_by('-id').first()
+            new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
+            if SalesOrderReference.objects.filter(company = company).exists():
+                deleted = SalesOrderReference.objects.get(company = comp_details)
+                if deleted:
+                    while int(deleted.reference_number) >= new_number:
+                        new_number+=1
+            
+            nxtSel = ""
+            lastSel = SaleOrder.objects.filter(company = comp_details).last()
+            if lastSel:
+                sel_no = str(lastSel.sales_order_number)
+                numbers = []
+                stri = []
+                for word in sel_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
+                
+                num=''
+                for i in numbers:
+                    num +=i
+                
+                st = ''
+                for j in stri:
+                    st = st+j
+
+                sel_num = int(num)+1
+
+                padding_length = len(num) - 1
+
+                        
+                nxtSel = f"{st}{num[0]}{sel_num:0{padding_length}d}"
+            else:
+                nxtSel = 'sel-01'
 
 
         
@@ -19466,6 +19516,7 @@ def convert_estimate_to_sales_order(request,pk):
                 'estimate':estimate,
                 'company':company,
                 'customer':customer_details,
+                'est_items':est_items,
                 
 
             }
@@ -19477,7 +19528,7 @@ def convert_estimate_to_sales_order(request,pk):
             estimate = Estimate.objects.get(id=pk)
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
-            # est_items = EstimateItems.objects.get(estimate=estimate_c)
+            est_items = EstimateItems.objects.get(estimate=estimate)
 
         
             context = {
@@ -19487,6 +19538,7 @@ def convert_estimate_to_sales_order(request,pk):
                 'estimate':estimate,
                 'company':company,
                 'customer':customer_details,
+                'est_items':est_items,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
