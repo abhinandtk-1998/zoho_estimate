@@ -985,6 +985,7 @@ class EmployeeLoanRepaymentHistory(models.Model):
 
 
 #------------Sales Order---------------
+#------------Sales Order---------------
 class SaleOrder(models.Model):
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
     login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE)
@@ -1014,11 +1015,12 @@ class SaleOrder(models.Model):
     
     description = models.CharField(max_length=255)
     terms_and_condition = models.TextField()
-    document = models.FileField(upload_to='documents/')
+    document = models.FileField(upload_to='documents/',blank=True, null=True)
     sub_total = models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True)
+    igst = models.FloatField(default=0.0, null=True, blank=True)
     cgst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     sgst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
-    tax_amount_igst = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     shipping_charge = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     adjustment = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     grand_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
@@ -1030,10 +1032,54 @@ class SaleOrder(models.Model):
         ('Draft', 'Draft'),
         ('Save', 'Save'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft')
-
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft') 
+    
     def getNumFieldName(self):
-        return 'sales_order_number'
+        return 'sales_order_number'   
+
+class SalesOrderItems(models.Model):
+    item = models.ForeignKey(Items, on_delete=models.CASCADE, blank=True, null=True)
+    hsn = models.CharField(max_length=255)
+    quantity = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2,blank=True, null=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE, blank=True, null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE, blank=True, null=True)
+    
+    
+class SalesOrderReference(models.Model):
+    reference_number = models.CharField(max_length=255)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE, blank=True, null=True)
+    staff = models.ForeignKey(StaffDetails, on_delete=models.CASCADE, blank=True, null=True)
+    
+class SalesOrderHistory(models.Model):
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE, blank=True, null=True)
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE, blank=True, null=True)
+    sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    current_date = models.DateField()
+    action = models.CharField(max_length=255)
+    
+class Salesorder_comments_table(models.Model):
+    login_details=models.ForeignKey(LoginDetails,on_delete=models.CASCADE,null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
+    sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
+ 
+    comment=models.TextField(max_length=500)
+    
+class Salesorder_doc_upload_table(models.Model):
+    login_details=models.ForeignKey(LoginDetails,on_delete=models.CASCADE,null=True)
+    company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE)
+    customer=models.ForeignKey(Customer,on_delete=models.CASCADE,null=True)
+    sales_order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE, blank=True, null=True)
+    title=models.TextField(max_length=200)
+    document=models.FileField(upload_to='doc/')        
+#End
     
 
 

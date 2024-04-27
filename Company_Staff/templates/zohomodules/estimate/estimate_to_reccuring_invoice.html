@@ -401,7 +401,7 @@
                         <label for="" class="labels">RI No.</label>
                       </div>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" value="{{invoice.rec_invoice_no}}" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.rec_invoice_no}}" required>
+                        <input type="text" class="form-control bg-black text-white" value="{{nxtInv}}" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.rec_invoice_no}}" required>
                         <span class="text-danger ml-1" id="invNoErr"></span>
                       </div>
                     </div>
@@ -411,7 +411,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Reference No.</label>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" name="reference_number" value="{{invoice.reference_no}}" readonly>
+                        <input type="text" class="form-control bg-black text-white" name="reference_number" value="{{new_number}}" readonly>
                       </div>
                     </div>
                   </div>
@@ -734,12 +734,12 @@
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Paid Off</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value={{invoice.advance_paid}} class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='advance' id="advance"  value=0 class="form-control bg-black text-white"/></div>
                         </div>
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Balance</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value={{invoice.balance}} readonly class="form-control bg-black text-white" readonly /></div>
+                            <div class="col-sm-7 mt-2"><input type="number" name='balance' id="balance" value={{estimate.grand_total}} readonly class="form-control bg-black text-white" readonly /></div>
                         </div>
                     </div>
                 </div>

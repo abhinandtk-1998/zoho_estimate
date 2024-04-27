@@ -19464,22 +19464,30 @@ def convert_estimate_to_sales_order(request,pk):
             item=Items.objects.all()
             units = Unit.objects.filter(company=company)
             accounts=Chart_of_Accounts.objects.filter(company=company)
-            bnk = Banking.objects.filter(company = company)
+            banks = Banking.objects.filter(company = company)
             
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+
+            if SalesOrderReference.objects.filter(company = company).exists():
+
+                last_ref_num = SalesOrderReference.objects.filter(company = company).last()
+                new_ref_num = last_ref_num.reference_number + 1
+
+            else:
+                new_ref_num = 1
             
 
-            latest_sel = SaleOrder.objects.filter(company = company).order_by('-id').first()
-            new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
-            if SalesOrderReference.objects.filter(company = company).exists():
-                deleted = SalesOrderReference.objects.get(company = comp_details)
-                if deleted:
-                    while int(deleted.reference_number) >= new_number:
-                        new_number+=1
+            # latest_sel = SaleOrder.objects.filter(company = company).order_by('-id').first()
+            # new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
+            # if SalesOrderReference.objects.filter(company = company).exists():
+            #     deleted = SalesOrderReference.objects.get(company = company)
+            #     if deleted:
+            #         while int(deleted.reference_number) >= new_number:
+            #             new_number+=1
             
             nxtSel = ""
-            lastSel = SaleOrder.objects.filter(company = comp_details).last()
+            lastSel = SaleOrder.objects.filter(company = company).last()
             if lastSel:
                 sel_no = str(lastSel.sales_order_number)
                 numbers = []
@@ -19517,6 +19525,11 @@ def convert_estimate_to_sales_order(request,pk):
                 'company':company,
                 'customer':customer_details,
                 'est_items':est_items,
+                'nxtSel':nxtSel,
+                'new_ref_num':new_ref_num,
+                'comp_payment_terms':comp_payment_terms,
+                'banks':banks,
+                'items':item,
                 
 
             }
@@ -19530,6 +19543,62 @@ def convert_estimate_to_sales_order(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.get(estimate=estimate)
 
+
+            customer=Customer.objects.all()
+            item=Items.objects.all()
+            units = Unit.objects.filter(company=company)
+            accounts=Chart_of_Accounts.objects.filter(company=company)
+            banks = Banking.objects.filter(company = company)
+            
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+
+            if SalesOrderReference.objects.filter(company = company).exists():
+
+                last_ref_num = SalesOrderReference.objects.filter(company = company).last()
+                new_ref_num = last_ref_num.reference_number + 1
+
+            else:
+                new_ref_num = 1
+            
+
+            # latest_sel = SaleOrder.objects.filter(company = company).order_by('-id').first()
+            # new_number = int(latest_sel.reference_number) + 1 if latest_sel else 1
+            # if SalesOrderReference.objects.filter(company = company).exists():
+            #     deleted = SalesOrderReference.objects.get(company = company)
+            #     if deleted:
+            #         while int(deleted.reference_number) >= new_number:
+            #             new_number+=1
+            
+            nxtSel = ""
+            lastSel = SaleOrder.objects.filter(company = company).last()
+            if lastSel:
+                sel_no = str(lastSel.sales_order_number)
+                numbers = []
+                stri = []
+                for word in sel_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
+                
+                num=''
+                for i in numbers:
+                    num +=i
+                
+                st = ''
+                for j in stri:
+                    st = st+j
+
+                sel_num = int(num)+1
+
+                padding_length = len(num) - 1
+
+                        
+                nxtSel = f"{st}{num[0]}{sel_num:0{padding_length}d}"
+            else:
+                nxtSel = 'sel-01'
+
         
             context = {
                 'details':dash_details,
@@ -19539,10 +19608,134 @@ def convert_estimate_to_sales_order(request,pk):
                 'company':company,
                 'customer':customer_details,
                 'est_items':est_items,
+                'nxtSel':nxtSel,
+                'new_ref_num':new_ref_num,
+                'comp_payment_terms':comp_payment_terms,
+                'banks':banks,
+                'items':item,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
-        
+
+
+def convert_estimate_to_sales_order_op(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            comp_details = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            comp_details = StaffDetails.objects.get(login_details = log_details).company
+
+        if request.method == 'POST':
+            selNum = request.POST['sales_order_number']
+            if SaleOrder.objects.filter(company = comp_details, sales_order_number__iexact = selNum).exists():
+                res = f'<script>alert("Salesorder Number `{selNum}` already exists, try another!");window.history.back();</script>'
+                return HttpResponse(res)
+
+            sale = SaleOrder(
+                company=comp_details,
+                login_details=log_details,
+                customer = Customer.objects.get(id = request.POST['customerId']),
+                customer_email = request.POST['customer_email'],
+                # customer_billing_address = request.POST['customer_billing_address'],
+                customer_gst_type = request.POST['customer_gst_type'],
+                customer_gst_number = request.POST['customer_gst_number'],
+                customer_place_of_supply = request.POST['customer_place_of_supply'],
+               
+                reference_number = request.POST['reference_number'],
+                sales_order_number =selNum,
+                payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_terms']),
+                sales_order_date = request.POST['sales_order_date'],
+                # expiration_date = datetime.strptime(request.POST['expiration_date'], '%d-%m-%Y').date(),
+                expiration_date = request.POST['expiration_date'],
+
+                payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method'],
+                cheque_number = None if request.POST['cheque_number'] == "" else request.POST['cheque_number'],
+                upi_number = None if request.POST['upi_number'] == "" else request.POST['upi_number'],
+                bank_account_number = None if request.POST['bank_account_number'] == "" else request.POST['bank_account_number'],
+
+
+                sub_total = 0.0 if request.POST['sub_total'] == "" else float(request.POST['sub_total']),
+                igst = 0.0 if request.POST['igst'] == "" else float(request.POST['igst']),
+                cgst = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst']),
+                sgst = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst']),
+                tax_amount = 0.0 if request.POST['tax_amount'] == "" else float(request.POST['tax_amount']),
+                adjustment = 0.0 if request.POST['adjustment'] == "" else float(request.POST['adjustment']),
+                shipping_charge = 0.0 if request.POST['shipping_charge'] == "" else float(request.POST['shipping_charge']),
+                grand_total = 0.0 if request.POST['grand_total'] == "" else float(request.POST['grand_total']),
+                advanced_paid = 0.0 if request.POST['advanced_paid'] == "" else float(request.POST['advanced_paid']),
+                balance = request.POST['grand_total'] if request.POST['balance'] == "" else float(request.POST['balance']),
+                description = request.POST['description'],
+                terms_and_condition = request.POST['terms_and_condition']
+            )
+
+            if 'customer_billing_address' in request.POST:
+                sale.customer_billing_address = request.POST['customer_billing_address']
+
+            sale.save()
+
+            
+
+            if len(request.FILES) != 0:
+                sale.document=request.FILES.get('file')
+            sale.save()
+
+            if 'save_as_draft' in request.POST:
+                sale.status = "Draft"
+            elif "save" in request.POST:
+                sale.status = "Save" 
+            sale.save()
+
+            
+            itemId = request.POST.getlist("item_id[]")
+            itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['customer_place_of_supply'] == comp_details.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    SalesOrderItems.objects.create(company=comp_details, login_details=log_details, sales_order=sale, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                    itm.current_stock -= int(ele[3])
+                    itm.save()
+            
+
+            # Save transaction
+                 
+            SalesOrderHistory.objects.create(
+                company=comp_details,
+                login_details=log_details,
+                sales_order=sale,
+                date=sale.sales_order_date,
+                current_date=date.today(),
+                action='Created'
+            )
+
+
+            # messages.success(request, 'Sales Order created successfully!')
+
+
+            est = Estimate.objects.get(id=pk)
+            est.converted_to_sales_order = sale
+            est.save()
+
+
+            return redirect(sales_estimate)
+        else:
+            return redirect(sales_estimate)
+    else:
+        return redirect('/')
+    
+
+
 
 def convert_estimate_to_invoice(request,pk):
     if 'login_id' in request.session:
@@ -19825,6 +20018,7 @@ def convert_estimate_to_reccuring_invoice(request,pk):
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
 
 
         
@@ -19836,6 +20030,7 @@ def convert_estimate_to_reccuring_invoice(request,pk):
                 'company':company,
                 'customer':customer_details,
                 'est_items':est_items,
+                'comp_payment_terms':comp_payment
                 
 
             }
@@ -19848,6 +20043,7 @@ def convert_estimate_to_reccuring_invoice(request,pk):
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
+            comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
 
         
             context = {
