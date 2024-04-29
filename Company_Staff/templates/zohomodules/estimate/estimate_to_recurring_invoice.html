@@ -251,7 +251,7 @@
             <div class="card mb-5 px-3 py-4" style="background-color: black; border-radius: 1vh;">
               <h1 class="mb-0 text-uppercase text-right" style="color: white; font-weight: bolder;">CONVERT TO RECURRING INVOICE</h1><br>
               <hr class="text-warning">
-              <form action="" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
+              <form action="{% url 'convert_estimate_to_recurring_invoice_op' estimate.id %}" method="post" enctype="multipart/form-data"id="myForm" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="row">
                   <div class="col-md-3">
@@ -434,8 +434,8 @@
                         <div class="d-flex">
                           <select class="form-control bg-black text-white" name="payment_term" id="paymentTerm" required>
                               <option value="" selected> Select Payment Term</option>
-                              {% for term in pTerms %}
-                                {% if invoice.payment_terms.id == term.id %}
+                              {% for term in comp_payment_terms %}
+                                {% if estimate.payment_term.id == term.id %}
                                   <option value="{{term.id}}" text="{{term.days}}" selected>{{term.term_name}}</option>
                                 {% else %}
                                   <option value="{{term.id}}" text="{{term.days}}">{{term.term_name}}</option>
@@ -5775,6 +5775,25 @@ if (vals == "Other Expense") {
     }
 }
 }
+</script>
+
+<script>
+    // Assuming estimate.customer_place_of_supply contains the default value for place of supply
+    const defaultPlaceOfSupply = '{{ estimate.customer_place_of_supply }}';
+
+    // Select the select element by its ID
+    const selectElement = document.getElementById('placeOfSupply');
+
+    // Find the option that matches the default value and set it as selected
+    if (selectElement) {
+        const options = selectElement.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === defaultPlaceOfSupply) {
+                options[i].selected = true;
+                break;
+            }
+        }
+    }
 </script>
 
 {%endblock%}

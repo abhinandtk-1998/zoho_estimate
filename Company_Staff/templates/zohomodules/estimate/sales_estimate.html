@@ -60,7 +60,7 @@
                     <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Draft">Draft</a></li>
                   </ul>
                   <button class="btn btn-outline-warning mr-2 text-yellow m-2" onclick="exportToExcel()"><i class="fa fa-file-export"></i>Export</button>
-                  <button class="btn btn-outline-warning mr-2 text-yellow m-2"><i class="fa fa-file-import"></i> Import </button>
+                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" data-toggle="modal" data-target="#importModal"><i class="fa fa-file-import"></i> Import </button>
                   <a href="{% url 'sales_estimate_new' %}" class="btn btn-outline-warning text-yellow m-2"><i class="fa fa-plus text-yellow"></i>New</a>
                 </div>
               </div>
@@ -104,7 +104,7 @@
                         {% if est.converted_to_invoice %}
                         Converted To Invoice {{est.converted_to_invoice.invoice_number}}
                         {% elif est.converted_to_recurring_invoice %}
-                        Converted To Recurring Invoice {{est.converted_to_invoice.rec_invoice_no}}
+                        Converted To Recurring Invoice {{est.converted_to_recurring_invoice.rec_invoice_no}}
                         {% elif est.converted_to_sales_order %}
                         Converted To Sales Order {{est.converted_to_sales_order.sales_order_number}}
                         {% else %}
@@ -115,7 +115,7 @@
                         <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
                         <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
                         <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
-                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_reccuring_invoice' est.id %}" >To Reccuring Invoice</a></li>
+                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_recurring_invoice' est.id %}" >To Recurring Invoice</a></li>
                         </ul>
                         {% endif %}
 
@@ -125,16 +125,52 @@
                   {% endfor %}
                 </tbody>
               </table>
-
-
-
             </div>
-
-
-
-
-
           </div>
+
+
+          <!-- Import Estimate modal -->
+        <div class="modal fade" id="importModal">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content" style="background-color: #3b3b3b;">
+                    <div class="modal-header">
+                        <h3 class="modal-title text-light" id="exampleModalLabel">Import Estimate</h3>
+                        <button type="button" class="btn close text-white" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3 rounded-1" style="background-color: #000;">
+                        <div class="file_instructions">
+                            <div class="alert alert-danger" role="alert">
+                                <span class="fw-bolder">IMPORTANT:</span>
+                                <p>File should have 2 sheets named 'estimate' & 'items' and column name & order should be in the given formate(Uppercase).</p>
+                                <p class="fw-bolder">Estimate sheet - SLNO*, CUSTOMER*, ESTIMATE DATE*, PLACE OF SUPPLY*, PROFILE NAME, ENTRY TYPE, ESTIMATE NO*, TERMS*, DESCRIPTION, SUB TOTAL*, IGST*, CGST*, SGST*, TAX AMOUNT*, ADJUSTMENT, SHIPPING CHARGE, GRAND TOTAL* </p>
+                                <p class="fw-bolder">Items sheet - ESTIMATE NO**, PRODUCT*, HSN*, QUANTITY*, PRICE*, TAX PERCENTAGE*, DISCOUNT, TOTAL* </p>
+                                <p>* All required columns should be filled.</p>
+                                <p>** <b>ESTIMATE NO</b> is <b>SLNO</b> of estimate</p>
+                                <p>Place of supply should be in the give format with state code('Ex: [KL]-Kerala') or '[OT]-Other Territory'.</p>
+                                <p>Date format should be 'YYYY-MM-DD' or 'DD-MM-YYYY'.</p>
+                            </div>
+                        </div>
+                        <div class="sample_file mb-2">
+                            <a href="{% url 'download_recurring_invoice_sample_import_file' %}" class="fw-bolder btn btn-outline-warning btn-sm">Download Sample File</a>
+                        </div>
+                        <form id="importEstimateForm" action="" method="POST" class="form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="excel_file" class="form-label text-white">File</label>
+                                <input id="excel_file" class="form-control" type="file" name="excel_file" required>
+                            </div>
+                            <div class="d-flex justify-content-center mt-4">
+                                <input id="submit_import_excel" value="IMPORT" class="btn btn-outline-warning" type="submit">
+                            </div>
+                            
+                        </form>
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+            </div>
+        </div>
 </body>
 
 <script>

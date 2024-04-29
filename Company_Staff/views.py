@@ -20005,7 +20005,7 @@ def convert_estimate_to_invoice_op(request,pk):
 
 
 
-def convert_estimate_to_reccuring_invoice(request,pk):
+def convert_estimate_to_recurring_invoice(request,pk):
 
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -20019,6 +20019,46 @@ def convert_estimate_to_reccuring_invoice(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            repeat = CompanyRepeatEvery.objects.filter(company = company)
+
+
+            # Fetching last rec_invoice and assigning upcoming ref no as current + 1
+            # Also check for if any bill is deleted and ref no is continuos w r t the deleted rec_invoice
+            latest_inv = RecurringInvoice.objects.filter(company = company).order_by('-id').first()
+
+            new_number = int(latest_inv.reference_no) + 1 if latest_inv else 1
+
+            if Reccurring_Invoice_Reference.objects.filter(company = company).exists():
+                deleted = Reccurring_Invoice_Reference.objects.get(company = company)
+                
+                if deleted:
+                    while int(deleted.reference_number) >= new_number:
+                        new_number+=1
+
+            # Finding next rec_invoice number w r t last rec_invoice number if exists.
+            nxtInv = ""
+            lastInv = RecurringInvoice.objects.filter(company=company).last()
+
+            if lastInv:
+                inv_no = str(lastInv.rec_invoice_no)
+                numbers = []
+                stri = []
+                for word in inv_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
+
+                num = ''.join(numbers)
+                st = ''.join(stri)
+
+                inv_num = int(num) + 1
+                if num[0] == 0:
+                    nxtInv = st + num.zfill(len(num)) 
+                else:
+                    nxtInv = st + str(inv_num).zfill(len(num))
+            else:
+                nxtInv = 'RI001'
 
 
         
@@ -20030,11 +20070,13 @@ def convert_estimate_to_reccuring_invoice(request,pk):
                 'company':company,
                 'customer':customer_details,
                 'est_items':est_items,
-                'comp_payment_terms':comp_payment
-                
+                'comp_payment_terms':comp_payment_terms,
+                'nxtInv':nxtInv,
+                'new_number':new_number,
+                'repeat':repeat,
 
             }
-            return render(request,'zohomodules/estimate/estimate_to_reccuring_invoice.html', context)
+            return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
 
         if login_d.user_type == 'Staff':
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
@@ -20044,6 +20086,46 @@ def convert_estimate_to_reccuring_invoice(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            repeat = CompanyRepeatEvery.objects.filter(company = company)
+
+
+            # Fetching last rec_invoice and assigning upcoming ref no as current + 1
+            # Also check for if any bill is deleted and ref no is continuos w r t the deleted rec_invoice
+            latest_inv = RecurringInvoice.objects.filter(company = company).order_by('-id').first()
+
+            new_number = int(latest_inv.reference_no) + 1 if latest_inv else 1
+
+            if Reccurring_Invoice_Reference.objects.filter(company = company).exists():
+                deleted = Reccurring_Invoice_Reference.objects.get(company = company)
+                
+                if deleted:
+                    while int(deleted.reference_number) >= new_number:
+                        new_number+=1
+
+            # Finding next rec_invoice number w r t last rec_invoice number if exists.
+            nxtInv = ""
+            lastInv = RecurringInvoice.objects.filter(company=company).last()
+
+            if lastInv:
+                inv_no = str(lastInv.rec_invoice_no)
+                numbers = []
+                stri = []
+                for word in inv_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
+
+                num = ''.join(numbers)
+                st = ''.join(stri)
+
+                inv_num = int(num) + 1
+                if num[0] == 0:
+                    nxtInv = st + num.zfill(len(num)) 
+                else:
+                    nxtInv = st + str(inv_num).zfill(len(num))
+            else:
+                nxtInv = 'RI001'
 
         
             context = {
@@ -20054,13 +20136,424 @@ def convert_estimate_to_reccuring_invoice(request,pk):
                 'company':company,
                 'customer':customer_details,
                 'est_items':est_items,
+                'comp_payment_terms':comp_payment_terms,
+                'nxtInv':nxtInv,
+                'new_number':new_number,
+                'repeat':repeat,
 
             }
-            return render(request,'zohomodules/estimate/estimate_to_reccuring_invoice.html', context)
+            return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
+
+def convert_estimate_to_recurring_invoice_op(request,pk):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        if request.method == 'POST':
+            invNum = request.POST['rec_invoice_no']
+
+            PatternStr = []
+            for word in invNum:
+                if word.isdigit():
+                    pass
+                else:
+                    PatternStr.append(word)
+            
+            pattern = ''
+            for j in PatternStr:
+                pattern += j
+
+            # pattern_exists = checkRecInvNumberPattern(pattern)
+
+            # if pattern !="" and pattern_exists:
+            #     res = f'<script>alert("Rec. Invoice No. Pattern already Exists.! Try another!");window.history.back();</script>'
+            #     return HttpResponse(res)
+
+            if RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = invNum).exists():
+                res = f'<script>alert("Rec. Invoice Number `{invNum}` already exists, try another!");window.history.back();</script>'
+                return HttpResponse(res)
+
+            inv = RecurringInvoice(
+                company = com,
+                login_details = com.login_details,
+                customer = Customer.objects.get(id = request.POST['customerId']),
+                customer_email = request.POST['customer_email'],
+                # billing_address = request.POST['bill_address'],
+                gst_type = request.POST['customer_gst_type'],
+                # gstin = request.POST['customer_gstin'],
+                place_of_supply = request.POST['place_of_supply'],
+                profile_name = request.POST['profile_name'],
+                entry_type = None if request.POST['entry_type'] == "" else request.POST['entry_type'],
+                reference_no = request.POST['reference_number'],
+                rec_invoice_no = invNum,
+                payment_terms = Company_Payment_Term.objects.get(id = request.POST['payment_term']),
+                start_date = request.POST['start_date'],
+                end_date = datetime.strptime(request.POST['end_date'], '%d-%m-%Y').date(),
+                salesOrder_no = request.POST['order_number'],
+                price_list_applied = True if 'priceList' in request.POST else False,
+                price_list = None if request.POST['price_list_id'] == "" else PriceList.objects.get(id = request.POST['price_list_id']),
+                repeat_every = CompanyRepeatEvery.objects.get(id = request.POST['repeat_every']),
+                payment_method = None if request.POST['payment_method'] == "" else request.POST['payment_method'],
+                cheque_number = None if request.POST['cheque_id'] == "" else request.POST['cheque_id'],
+                upi_number = None if request.POST['upi_id'] == "" else request.POST['upi_id'],
+                bank_account_number = None if request.POST['bnk_id'] == "" else request.POST['bnk_id'],
+                subtotal = 0.0 if request.POST['subtotal'] == "" else float(request.POST['subtotal']),
+                igst = 0.0 if request.POST['igst'] == "" else float(request.POST['igst']),
+                cgst = 0.0 if request.POST['cgst'] == "" else float(request.POST['cgst']),
+                sgst = 0.0 if request.POST['sgst'] == "" else float(request.POST['sgst']),
+                tax_amount = 0.0 if request.POST['taxamount'] == "" else float(request.POST['taxamount']),
+                adjustment = 0.0 if request.POST['adj'] == "" else float(request.POST['adj']),
+                shipping_charge = 0.0 if request.POST['ship'] == "" else float(request.POST['ship']),
+                grandtotal = 0.0 if request.POST['grandtotal'] == "" else float(request.POST['grandtotal']),
+                advance_paid = 0.0 if request.POST['advance'] == "" else float(request.POST['advance']),
+                balance = request.POST['grandtotal'] if request.POST['balance'] == "" else float(request.POST['balance']),
+                description = request.POST['note'],
+                terms_and_conditions = request.POST['terms']
+            )
+
+            if 'customer_gstin' in request.POST:
+                inv.gstin = request.POST['customer_gstin']
+            if 'bill_address' in request.POST:
+                inv.billing_address = request.POST['bill_address']
 
 
+            inv.save()
+
+            if len(request.FILES) != 0:
+                inv.document=request.FILES.get('file')
+            inv.save()
+
+            if 'Draft' in request.POST:
+                inv.status = "Draft"
+            elif "Saved" in request.POST:
+                inv.status = "Saved" 
+            inv.save()
+
+            # Save rec_invoice items.
+
+            itemId = request.POST.getlist("item_id[]")
+            itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("priceListPrice[]") if 'priceList' in request.POST else request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == com.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            if len(itemId)==len(itemName)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and itemName and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,itemName,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = inv, item = itm, hsn = ele[2], quantity = int(ele[3]), price = float(ele[4]), tax_rate = ele[5], discount = float(ele[6]), total = float(ele[7]))
+                    itm.current_stock -= int(ele[3])
+                    itm.save()
+
+            # Save transaction
+                    
+            RecurringInvoiceHistory.objects.create(
+                company = com,
+                login_details = log_details,
+                recurring_invoice = inv,
+                action = 'Created'
+            )
 
 
+            est = Estimate.objects.get(id=pk)
+            est.converted_to_recurring_invoice = inv
+            est.save()
+
+            return redirect(sales_estimate)
+        else:
+            return redirect(sales_estimate)
+    else:
+       return redirect('/')
+
+def download_recurring_invoice_sample_import_file(request):
+
+    estimate_table_data = [['SLNO','CUSTOMER','ESTIMATE DATE','PLACE OF SUPPLY','ESTIMATE NO','TERMS','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','SHIPPING CHARGE','GRAND TOTAL'],['1', 'Arun Kumar', '2024-03-20', '[KL]-Kerala','EST100','NET 30','','1000','0','25','25','50','0','0','1050']]
+    items_table_data = [['ESTIMATE NO', 'PRODUCT','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL'], ['1', 'Test Item 1','789987','1','1000','5','0','1000']]
+
+    wb = Workbook()
+
+    sheet1 = wb.active
+    sheet1.title = 'estimate'
+    sheet2 = wb.create_sheet(title='items')
+
+    # Populate the sheets with data
+    for row in estimate_table_data:
+        sheet1.append(row)
+
+    for row in items_table_data:
+        sheet2.append(row)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=estimate_sample_file.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
 
 
+def import_estimate_from_excel(request):
+    
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company 
+
+        current_datetime = timezone.now()
+        dateToday =  current_datetime.date()
+
+        if request.method == "POST" and 'excel_file' in request.FILES:
+        
+            excel_file = request.FILES['excel_file']
+
+            wb = load_workbook(excel_file)
+
+            # checking estimate sheet columns
+            try:
+                ws = wb["estimate"]
+            except:
+                print('sheet not found')
+                messages.error(request,'`estimate` sheet not found.! Please check.')
+                return redirect(sales_estimate)
+
+            try:
+                ws = wb["items"]
+            except:
+                print('sheet not found')
+                messages.error(request,'`items` sheet not found.! Please check.')
+                return redirect(sales_estimate)
+            
+            ws = wb["estimate"]
+            estimate_columns = ['SLNO','CUSTOMER','ESTIMATE DATE','PLACE OF SUPPLY','ESTIMATE NO','TERMS','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','SHIPPING CHARGE','GRAND TOTAL']
+            estimate_sheet = [cell.value for cell in ws[1]]
+            if estimate_sheet != estimate_columns:
+                print('invalid sheet')
+                messages.error(request,'`estimate` sheet column names or order is not in the required formate.! Please check.')
+                return redirect(sales_estimate)
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                slno, customer,date,place_of_supply, profile_name, entry_type, rec_inv_no, terms, repeat, price_list, description, subtotal, igst, cgst, sgst, taxamount, adjustment, shipping, grandtotal, advance = row
+                if slno is None  or customer is None  or date is None or place_of_supply is None  or rec_inv_no is None  or terms is None  or repeat is None  or subtotal is None or taxamount is None or grandtotal is None:
+                    print('recurringInvoice == invalid data')
+                    messages.error(request,'`recurring_invoice` sheet entries missing required fields.! Please check.')
+                    return redirect(sales_estimate)
+            
+            # checking items sheet columns
+            ws = wb["items"]
+            items_columns = ['RI NO','PRODUCT','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL']
+            items_sheet = [cell.value for cell in ws[1]]
+            if items_sheet != items_columns:
+                print('invalid sheet')
+                messages.error(request,'`items` sheet column names or order is not in the required formate.! Please check.')
+                return redirect(sales_estimate)
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                ri_no,name,hsn,quantity,price,tax_percentage,discount,total = row
+                if ri_no is None or name is None or quantity is None or tax_percentage is None or total is None:
+                    print('items == invalid data')
+                    messages.error(request,'`items` sheet entries missing required fields.! Please check.')
+                    return redirect(sales_estimate)
+            
+            # getting data from rec_invoice sheet and create rec_invoice.
+            incorrect_data = []
+            existing_pattern = []
+            ws = wb['recurring_invoice']
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                slno, customer,startdate,place_of_supply, profile_name, entry_type, rec_inv_no, terms, repeat, price_list, description, subtotal, igst, cgst, sgst, taxamount, adjustment, shipping, grandtotal, advance = row
+                recInvNo = slno
+                if slno is None:
+                    continue
+                # Fetching last rec_inv and assigning upcoming rec_inv no as current + 1
+                # Also check for if any rec_inv is deleted and rec_inv no is continuos w r t the deleted rec_inv
+                latest_inv = RecurringInvoice.objects.filter(company = com).order_by('-id').first()
+                
+                new_number = int(latest_inv.reference_no) + 1 if latest_inv else 1
+
+                if Reccurring_Invoice_Reference.objects.filter(company = com).exists():
+                    deleted = Reccurring_Invoice_Reference.objects.get(company = com)
+                    
+                    if deleted:
+                        while int(deleted.reference_number) >= new_number:
+                            new_number+=1
+                
+                cust = customer.split(' ')
+            
+                if len(cust) > 2:
+                    cust[1] = cust[1] + ' ' + ' '.join(cust[2:])
+                    cust = cust[:2]
+                    fName = cust[0]
+                    lName = cust[1]
+                else:
+                    fName = cust[0]
+                    lName = cust[1]
+                print(cust,fName,lName)
+
+                if lName == "":  
+                    if not Customer.objects.filter(company = com, first_name = fName).exists():
+                        print('No Customer1')
+                        incorrect_data.append(slno)
+                        continue
+                    try:
+                        c = Customer.objects.filter(company = com, first_name = fName).first()
+                        email = c.customer_email
+                        gstType = c.GST_treatement
+                        gstIn = c.GST_number
+                        adrs = f"{c.billing_address}, {c.billing_city}\n{c.billing_state}\n{c.billing_country}\n{c.billing_pincode}"
+                    except:
+                        pass
+
+                if fName != "" and lName != "":  
+                    if not Customer.objects.filter(company = com, first_name = fName, last_name = lName).exists():
+                        print('No Customer2')
+                        incorrect_data.append(slno)
+                        continue
+                    try:
+                        c = Customer.objects.filter(company = com, first_name = fName, last_name = lName).first()
+                        email = c.customer_email
+                        gstType = c.GST_treatement
+                        gstIn = c.GST_number
+                        adrs = f"{c.billing_address}, {c.billing_city}\n{c.billing_state}\n{c.billing_country}\n{c.billing_pincode}"
+                    except:
+                        pass
+
+                if startdate is None:
+                    startdate = dateToday
+                else:
+                    startdate = datetime.strptime(startdate, '%Y-%m-%d').date()
+
+                PatternStr = []
+                for word in rec_inv_no:
+                    if word.isdigit():
+                        pass
+                    else:
+                        PatternStr.append(word)
+                
+                pattern = ''
+                for j in PatternStr:
+                    pattern += j
+
+                pattern_exists = checkRecInvNumberPattern(pattern)
+
+                if pattern !="" and pattern_exists:
+                    existing_pattern.append(slno)
+                    continue
+
+                while RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = rec_inv_no).exists():
+                    rec_inv_no = getNextRINumber(rec_inv_no)
+
+                try:
+                    trm = Company_Payment_Term.objects.get(company = com, term_name = terms)
+                    endDate = startdate+timedelta(days = trm.days)
+                except:
+                    trm = None
+                    endDate = None
+                try:
+                    priceList = PriceList.objects.get(company = com, name = price_list)
+                except:
+                    priceList = None
+
+                try:
+                    rpt = CompanyRepeatEvery.objects.get(company = com, repeat_every = repeat)
+                except:
+                    rpt = None
+
+                recInv = RecurringInvoice(
+                    company = com,
+                    login_details = com.login_details,
+                    customer = None if c is None else c,
+                    customer_email = email,
+                    billing_address = adrs,
+                    gst_type = gstType,
+                    gstin = gstIn,
+                    place_of_supply = place_of_supply,
+                    profile_name = profile_name,
+                    entry_type = None if entry_type == "" else entry_type,
+                    reference_no = new_number,
+                    rec_invoice_no = rec_inv_no,
+                    payment_terms = trm,
+                    start_date = startdate,
+                    end_date = endDate,
+                    salesOrder_no = None,
+                    price_list_applied = True if priceList is not None else False,
+                    price_list = priceList,
+                    repeat_every = rpt,
+                    payment_method = None,
+                    cheque_number = None,
+                    upi_number = None,
+                    bank_account_number = None,
+                    subtotal = 0.0 if subtotal == "" else float(subtotal),
+                    igst = 0.0 if igst == "" else float(igst),
+                    cgst = 0.0 if cgst == "" else float(cgst),
+                    sgst = 0.0 if sgst == "" else float(sgst),
+                    tax_amount = 0.0 if taxamount == "" else float(taxamount),
+                    adjustment = 0.0 if adjustment == "" else float(adjustment),
+                    shipping_charge = 0.0 if shipping == "" else float(shipping),
+                    grandtotal = 0.0 if grandtotal == "" else float(grandtotal),
+                    advance_paid = 0.0 if advance == "" else float(advance),
+                    balance = float(grandtotal) - float(advance),
+                    description = description,
+                    status = "Draft"
+                )
+                recInv.save()
+
+                # Transaction history
+                history = RecurringInvoiceHistory(
+                    company = com,
+                    login_details = log_details,
+                    recurring_invoice = recInv,
+                    action = 'Created'
+                )
+                history.save()
+
+                # Items for the estimate
+                ws = wb['items']
+                for row in ws.iter_rows(min_row=2, values_only=True):
+                    rec_no,name,hsn,quantity,price,tax_percentage,discount,total = row
+                    if int(rec_no) == int(recInvNo):
+                        print(row)
+                        if discount is None:
+                            discount=0
+                        if price is None:
+                            price=0
+                        if quantity is None:
+                            quantity=0
+                        if not Items.objects.filter(company = com, item_name = name).exists():
+                            print('No Item')
+                            incorrect_data.append(rec_no)
+                            continue
+                        try:
+                            itm = Items.objects.filter(company = com, item_name = name).first()
+                        except:
+                            pass
+
+                        Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = recInv, item = itm, hsn = hsn, quantity = quantity, price = price, tax_rate = tax_percentage, discount = discount, total = total)
+                        itm.current_stock -= int(quantity)
+                        itm.save()
+
+            if not incorrect_data and not existing_pattern:
+                messages.success(request, 'Data imported successfully.!')
+                return redirect(sales_estimate)
+            else:
+                if incorrect_data:
+                    messages.warning(request, f'Data with following SlNo could not import due to incorrect data provided -> {", ".join(str(item) for item in incorrect_data)}')
+                if existing_pattern:
+                    messages.warning(request, f'Data with following SlNo could not import due to RI No pattern exists already -> {", ".join(str(item) for item in existing_pattern)}')
+                return redirect(sales_estimate)
+        else:
+            return redirect(sales_estimate)
+    else:
+        return redirect('/')
 
