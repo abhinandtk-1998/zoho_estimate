@@ -70,6 +70,7 @@ from reportlab.platypus import Spacer
 from email.mime.base import MIMEBase
 from email import encoders
 from reportlab.pdfgen import canvas
+from django.core.mail import EmailMessage as EmailMsg
 
 
 # Create your views here.
@@ -20345,15 +20346,15 @@ def import_estimate_from_excel(request):
                 return redirect(sales_estimate)
 
             for row in ws.iter_rows(min_row=2, values_only=True):
-                slno, customer,date,place_of_supply, profile_name, entry_type, rec_inv_no, terms, repeat, price_list, description, subtotal, igst, cgst, sgst, taxamount, adjustment, shipping, grandtotal, advance = row
-                if slno is None  or customer is None  or date is None or place_of_supply is None  or rec_inv_no is None  or terms is None  or repeat is None  or subtotal is None or taxamount is None or grandtotal is None:
-                    print('recurringInvoice == invalid data')
-                    messages.error(request,'`recurring_invoice` sheet entries missing required fields.! Please check.')
+                slno, customer,date,place_of_supply, estimate_no, terms, description, subtotal, igst, cgst, sgst, taxamount, adjustment, shipping, grandtotal = row
+                if slno is None  or customer is None  or date is None or place_of_supply is None  or estimate_no is None  or terms is None  or subtotal is None or taxamount is None or grandtotal is None:
+                    print('estimate == invalid data')
+                    messages.error(request,'`estimate` sheet entries missing required fields.! Please check.')
                     return redirect(sales_estimate)
             
             # checking items sheet columns
             ws = wb["items"]
-            items_columns = ['RI NO','PRODUCT','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL']
+            items_columns = ['ESTIMATE NO','PRODUCT','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL']
             items_sheet = [cell.value for cell in ws[1]]
             if items_sheet != items_columns:
                 print('invalid sheet')
@@ -20361,33 +20362,33 @@ def import_estimate_from_excel(request):
                 return redirect(sales_estimate)
 
             for row in ws.iter_rows(min_row=2, values_only=True):
-                ri_no,name,hsn,quantity,price,tax_percentage,discount,total = row
-                if ri_no is None or name is None or quantity is None or tax_percentage is None or total is None:
+                est_no,name,hsn,quantity,price,tax_percentage,discount,total = row
+                if est_no is None or name is None or quantity is None or tax_percentage is None or total is None:
                     print('items == invalid data')
                     messages.error(request,'`items` sheet entries missing required fields.! Please check.')
                     return redirect(sales_estimate)
             
-            # getting data from rec_invoice sheet and create rec_invoice.
+            # getting data from estimate sheet and create estimate.
             incorrect_data = []
             existing_pattern = []
-            ws = wb['recurring_invoice']
+            ws = wb['estimate']
             for row in ws.iter_rows(min_row=2, values_only=True):
-                slno, customer,startdate,place_of_supply, profile_name, entry_type, rec_inv_no, terms, repeat, price_list, description, subtotal, igst, cgst, sgst, taxamount, adjustment, shipping, grandtotal, advance = row
-                recInvNo = slno
+                slno, customer,startdate,place_of_supply, estimate_no, terms, description, subtotal, igst, cgst, sgst, taxamount, adjustment, shipping, grandtotal = row
+                estNo = slno
                 if slno is None:
                     continue
                 # Fetching last rec_inv and assigning upcoming rec_inv no as current + 1
                 # Also check for if any rec_inv is deleted and rec_inv no is continuos w r t the deleted rec_inv
-                latest_inv = RecurringInvoice.objects.filter(company = com).order_by('-id').first()
+                latest_est = Estimate.objects.filter(company = com).order_by('-id').first()
                 
-                new_number = int(latest_inv.reference_no) + 1 if latest_inv else 1
+                new_number = int(latest_est.reference_number) + 1 if latest_est else 1
 
-                if Reccurring_Invoice_Reference.objects.filter(company = com).exists():
-                    deleted = Reccurring_Invoice_Reference.objects.get(company = com)
+                # if EstimateReference.objects.filter(company = com).exists():
+                #     deleted = EstimateReference.objects.get(company = com)
                     
-                    if deleted:
-                        while int(deleted.reference_number) >= new_number:
-                            new_number+=1
+                #     if deleted:
+                #         while int(deleted.reference_number) >= new_number:
+                #             new_number+=1
                 
                 cust = customer.split(' ')
             
@@ -20435,7 +20436,7 @@ def import_estimate_from_excel(request):
                     startdate = datetime.strptime(startdate, '%Y-%m-%d').date()
 
                 PatternStr = []
-                for word in rec_inv_no:
+                for word in estimate_no:
                     if word.isdigit():
                         pass
                     else:
@@ -20445,14 +20446,14 @@ def import_estimate_from_excel(request):
                 for j in PatternStr:
                     pattern += j
 
-                pattern_exists = checkRecInvNumberPattern(pattern)
+                pattern_exists = checkEstNumberPattern(pattern)
 
                 if pattern !="" and pattern_exists:
                     existing_pattern.append(slno)
                     continue
 
-                while RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = rec_inv_no).exists():
-                    rec_inv_no = getNextRINumber(rec_inv_no)
+                while Estimate.objects.filter(company = com, estimate_no__iexact = estimate_no).exists():
+                    estimate_no = getNextEstNumber(estimate_no)
 
                 try:
                     trm = Company_Payment_Term.objects.get(company = com, term_name = terms)
@@ -20460,60 +20461,49 @@ def import_estimate_from_excel(request):
                 except:
                     trm = None
                     endDate = None
-                try:
-                    priceList = PriceList.objects.get(company = com, name = price_list)
-                except:
-                    priceList = None
+                # try:
+                #     priceList = PriceList.objects.get(company = com, name = price_list)
+                # except:
+                #     priceList = None
 
-                try:
-                    rpt = CompanyRepeatEvery.objects.get(company = com, repeat_every = repeat)
-                except:
-                    rpt = None
+                # try:
+                #     rpt = CompanyRepeatEvery.objects.get(company = com, repeat_every = repeat)
+                # except:
+                #     rpt = None
 
-                recInv = RecurringInvoice(
+                est = Estimate(
                     company = com,
                     login_details = com.login_details,
                     customer = None if c is None else c,
                     customer_email = email,
-                    billing_address = adrs,
-                    gst_type = gstType,
-                    gstin = gstIn,
-                    place_of_supply = place_of_supply,
-                    profile_name = profile_name,
-                    entry_type = None if entry_type == "" else entry_type,
-                    reference_no = new_number,
-                    rec_invoice_no = rec_inv_no,
-                    payment_terms = trm,
-                    start_date = startdate,
-                    end_date = endDate,
-                    salesOrder_no = None,
-                    price_list_applied = True if priceList is not None else False,
-                    price_list = priceList,
-                    repeat_every = rpt,
-                    payment_method = None,
-                    cheque_number = None,
-                    upi_number = None,
-                    bank_account_number = None,
-                    subtotal = 0.0 if subtotal == "" else float(subtotal),
-                    igst = 0.0 if igst == "" else float(igst),
+                    customer_bill_address = adrs,
+                    customer_gst_treatment = gstType,
+                    customer_gst_number = gstIn,
+                    customer_place_of_supply = place_of_supply,
+                    reference_number = new_number,
+                    estimate_number = estimate_no,
+                    payment_term = trm,
+                    estimate_date = startdate,
+                    expiration_date = endDate,
+                    sub_total = 0.0 if subtotal == "" else float(subtotal),
+                    tax_amount_igst = 0.0 if igst == "" else float(igst),
                     cgst = 0.0 if cgst == "" else float(cgst),
                     sgst = 0.0 if sgst == "" else float(sgst),
                     tax_amount = 0.0 if taxamount == "" else float(taxamount),
                     adjustment = 0.0 if adjustment == "" else float(adjustment),
                     shipping_charge = 0.0 if shipping == "" else float(shipping),
-                    grandtotal = 0.0 if grandtotal == "" else float(grandtotal),
-                    advance_paid = 0.0 if advance == "" else float(advance),
-                    balance = float(grandtotal) - float(advance),
+                    grand_total = 0.0 if grandtotal == "" else float(grandtotal),
                     description = description,
                     status = "Draft"
                 )
-                recInv.save()
+                est.save()
 
                 # Transaction history
-                history = RecurringInvoiceHistory(
+                history = EstimateHistory(
                     company = com,
                     login_details = log_details,
-                    recurring_invoice = recInv,
+                    estimate = est,
+                    date = dateToday,
                     action = 'Created'
                 )
                 history.save()
@@ -20521,8 +20511,8 @@ def import_estimate_from_excel(request):
                 # Items for the estimate
                 ws = wb['items']
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    rec_no,name,hsn,quantity,price,tax_percentage,discount,total = row
-                    if int(rec_no) == int(recInvNo):
+                    est_no,name,hsn,quantity,price,tax_percentage,discount,total = row
+                    if int(est_no) == int(estNo):
                         print(row)
                         if discount is None:
                             discount=0
@@ -20532,14 +20522,14 @@ def import_estimate_from_excel(request):
                             quantity=0
                         if not Items.objects.filter(company = com, item_name = name).exists():
                             print('No Item')
-                            incorrect_data.append(rec_no)
+                            incorrect_data.append(est_no)
                             continue
                         try:
                             itm = Items.objects.filter(company = com, item_name = name).first()
                         except:
                             pass
 
-                        Reccurring_Invoice_item.objects.create(company = com, login_details = com.login_details, reccuring_invoice = recInv, item = itm, hsn = hsn, quantity = quantity, price = price, tax_rate = tax_percentage, discount = discount, total = total)
+                        EstimateItems.objects.create(company = com, login_details = com.login_details, estimate = est, item = itm, hsn = hsn, quantity = quantity, price = price, tax_rate = tax_percentage, discount = discount, total = total)
                         itm.current_stock -= int(quantity)
                         itm.save()
 
@@ -20550,10 +20540,87 @@ def import_estimate_from_excel(request):
                 if incorrect_data:
                     messages.warning(request, f'Data with following SlNo could not import due to incorrect data provided -> {", ".join(str(item) for item in incorrect_data)}')
                 if existing_pattern:
-                    messages.warning(request, f'Data with following SlNo could not import due to RI No pattern exists already -> {", ".join(str(item) for item in existing_pattern)}')
+                    messages.warning(request, f'Data with following SlNo could not import due to Estimate No pattern exists already -> {", ".join(str(item) for item in existing_pattern)}')
                 return redirect(sales_estimate)
         else:
             return redirect(sales_estimate)
     else:
         return redirect('/')
+
+
+def getNextEstNumber(estimate_no):
+    est_no = estimate_no
+    numbers = []
+    stri = []
+    for word in est_no:
+        if word.isdigit():
+            numbers.append(word)
+        else:
+            stri.append(word)
+    
+    num = ''.join(numbers)
+    st = ''.join(stri)
+
+    est_num = int(num) + 1
+    if num[0] == 0:
+        nxtEstInv = st + num.zfill(len(num)) 
+    else:
+        nxtEstInv = st + str(est_num).zfill(len(num))
+
+    return nxtEstInv
+
+
+def checkEstNumberPattern(pattern):
+    models = [invoice, Journal, SaleOrder]
+
+    for model in models:
+        field_name = model.getNumFieldName(model)
+        if model.objects.filter(**{f"{field_name}__icontains": pattern}).exists():
+            return True
+    return False
+
+
+def estimate_share_email(request,pk):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        est = Estimate.objects.get(id = pk)
+        itms = EstimateItems.objects.filter(estimate = est)
+        try:
+            if request.method == 'POST':
+                emails_string = request.POST['email_ids']
+
+                # Split the string by commas and remove any leading or trailing whitespace
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                email_message = request.POST['email_message']
+                # print(emails_list)
+            
+                context = {'estimate':est, 'estimateItems':itms,'cmp':com}
+                template_path = 'zohomodules/estimate/estimate_pdf.html'
+                template = get_template(template_path)
+
+                html  = template.render(context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                pdf = result.getvalue()
+                filename = f'Estimate_{est.estimate_number}'
+                subject = f"Estimate_{est.estimate_number}"
+                # from django.core.mail import EmailMessage as EmailMsg
+                email = EmailMsg(subject, f"Hi,\nPlease find the attached Estimate for - ESTIMATE-{est.estimate_number}. \n{email_message}\n\n--\nRegards,\n{com.company_name}\n{com.address}\n{com.state} - {com.country}\n{com.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                email.attach(filename, pdf, "application/pdf")
+                email.send(fail_silently=False)
+
+                messages.success(request, 'Estimate details has been shared via email successfully..!')
+                return redirect(reverse('sales_estimate_overview', args=[pk]))
+        except Exception as e:
+            print(e)
+            messages.error(request, f'{e}')
+            return redirect(reverse('sales_estimate_overview', args=[pk]))
+
+
 

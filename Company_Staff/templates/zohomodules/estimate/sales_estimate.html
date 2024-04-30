@@ -37,6 +37,16 @@
 
           <div style="overflow-x:auto;background-color: black;border-radius: 10px;" class="m-3 p-5"> 
             <h1 class="text-center text-white">All Estimates</h1>
+            {% for message in messages %}
+                    <h5>
+                      <div class="alert alert-danger message text-center" style="color: black;" id="alert_danger">
+                        {{ message }}
+                        <a type="button" id="alert_close" class="close" data-dismiss="alert" aria-label="Close" style="float: right;">
+                            <span aria-hidden="true" style="font-size: large; color: #68020F;">&times;</span>
+                        </a>
+                      </div>
+                    </h5>
+            {% endfor %}
             <div class="table-responsive">
               <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
@@ -155,7 +165,7 @@
                         <div class="sample_file mb-2">
                             <a href="{% url 'download_recurring_invoice_sample_import_file' %}" class="fw-bolder btn btn-outline-warning btn-sm">Download Sample File</a>
                         </div>
-                        <form id="importEstimateForm" action="" method="POST" class="form" enctype="multipart/form-data">
+                        <form id="importEstimateForm" action="{% url 'import_estimate_from_excel' %}" method="POST" class="form" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="excel_file" class="form-label text-white">File</label>
