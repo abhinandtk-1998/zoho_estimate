@@ -1201,10 +1201,18 @@ class Estimate(models.Model):
     shipping_charge = models.FloatField()
     adjustment = models.FloatField()
     grand_total = models.FloatField()
-    status = models.CharField(max_length=255)
+
+    STATUS_CHOICES = [
+        ('Draft', 'Draft'),
+        ('Saved', 'Saved'),
+    ]
+    status = models.CharField(max_length=255,  choices=STATUS_CHOICES)
     converted_to_invoice = models.ForeignKey(invoice,on_delete=models.CASCADE,null=True)
     converted_to_recurring_invoice = models.ForeignKey(RecurringInvoice,on_delete=models.CASCADE,null=True)
     converted_to_sales_order = models.ForeignKey(SaleOrder,on_delete=models.CASCADE,null=True)
+
+    def getNumFieldName(self):
+        return 'estimate_number'
 
 
 class EstimateItems(models.Model):

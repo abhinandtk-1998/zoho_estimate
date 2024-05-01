@@ -467,6 +467,7 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/Overview/Delete/<int:pk>',views.sales_estimate_delete,name='sales_estimate_delete'),
     path('Zohomodule/Sales/Estimate/Overview/Convert/<int:pk>',views.sales_estimate_convert_saved,name='sales_estimate_convert_saved'),
     path('Zohomodule/Sales/Estimate/Overview/Share_email/<int:pk>',views.estimate_share_email,name='estimate_share_email'),
+    path('Zohomodule/Sales/Estimate/Overview/attach_document/<int:pk>',views.attach_estimate_document,name='attach_estimate_document'),
     path('Zohomodule/Sales/Estimate/Convert/Sales_order/<int:pk>',views.convert_estimate_to_sales_order,name='convert_estimate_to_sales_order'),
     path('Zohomodule/Sales/Estimate/Convert/Sales_order_operation/<int:pk>',views.convert_estimate_to_sales_order_op,name='convert_estimate_to_sales_order_op'),
     path('Zohomodule/Sales/Estimate/Convert/Invoice/<int:pk>',views.convert_estimate_to_invoice,name='convert_estimate_to_invoice'),
@@ -475,6 +476,9 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/Convert/Recurring_invoice_operation/<int:pk>',views.convert_estimate_to_recurring_invoice_op,name='convert_estimate_to_recurring_invoice_op'),
     path('Zohomodule/Sales/Estimate/Import',views.download_recurring_invoice_sample_import_file,name='download_recurring_invoice_sample_import_file'),
     path('Zohomodule/Sales/Estimate/Import_operation',views.import_estimate_from_excel,name='import_estimate_from_excel'),
+
+    path('Company/new_sales_customer_ajax',views.newSalesCustomerAjax, name='newSalesCustomerAjax'),
+    path('Company/get_all_cust',views.getCustomersAjax, name='getCustomersAjax'),
 
 
 

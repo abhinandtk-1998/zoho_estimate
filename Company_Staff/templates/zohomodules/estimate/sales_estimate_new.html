@@ -920,12 +920,12 @@
 
 
             <!-- Modal Customer Add-->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
               <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                   <div class="modal-header">
                     
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-dismiss="modal"></button>
                   </div>
                   <div class="modal-body">
                   <div class="card p-3 m-3" style="background-color: black;">
@@ -935,7 +935,7 @@
 
                     <hr style="color: yellow;" class="mb-5">
 
-                    <form  method="post" action="{% url 'sales_estimate_new_customer' %}"  enctype="multipart/form-data" class="mb-3">
+                    <form  id="newCustomerForm"  class="mb-3">
                       {% csrf_token %}
 
                       <div class="form-group row mt-4">
@@ -1630,7 +1630,7 @@
 
                 <div class="row mt-5">
                     <div class="col-sm-12 col-md-2 col-lg-2 mt-3">
-                        <button type="submit" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" >Save</button>
+                        <button type="button" class="btn btn-outline-warning form-control bg-warning text-dark" style="font-weight: bold;" id="newCustomerSave1" >Save</button>
                        
                     </div>
                     
@@ -3270,6 +3270,223 @@ $(document).ready(function(){
         refreshTax();
         calc();
     });
+
+
+
+
+
+    $(document).ready(function(){
+
+    $(document).on("click", "#newCustomerSave1", function(){
+        console.log("Button clicked!");
+      var type = $('input[name="type"]:checked').val();
+      var title = $('#select1').val();
+      var fName = $('#fname').val();
+      var lName = $('#lname').val();
+      var placeSupply = $('#PLACE').val();
+      var gstType = $("#GSTT").val();
+      var gstIN = $("#gstInput").val();
+      var panNo = $("#panInput").val();
+      var Email = $("#vendor-email").val();
+      var Mob = $("#mphone").val();
+      var street = $("#badd1").val();
+      var city = $("#bcty").val();
+      var state = $("#bste").val();
+      var pin = $("#bzp").val();
+      var country = $("#btry").val();
+      var tax_ref = $('input[name="tax1"]:checked').val();
+      var tSalutation = []
+      var tFirstName = []
+      var tLastName = []
+      var tEmail = []
+      var tWork = []
+      var tMobile = []
+      var tSkype = []
+      var tDesignation = []
+      var tDepartment = []
+
+      if(gstType != "" && gstType != "Unregistered Business-not Registered under GST" && gstType != 'Overseas- Persons with who you do import or exports of supplies outside india' && gstIN == ""){
+          alert('Fill Enter GSTIN..!')
+          return
+      }
+
+      $('#tbl tbody tr').each(function(){
+        var row = $(this)
+        if(row != ""){
+            var sal = row.find('.salutation').val();
+            var fn = row.find('.first_name').val();
+            var ln = row.find('.last_name').val();
+            var eml = row.find('.email').val();
+            var wrk = row.find('.work_phone').val();
+            var mob = row.find('.mobile_phone').val();
+            var sky = row.find('.skype_number').val();
+            var dep = row.find('.department').val();
+            var des = row.find('.designation').val();
+            console.log(sal,fn,ln, eml,wrk, mob, sky, dep, des)
+            // if(sal == "" && fn == "" && ln == "" && eml == "" && wrk == "" && mob == "" && sky == "" && dep == "" && des == ""){
+            //     console.log('No table data')
+            // }else{
+            //     if(sal == "" || fn == "" || ln == "" || eml == "" || wrk == "" || mob == "" || sky == "" || dep == "" || des == ""){
+            //         // alert('Fill All Fields of Contact persons table')
+            //         // return
+            //     }
+            // }
+            tSalutation.push(sal);
+            tFirstName.push(fn);
+            tLastName.push(ln);
+            tEmail.push(eml);
+            tWork.push(wrk);
+            tMobile.push(mob);
+            tSkype.push(sky);
+            tDesignation.push(des);
+            tDepartment.push(dep);
+        }
+    })
+    var cols = [tSalutation,tFirstName,tLastName,tEmail,tWork,tMobile,tSkype,tDesignation,tDepartment]
+    var cntactTableLength = $('#tbl tbody tr').length
+    var nullExists = false
+    if(cntactTableLength == 1 && tSalutation[0] == "" && tFirstName[0] == "" && tLastName[0] == "" && tEmail[0] == "" && tWork[0] == "" && tMobile[0] == "" && tSkype[0] == "" && tDesignation[0] == "" && tDepartment[0] == ""){
+        console.log('No table data')
+    }else{
+        for(i=0; i<cols.length; i++){
+            for(j=0; j<cols[i].length; j++){
+                if(cols[i][j] == ''){
+                    nullExists = true
+                }
+            }
+        }
+        // if(sal == "" || fn == "" || ln == "" || eml == "" || wrk == "" || mob == "" || sky == "" || dep == "" || des == ""){
+        //     // alert('Fill All Fields of Contact persons table')
+        //     // return
+        // }
+    }
+    if(nullExists){
+        alert('Fill All Fields of Contact persons table')
+        return
+    }
+
+      if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" && tax_ref != undefined){
+          $.ajax({
+              type : 'POST',
+              url:"{% url 'newSalesCustomerAjax' %}",
+              data:{
+                'type': type,
+                'salutation' : title,
+                'first_name' : fName,
+                'last_name' : lName,
+                'company_name' : $('#companyName').val(),
+                'v_display_name' : $('#v_display_name').val(),
+                'vendor_email' : Email,
+                'w_phone' : $('#workphone').val(),
+                'm_phone' : Mob,
+                'skype_number' : $('#skypeNumber').val(),
+                'designation' : $('#design').val(),
+                'department' : $('#dept').val(),
+                'website' : $('#web').val(),
+                'gst' : gstType,
+                'remark' : $('#rmrk').val(),
+                'pan_number' : panNo,
+                'gst_number' : gstIN,
+                'source_supply' : placeSupply,
+                'currency' : $('#crncy').val(),
+                'op_type' : $('input[name="op_type"]:checked').val(),
+                'opening_bal' : $('#opa').val(),
+                'payment_terms' : $('#paytearm-select').val(),
+                'plst' : $('#priceLs').val(),
+                'plang' : $('#plang').val(),
+                'fbk' : $('#fbk').val(),
+                'twtr' : $('#twtr').val(),
+                'tax1' : tax_ref,
+                'battention' : $('#batten').val(),
+                'bcountry' : country,
+                'baddress' : street,
+                'bcity' : city,
+                'bstate' : state,
+                'bzip' : pin,
+                'bphone' : $('#bphone_num').val(),
+                'bfax' : $('#bfx').val(),
+                'sattention' : $('#satten').val(),
+                's_country' : $('#sctry').val(),
+                'saddress' : $('#sadd1').val(),
+                'scity' : $('#scty').val(),
+                'sstate' : $('#sste').val(),
+                'szip' : $('#szp').val(),
+                'sphone' : $('#sphone_num').val(),
+                'sfax' : $('#sfx').val(),
+                'tsalutation[]' : tSalutation,
+                'tfirstName[]' : tFirstName,
+                'tlastName[]' : tLastName,
+                'tEmail[]' : tEmail,
+                'tWorkPhone[]' : tWork,
+                'tMobilePhone[]' : tMobile,
+                'tSkype[]' : tSkype,
+                'tDesignation[]' : tDesignation,
+                'tDepartment[]' : tDepartment,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+              },
+
+              success: function(response) {
+                if(response.status){
+                    console.log("AJAX Success",response)
+                    document.getElementById("newCustomerForm").reset();
+                    if($('#newCustomer').hasClass('show')){
+                        $("#newCustomer .close_customer_modal").click()
+                    }
+                    reloadCustomer(title, fName, lName);
+                }else{
+                    alert(response.message)
+                }
+              },
+          });
+      }else{
+          alert('Fill all required fields..!')
+          return
+      }
+  });
+
+});
+
+
+  function reloadCustomer(title,fName,lName) {
+      const fullName = title+' '+fName+' '+lName
+      $.ajax({
+          url: "{% url 'getCustomersAjax' %}",
+          type: "GET",
+          dataType: "json",
+          data: {},
+
+          success: function(data) {
+              console.log('Ajax Response ->',data);
+              var custDrpDwn = $('#cust_drop');
+              custDrpDwn.empty();
+              custDrpDwn.append(`<li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>`);
+
+              $.each(data, function (key, value) {
+                  const customerDetails = `${value[1]} ${value[2]} ${value[3]}`;
+                  const ID = `${value[0]}`
+
+                  if(customerDetails == fullName){
+                      getCustomerDetails(value[0], customerDetails)
+                  }
+                  const listItem = $(`
+                      <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('${ID}', '${customerDetails}')">${customerDetails}</li>`
+                  );
+                  custDrpDwn.append(listItem);
+              });
+              console.log('Customers RELOADED');
+
+          },
+          error: function(xhr, status, error) {
+              console.error(xhr.responseText);
+          }
+
+      });
+      // refreshCustomerDetails();
+
+      if ($('#newpayment').hasClass('show')){
+          $('#newpayment .cust_payment_modal_close').click();
+      }
+  }
 
 
 
