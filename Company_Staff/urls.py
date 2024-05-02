@@ -479,6 +479,8 @@ urlpatterns = [
 
     path('Company/new_sales_customer_ajax',views.newSalesCustomerAjax, name='newSalesCustomerAjax'),
     path('Company/get_all_cust',views.getCustomersAjax, name='getCustomersAjax'),
+    path('Company/save_new_itm',views.createNewItemAjax, name='createNewItemAjax'),
+    path('Company/get_all_itms',views.getAllItemsAjax, name='getAllItemsAjax'),
 
 
 

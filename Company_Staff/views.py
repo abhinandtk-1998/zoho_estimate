@@ -20489,7 +20489,6 @@ def import_estimate_from_excel(request):
                     tax_amount_igst = 0.0 if igst == "" else float(igst),
                     cgst = 0.0 if cgst == "" else float(cgst),
                     sgst = 0.0 if sgst == "" else float(sgst),
-                    tax_amount = 0.0 if taxamount == "" else float(taxamount),
                     adjustment = 0.0 if adjustment == "" else float(adjustment),
                     shipping_charge = 0.0 if shipping == "" else float(shipping),
                     grand_total = 0.0 if grandtotal == "" else float(grandtotal),
@@ -20645,11 +20644,17 @@ def newSalesCustomerAjax(request):
         else:
             com = StaffDetails.objects.get(login_details = log_details).company
 
-        if Customer.objects.filter(company = com, GST_number=request.POST['gst_number']).exists():
-            return JsonResponse({'status':False, 'message':'GSTIN already exists'})
-        elif Customer.objects.filter(company = com, PAN_number=request.POST['pan_number']).exists():
-            return JsonResponse({'status':False, 'message':'PAN No. already exists'})
-        elif Customer.objects.filter(company = com, customer_email=request.POST['vendor_email']).exists():
+        if 'gst_number' in request.POST:
+
+            if Customer.objects.filter(company = com, GST_number=request.POST['gst_number']).exists():
+                return JsonResponse({'status':False, 'message':'GSTIN already exists'})
+
+        if 'pan_number' in request.POST:
+
+            if Customer.objects.filter(company = com, PAN_number=request.POST['pan_number']).exists():
+                return JsonResponse({'status':False, 'message':'PAN No. already exists'})
+            
+        if Customer.objects.filter(company = com, customer_email=request.POST['vendor_email']).exists():
             return JsonResponse({'status':False, 'message':'Email already exists'})
         elif Customer.objects.filter(company = com, customer_phone=request.POST['w_phone']).exists():
             return JsonResponse({'status':False, 'message':'Work Phone no. already exists'})
@@ -20805,3 +20810,99 @@ def getCustomersAjax(request):
 
 
 
+def createNewItemAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        name = request.POST['name']
+        type = request.POST['type']
+        unit = request.POST.get('unit')
+        hsn = request.POST['hsn']
+        tax = request.POST['taxref']
+        gstTax = 0 if tax == 'None-Taxable' else request.POST['intra_st']
+        igstTax = 0 if tax == 'None-Taxable' else request.POST['inter_st']
+        purPrice = 0 if request.POST['pcost'] == "" else request.POST['pcost']
+        purAccount = None if not 'pur_account' in request.POST or request.POST['pur_account'] == "" else request.POST['pur_account']
+        purDesc = request.POST['pur_desc']
+        salePrice = 0 if request.POST['salesprice'] == "" else request.POST['salesprice']
+        saleAccount = None if not 'sale_account' in request.POST or request.POST['sale_account'] == "" else request.POST['sale_account']
+        saleDesc = request.POST['sale_desc']
+        inventory = request.POST.get('invacc')
+        stock = 0 if request.POST.get('stock') == "" else request.POST.get('stock')
+        stockUnitRate = 0 if request.POST.get('stock_rate') == "" else request.POST.get('stock_rate')
+        minStock = 0 if request.POST['min_stock'] == "" else request.POST['min_stock']
+        createdDate = date.today()
+        
+        #save item and transaction if item or hsn doesn't exists already
+        if Items.objects.filter(company=com, item_name__iexact=name).exists():
+            res = f"{name} already exists, try another!"
+            return JsonResponse({'status': False, 'message':res})
+        elif Items.objects.filter(company = com, hsn_code__iexact = hsn).exists():
+            res = f"HSN - {hsn} already exists, try another.!"
+            return JsonResponse({'status': False, 'message':res})
+        else:
+            item = Items(
+                company = com,
+                login_details = com.login_details,
+                item_name = name,
+                item_type = type,
+                unit = None if unit == "" else Unit.objects.get(id = int(unit)),
+                hsn_code = hsn,
+                tax_reference = tax,
+                intrastate_tax = gstTax,
+                interstate_tax = igstTax,
+                sales_account = saleAccount,
+                selling_price = salePrice,
+                sales_description = saleDesc,
+                purchase_account = purAccount,
+                purchase_price = purPrice,
+                purchase_description = purDesc,
+                date = createdDate,
+                minimum_stock_to_maintain = minStock,
+                inventory_account = inventory,
+                opening_stock = stock,
+                current_stock = stock,
+                opening_stock_per_unit = stockUnitRate,
+                track_inventory = int(request.POST['trackInv']),
+                activation_tag = 'active',
+                type = 'Opening Stock'
+            )
+            item.save()
+
+            #save transaction
+
+            Item_Transaction_History.objects.create(
+                company = com,
+                logindetails = log_details,
+                items = item,
+                Date = createdDate,
+                action = 'Created'
+
+            )
+            
+            return JsonResponse({'status': True})
+    else:
+       return redirect('/')
+
+def getAllItemsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        items = {}
+        option_objects = Items.objects.filter(company = com, activation_tag='active')
+        for option in option_objects:
+            items[option.id] = [option.id,option.item_name]
+
+        return JsonResponse(items)
+    else:
+        return redirect('/')
