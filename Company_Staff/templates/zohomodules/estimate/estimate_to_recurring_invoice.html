@@ -267,7 +267,7 @@
                                 <input required type="text" id="customer" value="{{ estimate.customer.title }} {{ estimate.customer.first_name }} {{ estimate.customer.last_name }}" name="customer" class="dropdown-toggle form-control text-white customers-display" onkeyup="filterCustomers()" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Customer.." autocomplete="off">
                                 <ul class="dropdown-menu w-100 customers-available position-absolute bg-black text-white" id="cust_drop"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>
-                                    {% for cust in customers %}
+                                    {% for cust in customer %}
                                     <li class="dropdown-item customers-options text-white" onclick="getCustomerDetails(`{{cust.id}}`,this.innerHTML)">{{ cust.title }} {{ cust.first_name }} {{ cust.last_name }}</li>
                                     {% endfor %}
                                 </ul>
@@ -293,25 +293,21 @@
                   </div>
                 </div>
 
-                {% if estimate.customer_gst_number %}
-                <div class="row mt-2" id="customerGstInDisplay" style="display: flex;">
+    
+                <div class="row mt-2" id="customerGstInDisplay" {% if estimate.customer_gst_number %} style="display: flex;" {% else %} style="display:none;" {% endif %}>
                   <label for="" class="col-md-3 labels">GSTIN</label>
                   <div class="col-md-6">
                     <input type="text" class="form-control text-white bg-black" value="{{estimate.customer_gst_number}}" id="customerGSTIN" name="customer_gstin" readonly>
                   </div>
                 </div>
-                {% endif %}
 
-                {% if estimate.customer_bill_address %}
-
-                <div class="row mt-2">
+                <div class="row mt-2" id="billAddressSection" {% if estimate.customer_bill_address %} style="display: flex;" {% else %} style="display:none;" {% endif %}>
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
                     <textarea class="form-control text-white bg-black" name="bill_address" id="billAddress" rows="4" readonly>{{estimate.customer_bill_address}}</textarea>
                   </div>
                 </div>
 
-                {% endif %}
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Place of Supply</label>
@@ -2632,7 +2628,7 @@
           $('#custErr').text('');
           $.ajax({
               type : 'POST',
-              url: "",
+              url: "{% url 'getCustomerDetailsAjax' %}",
               data: {
                   id: custId,
                   csrfmiddlewaretoken: '{{ csrf_token }}',

@@ -483,6 +483,13 @@ urlpatterns = [
     path('Company/get_all_itms',views.getAllItemsAjax, name='getAllItemsAjax'),
 
 
+    path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
+    path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
+
+    path('getinvCustomerDetails',views.getinvCustomerDetails,name='getinvCustomerDetails'),
+    path('Company/get_cust_details',views.getCustomerDetailsAjax, name='getCustomerDetailsAjax'),
+
+
 
 
 

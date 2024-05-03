@@ -292,23 +292,20 @@
                   </div>
                 </div>
 
-                {% if estimate.customer_gst_number %}
-                <div class="row mt-2" id="customerGstInDisplay" style="display: flex;">
+                <div class="row mt-2" id="customerGstInDisplay" {% if estimate.customer_gst_number %} style="display: flex;" {% else %} style="display:none;" {% endif %}>
                   <label for="" class="col-md-3 labels">GSTIN</label>
                   <div class="col-md-6">
                     <input type="text" class="form-control text-white bg-black" id="customerGSTIN" name="customer_gst_number" value="{{estimate.customer_gst_number}}" readonly>
                   </div>
                 </div>
-                {% endif %}
 
-                {% if estimate.customer_bill_address %}
-                <div class="row mt-2">
+
+                <div class="row mt-2" id="billAddressSection" {% if estimate.customer_bill_address %} style="display: flex;" {% else %} style="display:none;" {% endif %}>
                   <label for="" class="col-md-3 labels">Billing Address</label>
                   <div class="col-md-6">
                     <textarea class="form-control text-white bg-black" name="customer_billing_address" id="billAddress" rows="4" readonly>{{estimate.customer_bill_address}}</textarea>
                   </div>
                 </div>
-                {% endif %}
 
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Place of Supply</label>
@@ -551,7 +548,7 @@
                             <td >
                                 <input type="number" name='qty[]' id="qty{{forloop.counter}}"  class="form-control bg-black text-white qty mb-1" step=0 min=1 value="{{i.quantity}}" onchange="changeItemQty(this.id)" required/>
                                 <input type="text" id="avl{{forloop.counter}}" style="display: none;" value="{{i.item.current_stock}}">
-                                <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan1" class=''></span></div>
+                                <div class="d-flex text-white" style="font-size: 0.7rem;"><span>Available Qty:</span><span id="qtyspan1" class=''>{{i.item.current_stock}}</span></div>
                             </td>
                             <td>
                                 <input type="number" name='price[]' id="price{{forloop.counter}}" class="form-control bg-black text-white price" step="0.00" min="0" style="display: block;" value="{{i.price}}" readonly />
@@ -2442,7 +2439,7 @@
           $('#custErr').text('');
           $.ajax({
               type : 'POST',
-              url: "",
+              url: "{% url 'getselCustomerDetails' %}",
               data: {
                   id: custId,
                   csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -2458,8 +2455,15 @@
                   placeOfSupplySelect.appendChild(newOption); // Append the new option to the select element
                   placeOfSupplySelect.value = data.shipState;
                   document.getElementById('customerGstType').value = data.gstType;
-                  document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
-                  if(data.gstin){
+                  if(data.street && data.city && data.state && data.country && data.pincode){
+                    document.getElementById('billAddressSection').style.display = 'flex';
+                    document.getElementById('billAddress').value = data.street + ',' + data.city + '\n' + data.state + '\n' + data.country  + '\n' + data.pincode ;
+                  }else{
+                    document.getElementById('billAddressSection').style.display = 'none';
+                    document.getElementById('billAddress').value = '';
+                  }
+                  
+                  if(data.gstNo && data.gstNo != "null"){
                       document.getElementById('customerGstInDisplay').style.display = 'flex';
                       document.getElementById('customerGSTIN').value = data.gstNo;
                   }else{
@@ -2786,7 +2790,7 @@ function getItemDetails(inpId, value) {
         if (plc != "") {
             var n = inpId.slice(4);
             $.ajax({
-                url: "",
+                url: "{% url 'getselItemDetails' %}",
                 type: 'GET',
                 data: {
                     item: value,

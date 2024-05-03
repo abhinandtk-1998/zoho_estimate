@@ -71,6 +71,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 from reportlab.pdfgen import canvas
 from django.core.mail import EmailMessage as EmailMsg
+from django.http import QueryDict
 
 
 # Create your views here.
@@ -19202,6 +19203,11 @@ def sales_estimate_edit(request,pk):
             items=Items.objects.filter(company=company)
 
 
+            price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+            units=Unit.objects.filter(company=company)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+
+
 
         
             context = {
@@ -19214,6 +19220,8 @@ def sales_estimate_edit(request,pk):
                 'est_items':est_items,
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
+                'units':units,
+                'accounts':accounts,
                 
 
             }
@@ -19229,6 +19237,11 @@ def sales_estimate_edit(request,pk):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             items=Items.objects.filter(company=company)
 
+
+            price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+            units=Unit.objects.filter(company=company)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+
         
             context = {
                 'details':dash_details,
@@ -19240,6 +19253,8 @@ def sales_estimate_edit(request,pk):
                 'est_items':est_items,
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
+                'units':units,
+                'accounts':accounts,
 
             }
             return render(request,'zohomodules/estimate/sales_estimate_edit.html', context)
@@ -19462,7 +19477,7 @@ def convert_estimate_to_sales_order(request,pk):
 
         
             customer=Customer.objects.all()
-            item=Items.objects.all()
+            item=Items.objects.filter(company=company)
             units = Unit.objects.filter(company=company)
             accounts=Chart_of_Accounts.objects.filter(company=company)
             banks = Banking.objects.filter(company = company)
@@ -19546,7 +19561,7 @@ def convert_estimate_to_sales_order(request,pk):
 
 
             customer=Customer.objects.all()
-            item=Items.objects.all()
+            item=Items.objects.filter(company=company)
             units = Unit.objects.filter(company=company)
             accounts=Chart_of_Accounts.objects.filter(company=company)
             banks = Banking.objects.filter(company = company)
@@ -20644,6 +20659,13 @@ def newSalesCustomerAjax(request):
         else:
             com = StaffDetails.objects.get(login_details = log_details).company
 
+        post_data = QueryDict(request.body)
+        if 'vendor_email' in post_data:
+            vendor_email = post_data['vendor_email']
+        else:
+            # Handle the case where 'vendor_email' is missing
+            return JsonResponse({'status': False, 'message': 'Vendor email is missing'})
+
         if 'gst_number' in request.POST:
 
             if Customer.objects.filter(company = com, GST_number=request.POST['gst_number']).exists():
@@ -20906,3 +20928,128 @@ def getAllItemsAjax(request):
         return JsonResponse(items)
     else:
         return redirect('/')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def getselCustomerDetails(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        custId = request.POST['id']
+        cust = Customer.objects.get(id = custId)
+        
+      
+        if cust:
+            context = {
+                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None else True, 'gstNo':cust.GST_number,
+                'street':cust.billing_address, 'city':cust.billing_city, 'state':cust.billing_state, 'country':cust.billing_country, 'pincode':cust.billing_pincode
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
+
+
+def getselItemDetails(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details = LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details=log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details=log_details).company
+        
+        item_name = request.GET.get('item', '')
+        item = Items.objects.filter(company=cmp, item_name=item_name).first()
+
+        if item:
+            context = {
+                'status': True,
+                'id': item.id,
+                'hsn': item.hsn_code,
+                'sales_rate': item.selling_price,
+                'purchase_rate': item.purchase_price,
+                'avl': item.current_stock,
+                'tax': True if item.tax_reference == 'taxable' else False,
+                'gst': item.intrastate_tax,
+                'igst': item.interstate_tax,
+                'PLPrice': None,  # Since priceListId related content is removed, set to None
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'status': False, 'message': 'Item not found'})
+    else:
+        return redirect('/')
+
+
+
+
+def getinvCustomerDetails(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        custId = request.POST['id']
+        cust = Customer.objects.get(id = custId)
+
+        if cust:
+            context = {
+                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None else True, 'gstNo':cust.GST_number,
+                'street':cust.billing_address, 'city':cust.billing_city, 'state':cust.billing_state, 'country':cust.billing_country, 'pincode':cust.billing_pincode
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
+
+
+
+
+
+
+
+def getCustomerDetailsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        custId = request.POST['id']
+        cust = Customer.objects.get(id = custId)
+
+        if cust:
+            context = {
+                'status':True, 'id':cust.id, 'email':cust.customer_email, 'gstType':cust.GST_treatement,'shipState':cust.place_of_supply,'gstin':False if cust.GST_number == "" or cust.GST_number == None or cust.GST_number == 'null' else True, 'gstNo':cust.GST_number,
+                'street':cust.billing_address, 'city':cust.billing_city, 'state':cust.billing_state, 'country':cust.billing_country, 'pincode':cust.billing_pincode
+            }
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
+

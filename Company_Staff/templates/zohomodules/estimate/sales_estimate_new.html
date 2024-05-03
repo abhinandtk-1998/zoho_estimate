@@ -239,7 +239,7 @@
                         <label>Estimate No</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="number" class="form-control" name="estimate_no" placeholder="{{est_no}}" required>     
+                        <input  type="text" class="form-control" name="estimate_no" placeholder="{{est_no}}" required>     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -3552,7 +3552,6 @@ $(document).ready(function(){
 
 
 
-    $(document).ready(function(){
 
     $(document).on("click", "#newCustomerSave1", function(){
         console.log("Button clicked!");
@@ -3655,7 +3654,7 @@ $(document).ready(function(){
                 'last_name' : lName,
                 'company_name' : $('#companyName').val(),
                 'v_display_name' : $('#v_display_name').val(),
-                'vendor_email' : $("#vendor-email").val(),
+                'vendor_email' : Email,
                 'w_phone' : $('#workphone').val(),
                 'm_phone' : Mob,
                 'skype_number' : $('#skypeNumber').val(),
@@ -3723,7 +3722,6 @@ $(document).ready(function(){
       }
   });
 
-});
 
 
   function reloadCustomer(title,fName,lName) {
@@ -3885,6 +3883,12 @@ function reloadItems() {
     }
 
 }
+
+
+
+
+
+
 
 
 
