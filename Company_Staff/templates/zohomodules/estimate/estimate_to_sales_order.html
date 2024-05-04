@@ -3895,7 +3895,7 @@ $('#mphone').on('input', function() {
     if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" ){
           $.ajax({
               type : 'POST',
-              url:"",
+              url:"{% url 'createsalesCustomer' %}",
               data:{
                 'type': type,
                 'salutation' : title,
@@ -3975,7 +3975,7 @@ $('#mphone').on('input', function() {
   function reloadCustomer(title,fName,lName) {
       const fullName = title+' '+fName+' '+lName
       $.ajax({
-          url: "",
+          url: "{% url 'getsalesCustomers' %}",
           type: "GET",
           dataType: "json",
           data: {},
@@ -3983,7 +3983,7 @@ $('#mphone').on('input', function() {
           success: function(data) {
               console.log('Ajax Response ->',data);
               var custDrpDwn = $('#cust_drop');
-            //   custDrpDwn.empty();
+              custDrpDwn.empty();
               custDrpDwn.append(`<li class="dropdown-item customers-options text-white" onclick="getCustomerDetails('','')">Select Customer</li>`);
 
               $.each(data, function (key, value) {
