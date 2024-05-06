@@ -706,7 +706,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card px-2 py-4" style="background-color: #141414a2;">
+      <div class="card px-2 py-4" style="background-color: black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="newTermForm">
           
           <div class="row mt-2">
@@ -1371,7 +1371,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card p-3 m-3" style="background-color: #141414a2;">
+      <div class="card p-3 m-3" style="background-color: black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
           
 
@@ -2543,7 +2543,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newselPaymentTerm' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -3790,7 +3790,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newselPaymentTerm' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -4029,7 +4029,7 @@ $('#mphone').on('input', function() {
         var uName = $("#unitName").val();
         $.ajax({
           type: 'POST',
-          url: "",
+          url: "{% url 'addsel_unit' %}",
           data: {
             units: uName,
             csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -4051,7 +4051,7 @@ $('#mphone').on('input', function() {
       function reloadUnit(unit) {
       
         $.ajax({
-                url: "",
+                url: "{% url 'show_unit_dropdownsel' %}",
                 type: "GET",
                 dataType: "json",
                 data: $(this).serialize(),
@@ -4150,7 +4150,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != ""){
         $.ajax({
             type : 'POST',
-            url:"",
+            url:"{% url 'createNewItemsel' %}",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4197,7 +4197,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "",
+        url: "{% url 'getAllItemssel' %}",
         type: "GET",
         dataType: "json",
         data: {},

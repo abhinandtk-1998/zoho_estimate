@@ -1194,7 +1194,7 @@
                 
                 <div class=" col-sm-12 col-md-3 col-lg-3">
                     <select name="payment_terms" id="paytearm-select" class="form-control bg-light text-dark">
-                        {% for pay_terms in pTerms %}
+                        {% for pay_terms in comp_payment_terms %}
                         <option value="{{pay_terms.id}}" >{{pay_terms.term_name}}</option>
                         {% endfor %}
                     </select>
@@ -4132,7 +4132,7 @@ $('#mphone').on('input', function() {
       if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" && tax_ref != undefined){
           $.ajax({
               type : 'POST',
-              url:"",
+              url:"{% url 'newSalesCustomerAjax' %}",
               data:{
                 'type': type,
                 'salutation' : title,
@@ -4212,7 +4212,7 @@ $('#mphone').on('input', function() {
   function reloadCustomer(title,fName,lName) {
       const fullName = title+' '+fName+' '+lName
       $.ajax({
-          url: "",
+          url: "{% url 'getCustomersAjax' %}",
           type: "GET",
           dataType: "json",
           data: {},

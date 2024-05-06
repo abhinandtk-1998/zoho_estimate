@@ -19546,6 +19546,8 @@ def convert_estimate_to_sales_order(request,pk):
                 'comp_payment_terms':comp_payment_terms,
                 'banks':banks,
                 'items':item,
+                'units':units,
+                'accounts':accounts,
                 
 
             }
@@ -19629,6 +19631,8 @@ def convert_estimate_to_sales_order(request,pk):
                 'comp_payment_terms':comp_payment_terms,
                 'banks':banks,
                 'items':item,
+                'units':units,
+                'accounts':accounts,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
@@ -19767,6 +19771,12 @@ def convert_estimate_to_invoice(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
 
+            units = Unit.objects.filter(company=company)
+
+            accounts=Chart_of_Accounts.objects.filter(company=company)
+
+            item=Items.objects.filter(company=company)
+
             latest_inv = invoice.objects.filter(company = company).order_by('-id').first()
 
             new_number = int(latest_inv.reference_number) + 1 if latest_inv else 1
@@ -19828,7 +19838,10 @@ def convert_estimate_to_invoice(request,pk):
                 'nxtInv':nxtInv,
                 'new_ref_num':new_ref_num,
                 'est_items':est_items,
-                'comp_payment_terms':comp_payment_terms
+                'comp_payment_terms':comp_payment_terms,
+                'items':item,
+                'units':units,
+                'accounts':accounts,
                 
 
             }
@@ -19842,6 +19855,11 @@ def convert_estimate_to_invoice(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+
+            item=Items.objects.filter(company=company)
+
+            units = Unit.objects.filter(company=company)
+            accounts=Chart_of_Accounts.objects.filter(company=company)
 
 
 
@@ -19908,6 +19926,9 @@ def convert_estimate_to_invoice(request,pk):
                 'new_ref_num':new_ref_num,
                 'est_items':est_items,
                 'comp_payment_terms':comp_payment_terms,
+                'items':item,
+                'units':units,
+                'accounts':accounts,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
@@ -20037,6 +20058,12 @@ def convert_estimate_to_recurring_invoice(request,pk):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
 
+            item=Items.objects.filter(company=company)
+
+            units = Unit.objects.filter(company=company)
+
+            accounts=Chart_of_Accounts.objects.filter(company=company)
+
 
             # Fetching last rec_invoice and assigning upcoming ref no as current + 1
             # Also check for if any bill is deleted and ref no is continuos w r t the deleted rec_invoice
@@ -20090,6 +20117,9 @@ def convert_estimate_to_recurring_invoice(request,pk):
                 'nxtInv':nxtInv,
                 'new_number':new_number,
                 'repeat':repeat,
+                'items':item,
+                'units':units,
+                'accounts':accounts,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
@@ -20104,6 +20134,12 @@ def convert_estimate_to_recurring_invoice(request,pk):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
 
+            item=Items.objects.filter(company=company)
+
+            units = Unit.objects.filter(company=company)
+
+            accounts=Chart_of_Accounts.objects.filter(company=company)
+
 
             # Fetching last rec_invoice and assigning upcoming ref no as current + 1
             # Also check for if any bill is deleted and ref no is continuos w r t the deleted rec_invoice
@@ -20156,6 +20192,9 @@ def convert_estimate_to_recurring_invoice(request,pk):
                 'nxtInv':nxtInv,
                 'new_number':new_number,
                 'repeat':repeat,
+                'items':item,
+                'units':units,
+                'accounts':accounts,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
@@ -20203,6 +20242,7 @@ def convert_estimate_to_recurring_invoice_op(request,pk):
                 gst_type = request.POST['customer_gst_type'],
                 # gstin = request.POST['customer_gstin'],
                 place_of_supply = request.POST['place_of_supply'],
+                ly = request.POST['place_of_supply'],
                 profile_name = request.POST['profile_name'],
                 entry_type = None if request.POST['entry_type'] == "" else request.POST['entry_type'],
                 reference_no = request.POST['reference_number'],
@@ -21147,6 +21187,181 @@ def getsalesCustomers(request):
         return redirect('/')
 
 
+
+def createNewItemsel(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        name = request.POST['name']
+        type = request.POST['type']
+        unit = request.POST.get('unit')
+        hsn = request.POST['hsn']
+        tax = request.POST['taxref']
+        gstTax = 0 if tax == 'None-Taxable' else request.POST['intra_st']
+        igstTax = 0 if tax == 'None-Taxable' else request.POST['inter_st']
+        purPrice = request.POST['pcost']
+        purAccount = None if not 'pur_account' in request.POST or request.POST['pur_account'] == "" else request.POST['pur_account']
+        purDesc = request.POST['pur_desc']
+        salePrice = request.POST['salesprice']
+        saleAccount = None if not 'sale_account' in request.POST or request.POST['sale_account'] == "" else request.POST['sale_account']
+        saleDesc = request.POST['sale_desc']
+        inventory = request.POST.get('invacc')
+        stock = 0 if request.POST.get('stock') == "" else request.POST.get('stock')
+        stockUnitRate = 0 if request.POST.get('stock_rate') == "" else request.POST.get('stock_rate')
+        minStock = request.POST['min_stock']
+        createdDate = date.today()
+        
+        #save item and transaction if item or hsn doesn't exists already
+        if Items.objects.filter(company=com, item_name__iexact=name).exists():
+            res = f"{name} already exists, try another!"
+            return JsonResponse({'status': False, 'message':res})
+        elif Items.objects.filter(company = com, hsn_code__iexact = hsn).exists():
+            res = f"HSN - {hsn} already exists, try another.!"
+            return JsonResponse({'status': False, 'message':res})
+        else:
+            item = Items(
+                company = com,
+                login_details = com.login_details,
+                item_name = name,
+                item_type = type,
+                unit = None if unit == "" else Unit.objects.get(id = int(unit)),
+                hsn_code = hsn,
+                tax_reference = tax,
+                intrastate_tax = gstTax,
+                interstate_tax = igstTax,
+                sales_account = saleAccount,
+                selling_price = salePrice,
+                sales_description = saleDesc,
+                purchase_account = purAccount,
+                purchase_price = purPrice,
+                purchase_description = purDesc,
+                date = createdDate,
+                minimum_stock_to_maintain = minStock,
+                inventory_account = inventory,
+                opening_stock = stock,
+                current_stock = stock,
+                opening_stock_per_unit = stockUnitRate,
+                track_inventory = int(request.POST['trackInv']),
+                activation_tag ='active',
+                type ='Opening Stock'
+            )
+            item.save()
+
+            #save transaction
+
+            Item_Transaction_History.objects.create(
+                company = com,
+                logindetails = com.login_details,
+                items = item,
+                Date = createdDate,
+                action = 'Created'
+
+            )
+            
+            return JsonResponse({'status': True})
+    else:
+       return redirect('/')
+
+
+
+def getAllItemssel(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        items = {}
+        option_objects = Items.objects.filter(company = com, activation_tag='active')
+        for option in option_objects:
+            items[option.id] = [option.id,option.item_name]
+
+        return JsonResponse(items)
+    else:
+        return redirect('/')
+    
+
+def newselPaymentTerm(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        term = request.POST['term']
+        days = request.POST['days']
+
+        if not Company_Payment_Term.objects.filter(company = com, term_name__iexact = term).exists():
+            Company_Payment_Term.objects.create(company = com, term_name = term, days =days)
+            
+            list= []
+            terms = Company_Payment_Term.objects.filter(company = com)
+
+            for term in terms:
+                termDict = {
+                    'name': term.term_name,
+                    'id': term.id,
+                    'days':term.days
+                }
+                list.append(termDict)
+
+            return JsonResponse({'status':True,'terms':list},safe=False)
+        else:
+            return JsonResponse({'status':False, 'message':f'{term} already exists, try another.!'})
+
+    else:
+        return redirect('/')
+
+
+def addsel_unit(request):                                                               
+    login_id = request.session['login_id']
+    log_user = LoginDetails.objects.get(id=login_id)
+
+    if log_user.user_type == 'Company':
+        if request.method == 'POST':
+            c = CompanyDetails.objects.get(login_details=login_id)
+            unit_name = request.POST['units']
+            
+            if Unit.objects.filter(unit_name=unit_name, company=c).exists():
+                return JsonResponse({"message": "error"})
+            else:
+                unit = Unit(unit_name=unit_name, company=c)  
+                unit.save()  
+                return JsonResponse({"message": "success"})
+
+
+def show_unit_dropdownsel(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+            options = {}
+            option_objects = Unit.objects.filter(company=com)
+            for option in option_objects:
+                options[option.id] = [option.id,option.unit_name]
+            return JsonResponse(options)
+
+
+
+
+
+
+
+
     
 
 
@@ -21317,6 +21532,194 @@ def getinvCustomerDetails(request):
             return JsonResponse({'status':False, 'message':'Something went wrong..!'})
     else:
        return redirect('/')
+
+
+def createNewIteminv(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        name = request.POST['name']
+        type = request.POST['type']
+        unit = request.POST.get('unit')
+        hsn = request.POST['hsn']
+        tax = request.POST['taxref']
+        gstTax = 0 if tax == 'None-Taxable' else request.POST['intra_st']
+        igstTax = 0 if tax == 'None-Taxable' else request.POST['inter_st']
+        purPrice = request.POST['pcost']
+        purAccount = None if not 'pur_account' in request.POST or request.POST['pur_account'] == "" else request.POST['pur_account']
+        purDesc = request.POST['pur_desc']
+        salePrice = request.POST['salesprice']
+        saleAccount = None if not 'sale_account' in request.POST or request.POST['sale_account'] == "" else request.POST['sale_account']
+        saleDesc = request.POST['sale_desc']
+        inventory = request.POST.get('invacc')
+        stock = 0 if request.POST.get('stock') == "" else request.POST.get('stock')
+        stockUnitRate = 0 if request.POST.get('stock_rate') == "" else request.POST.get('stock_rate')
+        minStock = request.POST['min_stock']
+        createdDate = date.today()
+        
+        #save item and transaction if item or hsn doesn't exists already
+        if Items.objects.filter(company=com, item_name__iexact=name).exists():
+            res = f"{name} already exists, try another!"
+            return JsonResponse({'status': False, 'message':res})
+        elif Items.objects.filter(company = com, hsn_code__iexact = hsn).exists():
+            res = f"HSN - {hsn} already exists, try another.!"
+            return JsonResponse({'status': False, 'message':res})
+        else:
+            item = Items(
+                company = com,
+                login_details = com.login_details,
+                item_name = name,
+                item_type = type,
+                unit = None if unit == "" else Unit.objects.get(id = int(unit)),
+                hsn_code = hsn,
+                tax_reference = tax,
+                intrastate_tax = gstTax,
+                interstate_tax = igstTax,
+                sales_account = saleAccount,
+                selling_price = salePrice,
+                sales_description = saleDesc,
+                purchase_account = purAccount,
+                purchase_price = purPrice,
+                purchase_description = purDesc,
+                date = createdDate,
+                minimum_stock_to_maintain = minStock,
+                inventory_account = inventory,
+                opening_stock = stock,
+                current_stock = stock,
+                opening_stock_per_unit = stockUnitRate,
+                track_inventory = int(request.POST['trackInv']),
+                activation_tag ='active',
+                type ='Opening Stock'
+            )
+            item.save()
+
+            #save transaction
+
+            Item_Transaction_History.objects.create(
+                company = com,
+                logindetails = com.login_details,
+                items = item,
+                Date = createdDate,
+                action = 'Created'
+
+            )
+            
+            return JsonResponse({'status': True})
+    else:
+       return redirect('/')
+
+
+def getAllItemsinv(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        items = {}
+        option_objects = Items.objects.filter(company = com, activation_tag='active')
+        for option in option_objects:
+            items[option.id] = [option.id,option.item_name]
+
+        return JsonResponse(items)
+    else:
+        return redirect('/')
+
+
+def newinvPaymentTerm(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        term = request.POST['term']
+        days = request.POST['days']
+
+        if not Company_Payment_Term.objects.filter(company = com, term_name__iexact = term).exists():
+            Company_Payment_Term.objects.create(company = com, term_name = term, days =days)
+            
+            list= []
+            terms = Company_Payment_Term.objects.filter(company = com)
+
+            for term in terms:
+                termDict = {
+                    'name': term.term_name,
+                    'id': term.id,
+                    'days':term.days
+                }
+                list.append(termDict)
+
+            return JsonResponse({'status':True,'terms':list},safe=False)
+        else:
+            return JsonResponse({'status':False, 'message':f'{term} already exists, try another.!'})
+
+    else:
+        return redirect('/')
+
+def addinv_unit(request):                                                               
+    login_id = request.session['login_id']
+    log_user = LoginDetails.objects.get(id=login_id)
+
+    if log_user.user_type == 'Company':
+        if request.method == 'POST':
+            c = CompanyDetails.objects.get(login_details=login_id)
+            unit_name = request.POST['units']
+            
+            if Unit.objects.filter(unit_name=unit_name, company=c).exists():
+                return JsonResponse({"message": "error"})
+            else:
+                unit = Unit(unit_name=unit_name, company=c)  
+                unit.save()  
+                return JsonResponse({"message": "success"})
+
+    elif log_user.user_type == 'Staff':
+        if request.method == 'POST':
+            staff = LoginDetails.objects.get(id=login_id)
+            sf = StaffDetails.objects.get(login_details=staff)
+            c = sf.company
+            unit_name = request.POST['units']
+            
+            if Unit.objects.filter(unit_name=unit_name, company=c).exists():
+                return JsonResponse({"message": "error"})
+            else:
+                unit = Unit(unit_name=unit_name, company=c)  
+                unit.save()  
+                return JsonResponse({"message": "success"})
+
+    return JsonResponse({"message": "success"})
+# create unit
+
+
+def showinvunit_dropdown(request):                                                               
+   if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+            options = {}
+            option_objects = Unit.objects.filter(company=com)
+            for option in option_objects:
+                options[option.id] = [option.id,option.unit_name]
+            return JsonResponse(options)
+
+
+
+
+
+
 
 
 

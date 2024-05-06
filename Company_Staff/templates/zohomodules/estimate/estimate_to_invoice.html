@@ -567,7 +567,7 @@
                                         <div class="p-0 border-0 bg-none position-relative drop-box" style="display: block;">
                                             <input required type="text" id="item{{forloop.counter}}" value="{{i.item.item_name}}" name="item_name[]" class="dropdown-toggle form-control text-white item-display" onkeyup="filterFunction($(this).attr('id'))"  data-bs-toggle="dropdown" aria-expanded="false" placeholder="Items.." autocomplete="off">
                                             <ul class="dropdown-menu w-100 items-available position-absolute bg-black text-white" id="menu{{forloop.counter}}"  style="overflow-y: auto; height: fit-content;max-height: 40vh; border: 1px solid gray;"> 
-                                                {% for itm in items %}
+                                                {% for i in items %}
                                                 <li class="dropdown-item items-options text-white" onclick="getItemDetails($(this).parent().prev().attr('id'),`{{i.item_name}}`)">{{i.item_name}}</li>
                                                 {% endfor %}
                                             </ul>
@@ -745,7 +745,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card px-2 py-4" style="background-color: #141414a2;">
+      <div class="card px-2 py-4" style="background-color:black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="newTermForm">
           
           <div class="row mt-2">
@@ -1467,7 +1467,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card p-3 m-3" style="background-color: #141414a2;">
+      <div class="card p-3 m-3" style="background-color: black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
           
 
@@ -2704,7 +2704,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newinvPaymentTerm' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -3922,7 +3922,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newinvPaymentTerm' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -4162,7 +4162,7 @@ $('#mphone').on('input', function() {
         var uName = $("#unitName").val();
         $.ajax({
           type: 'POST',
-          url: "",
+          url: "{% url 'addinv_unit' %}",
           data: {
             units: uName,
             csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -4184,7 +4184,7 @@ $('#mphone').on('input', function() {
       function reloadUnit(unit) {
       
         $.ajax({
-                url: "",
+                url: "{% url 'showinvunit_dropdown' %}",
                 type: "GET",
                 dataType: "json",
                 data: $(this).serialize(),
@@ -4283,7 +4283,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != ""){
         $.ajax({
             type : 'POST',
-            url:"",
+            url:"{% url 'createNewIteminv' %}",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4329,7 +4329,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "",
+        url: "{% url 'getAllItemsinv' %}",
         type: "GET",
         dataType: "json",
         data: {},

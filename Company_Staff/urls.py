@@ -483,6 +483,11 @@ urlpatterns = [
     path('Company/get_all_itms',views.getAllItemsAjax, name='getAllItemsAjax'),
     path('createsalesCustomer',views.createsalesCustomer,name='createsalesCustomer'),
     path('getsalesCustomers',views.getsalesCustomers,name='getsalesCustomers'),
+    path('createNewItemsel',views.createNewItemsel,name='createNewItemsel'),
+    path('getAllItemssel',views.getAllItemssel,name='getAllItemssel'),
+    path('newselPaymentTerm',views.newselPaymentTerm,name='newselPaymentTerm'),
+    path('addsel_unit',views.addsel_unit,name='addsel_unit'),
+    path('show_unit_dropdownsel',views.show_unit_dropdownsel,name='show_unit_dropdownsel'),
 
 
     path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
@@ -490,6 +495,11 @@ urlpatterns = [
 
     path('getinvCustomerDetails',views.getinvCustomerDetails,name='getinvCustomerDetails'),
     path('Company/get_cust_details',views.getCustomerDetailsAjax, name='getCustomerDetailsAjax'),
+    path('Staff/invoice/createNewIteminv',views.createNewIteminv,name='createNewIteminv'),
+    path('Staff/invoice/getAllItemsinv',views.getAllItemsinv,name='getAllItemsinv'),
+    path('newinvPaymentTerm',views.newinvPaymentTerm,name='newinvPaymentTerm'),
+    path('Staff/invoice/addinv_unit',views.addinv_unit,name='addinv_unit'),
+    path('Staff/invoice/showinvunit_dropdown',views.showinvunit_dropdown,name='showinvunit_dropdown'),
 
 
 
