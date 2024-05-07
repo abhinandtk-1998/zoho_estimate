@@ -21356,6 +21356,70 @@ def show_unit_dropdownsel(request):
             return JsonResponse(options)
 
 
+def checksalesorderNumber(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            comp_details = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            comp_details = StaffDetails.objects.get(login_details = log_details).company
+        
+        RecSelNo = request.GET['RecSelNum']
+
+        nxtSel = ""
+        lastSel = SaleOrder.objects.filter(company = comp_details).last()
+
+        if lastSel:
+            sel_no = str(lastSel.sales_order_number)
+
+            numbers = []
+            stri = []
+            for word in sel_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+            
+            num=''
+            for i in numbers:
+                num +=i
+            
+            st = ''
+            for j in stri:
+                st = st+j            
+
+            sel_num = int(num)+1
+        
+            padding_length = len(num) - 1
+   
+            nxtSel = f"{st}{num[0]}{sel_num:0{padding_length}d}"
+            print(nxtSel)
+            
+
+        PatternStr = []
+        for word in RecSelNo:
+            if word.isdigit():
+                pass
+            else:
+                PatternStr.append(word)
+        
+        pattern = ''
+        for j in PatternStr:
+            pattern += j
+            print("patern")
+            print(pattern)
+
+        if SaleOrder.objects.filter(company = comp_details, sales_order_number__iexact = RecSelNo).exists():
+            return JsonResponse({'status':False, 'message':'Salesorder No. already Exists.!'})
+        elif nxtSel != "" and RecSelNo != nxtSel:
+            return JsonResponse({'status':False, 'message':'Salesorder No. is not continuous.!'})
+        else:
+            return JsonResponse({'status':True, 'message':'Number is okay.!'})
+    else:
+       return redirect('/')
+
+
 
 
 
@@ -21716,6 +21780,26 @@ def showinvunit_dropdown(request):
             return JsonResponse(options)
 
 
+def getinvBankAccountNumber(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        bankId = request.GET['id']
+        bnk = Banking.objects.get(id = bankId)
+
+        if bnk:
+            return JsonResponse({'status':True, 'account':bnk.bnk_acno})
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
+
+
 
 
 
@@ -21750,3 +21834,334 @@ def getCustomerDetailsAjax(request):
     else:
        return redirect('/')
 
+
+
+
+def newPaymentTermAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        term = request.POST['term']
+        days = request.POST['days']
+
+        if not Company_Payment_Term.objects.filter(company = com, term_name__iexact = term).exists():
+            Company_Payment_Term.objects.create(company = com, term_name = term, days =days)
+            
+            list= []
+            terms = Company_Payment_Term.objects.filter(company = com)
+
+            for term in terms:
+                termDict = {
+                    'name': term.term_name,
+                    'id': term.id,
+                    'days':term.days
+                }
+                list.append(termDict)
+
+            return JsonResponse({'status':True,'terms':list},safe=False)
+        else:
+            return JsonResponse({'status':False, 'message':f'{term} already exists, try another.!'})
+
+    else:
+        return redirect('/')
+
+
+
+def newRepeatEveryTypeAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        dur = int(request.POST['duration'])
+        type = request.POST['type']
+
+        d = 30 if type == 'Month' else 360
+        dys = dur * d
+        print(dur,d,dys)
+        rep_every = str(dur)+" "+type
+
+        if not CompanyRepeatEvery.objects.filter(company = com, repeat_every__iexact = rep_every).exists():
+            CompanyRepeatEvery.objects.create(company = com, repeat_every = rep_every, repeat_type = type, duration = dur, days = dys)
+            
+            list= []
+            rep = CompanyRepeatEvery.objects.filter(company = com)
+
+            for r in rep:
+                repDict = {
+                    'repeat_every': r.repeat_every,
+                    'id': r.id
+                }
+                list.append(repDict)
+
+            return JsonResponse({'status':True,'terms':list},safe=False)
+        else:
+            return JsonResponse({'status':False, 'message':f'{rep_every} already exists, try another.!'})
+
+    else:
+        return redirect('/')
+
+
+def getUnitsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+            options = {}
+            option_objects = Unit.objects.filter(company=com)
+            for option in option_objects:
+                options[option.id] = [option.id,option.unit_name]
+            return JsonResponse(options)
+
+        
+def getItemDetailsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        itemName = request.GET['item']
+        priceListId = request.GET['listId']
+        item = Items.objects.filter(company = cmp, item_name = itemName).first()
+
+        if priceListId != "":
+            priceList = PriceList.objects.get(id = int(priceListId))
+
+            if priceList.item_rate_type == 'Each Item':
+                try:
+                    priceListPrice = float(PriceListItem.objects.get(company = cmp, price_list = priceList, item = item).custom_rate)
+                except:
+                    priceListPrice = item.selling_price
+            else:
+                mark = priceList.percentage_type
+                percentage = float(priceList.percentage_value)
+                roundOff = priceList.round_off
+
+                if mark == 'Markup':
+                    price = float(item.selling_price) + float((item.selling_price) * (percentage/100))
+                else:
+                    price = float(item.selling_price) - float((item.selling_price) * (percentage/100))
+
+                if priceList.round_off != 'Never Mind':
+                    if roundOff == 'Nearest Whole Number':
+                        finalPrice = round(price)
+                    else:
+                        finalPrice = int(price) + float(roundOff)
+                else:
+                    finalPrice = price
+
+                priceListPrice = finalPrice
+        else:
+            priceListPrice = None
+
+        context = {
+            'status':True,
+            'id': item.id,
+            'hsn':item.hsn_code,
+            'sales_rate':item.selling_price,
+            'purchase_rate':item.purchase_price,
+            'avl':item.current_stock,
+            'tax': True if item.tax_reference == 'taxable' else False,
+            'gst':item.intrastate_tax,
+            'igst':item.interstate_tax,
+            'PLPrice':priceListPrice,
+
+        }
+        return JsonResponse(context)
+    else:
+       return redirect('/')
+
+
+
+
+def getBankAccountNumberAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        bankId = request.GET['id']
+        bnk = Banking.objects.get(id = bankId)
+
+        if bnk:
+            return JsonResponse({'status':True, 'account':bnk.bnk_acno})
+        else:
+            return JsonResponse({'status':False, 'message':'Something went wrong..!'})
+    else:
+       return redirect('/')
+
+
+def checkRecurringInvoiceNumber(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        RecInvNo = request.GET['RecInvNum']
+
+        # Finding next rec_invoice number w r t last rec_invoice number if exists.
+        nxtInv = ""
+        lastInv = RecurringInvoice.objects.filter(company = com).last()
+        if lastInv:
+            inv_no = str(lastInv.rec_invoice_no)
+            numbers = []
+            stri = []
+            for word in inv_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+
+            num = ''.join(numbers)
+            st = ''.join(stri)
+
+            inv_num = int(num) + 1
+            if num[0] == 0:
+                nxtInv = st + num.zfill(len(num)) 
+            else:
+                nxtInv = st + str(inv_num).zfill(len(num))
+        # else:
+        #     nxtInv = 'RI01'
+
+        PatternStr = []
+        for word in RecInvNo:
+            if word.isdigit():
+                pass
+            else:
+                PatternStr.append(word)
+        
+        pattern = ''
+        for j in PatternStr:
+            pattern += j
+
+        pattern_exists = checkRecInvNumberPattern(pattern)
+
+        if pattern !="" and pattern_exists:
+            return JsonResponse({'status':False, 'message':'Rec. Invoice No. Pattern already Exists.!'})
+        elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = RecInvNo).exists():
+            return JsonResponse({'status':False, 'message':'Rec. Invoice No. already Exists.!'})
+        elif nxtInv != "" and RecInvNo != nxtInv:
+            return JsonResponse({'status':False, 'message':'Rec. Invoice No. is not continuous.!'})
+        else:
+            return JsonResponse({'status':True, 'message':'Number is okay.!'})
+    else:
+       return redirect('/')
+
+
+def createNewAccountAjax(request):                                                                #new by tinto mt
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        if request.method=='POST':
+            a=Chart_of_Accounts()
+            b=Chart_of_Accounts_History()
+            b.company=com
+            b.logindetails=com.login_details
+            b.action="Created"
+            b.Date=date.today()
+            a.login_details=com.login_details
+            a.company=com
+          
+        
+            a.account_type = request.POST.get("account_type",None)
+            a.account_name = request.POST.get("account_name",None)
+            a.account_code = request.POST.get("account_code",None)
+            a.account_number = request.POST.get("account_number",None)
+            a.account_description = request.POST['description']
+            a.sub_account = request.POST.get("sub_acc",None)
+            a.parent_account = request.POST.get("parent_acc",None)
+               
+            account_type=request.POST.get("account_type",None)
+            if account_type == 'Other Assets':
+                a.description = 'Track special assets like goodwill and other intangible assets'
+            if account_type == 'Other Current Assets':
+                a.description = 'Any short term asset that can be converted into cash or cash equivalents easily Prepaid expenses Stocks and Mutual Funds'
+            if account_type == 'Cash':
+                a.description = 'To keep track of cash and other cash equivalents like petty cash, undeposited funds, etc., use an organized accounting system  financial software'
+            if account_type == 'Bank':
+                a.description = 'To keep track of bank accounts like Savings, Checking, and Money Market accounts.'
+            if account_type == 'Fixed Asset':
+                a.description = 'Any long-term investment or asset that cannot be easily converted into cash includes: Land and Buildings, Plant, Machinery, and Equipment, Computers, Furniture.'
+            if account_type == 'Stock':
+                a.description = 'To keep track of your inventory assets.'
+            if account_type == 'Payment Clearing':
+                a.description = 'To keep track of funds moving in and out via payment processors like Stripe, PayPal, etc.'
+            if account_type == 'Other Liability':
+                a.description = 'Obligation of an entity arising from past transactions or events which would require repayment.Tax to be paid Loan to be Repaid Accounts Payableetc.'
+            if account_type == 'Other Current Liability':
+                a.description = 'Any short term liability like: Customer Deposits Tax Payable'
+            if account_type == 'Credit Card':
+                a.description = 'Create a trail of all your credit card transactions by creating a credit card account.'
+            if account_type == 'Long Term Liability':
+                a.description = 'Liabilities that mature after a minimum period of one year like: Notes Payable Debentures Long Term Loans '
+            if account_type == 'Overseas Tax Payable':
+                a.description = 'Track your taxes in this account if your business sells digital services to foreign customers.'
+            if account_type == 'Equity':
+                a.description = 'Owners or stakeholders interest on the assets of the business after deducting all the liabilities.'
+            if account_type == 'Income':
+                a.description = 'Income or Revenue earned from normal business activities like sale of goods and services to customers.'
+            if account_type == 'Other Income':
+                a.description = 'Income or revenue earned from activities not directly related to your business like : Interest Earned Dividend Earned'
+            if account_type == 'Expense':
+                a.description = 'Reflects expenses incurred for running normal business operations, such as : Advertisements and Marketing Business Travel Expenses License Fees Utility Expenses'
+            if account_type == 'Cost Of Goods Sold':
+                a.description = 'This indicates the direct costs attributable to the production of the goods sold by a company such as: Material and Labor costs Cost of obtaining raw materials'
+            if account_type == 'Other Expense':
+                a.description = 'Track miscellaneous expenses incurred for activities other than primary business operations or create additional accounts to track default expenses like insurance or contribution towards charity.'
+    
+            a.Create_status="added"
+            a.status = 'Active'
+            ac_name=request.POST.get("account_name",None)
+            if Chart_of_Accounts.objects.filter(account_name=ac_name,company=com).exists():
+                return JsonResponse({'status': False, 'message':'Account Name already exists.!'})
+            else:
+                a.save()
+                b.chart_of_accounts=a
+                b.save()
+                return JsonResponse({'status': True})
+
+    else:
+        return redirect('/')
+
+def getAllAccountsAjax(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        acc = {}
+        acc_objects = Chart_of_Accounts.objects.filter(company = com, status = 'Active')
+        for option in acc_objects:
+            acc[option.id] = [option.account_name,option.account_type]
+
+        return JsonResponse(acc)
+    else:
+        return redirect('/')

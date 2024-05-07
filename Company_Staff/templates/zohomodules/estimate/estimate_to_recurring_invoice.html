@@ -776,7 +776,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card px-2 py-4" style="background-color: #141414a2;">
+      <div class="card px-2 py-4" style="background-color: black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="newTermForm">
           
           <div class="row mt-2">
@@ -832,7 +832,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card px-2 py-4" style="background-color: #141414a2;">
+      <div class="card px-2 py-4" style="background-color: black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="newRepeatEveryForm">
             {% csrf_token %}
 
@@ -1498,7 +1498,7 @@
           </button>
       </div>
       <div class="modal-body" style="background: rgb(32, 35, 37);">
-      <div class="card p-3 m-3" style="background-color: #141414a2;">
+      <div class="card p-3 m-3" style="background-color: black;">
           <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
           
 
@@ -2703,7 +2703,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "",
+                    url: "{% url 'getBankAccountNumberAjax' %}",
                     data: {
                         id: $('#paymentMethod').find(':selected').attr('text'),
                     },
@@ -2727,7 +2727,7 @@
         if (! isNaN(duration) && type !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newRepeatEveryTypeAjax' %}",
                 data:{
                     'duration' : duration,
                     'type' : type,
@@ -2767,7 +2767,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newPaymentTermAjax' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -2891,7 +2891,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "",
+                    url: "{% url 'getItemDetailsAjax' %}",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2951,7 +2951,7 @@
             console.log(inv_num);
             $.ajax({
                 type: "GET",
-                url: "",
+                url: "{% url 'checkRecurringInvoiceNumber' %}",
                 data: {
                     RecInvNum : inv_num,
                 },
@@ -3009,7 +3009,7 @@
               }else{
                   var n = inpId.slice(4);
                   $.ajax({
-                      url: "",
+                      url: "{% url 'getItemDetailsAjax' %}",
                       type : 'GET',
                       data:{
                           item : value,
@@ -4006,7 +4006,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"",
+                url:"{% url 'newPaymentTermAjax' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -4288,7 +4288,7 @@ $('#mphone').on('input', function() {
       function reloadUnit(unit) {
       
         $.ajax({
-                url: "",
+                url: "{% url 'getUnitsAjax' %}",
                 type: "GET",
                 dataType: "json",
                 data: $(this).serialize(),
@@ -4392,7 +4392,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != "" && purAccount != ""){
         $.ajax({
             type : 'POST',
-            url:"",
+            url:"{% url 'createNewItemAjax' %}",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4438,7 +4438,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "",
+        url: "{% url 'getAllItemsAjax' %}",
         type: "GET",
         dataType: "json",
         data: {},
@@ -4613,7 +4613,7 @@ function reloadItems() {
           $.ajax({
             
             type : 'POST',
-            url:"",
+            url:"{% url 'createNewAccountAjax' %}",
         
             data:{
                 
@@ -4648,7 +4648,7 @@ function reloadItems() {
         
         function reloadAccounts(account) {
             $.ajax({
-                url: "",
+                url: "{% url 'getAllAccountsAjax' %}",
                 type: "GET",
                 dataType: "json", 
                 data: {},

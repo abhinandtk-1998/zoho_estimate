@@ -490,6 +490,7 @@ urlpatterns = [
     path('show_unit_dropdownsel',views.show_unit_dropdownsel,name='show_unit_dropdownsel'),
 
 
+    path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
     path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
     path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
 
@@ -500,6 +501,16 @@ urlpatterns = [
     path('newinvPaymentTerm',views.newinvPaymentTerm,name='newinvPaymentTerm'),
     path('Staff/invoice/addinv_unit',views.addinv_unit,name='addinv_unit'),
     path('Staff/invoice/showinvunit_dropdown',views.showinvunit_dropdown,name='showinvunit_dropdown'),
+    path('getinvBankAccountNumber',views.getinvBankAccountNumber,name='getinvBankAccountNumber'),
+
+    path('Company/new_pymnt_trm',views.newPaymentTermAjax, name='newPaymentTermAjax'),
+    path('Company/new_repeat_every_ajax',views.newRepeatEveryTypeAjax, name='newRepeatEveryTypeAjax'),
+    path('Company/get_units_ajax',views.getUnitsAjax, name='getUnitsAjax'),
+    path('Company/get_itm_details',views.getItemDetailsAjax, name='getItemDetailsAjax'),
+    path('Company/get_bank_acc_num',views.getBankAccountNumberAjax, name='getBankAccountNumberAjax'),
+    path('Company/check_recurring_invoice_number',views.checkRecurringInvoiceNumber, name='checkRecurringInvoiceNumber'),
+    path('Company/create_new_acc',views.createNewAccountAjax, name= 'createNewAccountAjax'),
+    path('Company/get_all_accnts',views.getAllAccountsAjax, name='getAllAccountsAjax'),
 
 
 

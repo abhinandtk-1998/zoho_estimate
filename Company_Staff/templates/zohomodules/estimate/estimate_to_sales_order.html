@@ -2669,7 +2669,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "",
+                    url: "{% url 'getselItemDetails' %}",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2732,7 +2732,7 @@
         console.log(sel_num);
         $.ajax({
             type: "GET",
-            url: "",
+            url: "{% url 'checksalesorderNumber' %}",
             data: {
                 RecSelNum : sel_num,
             },
@@ -3006,7 +3006,7 @@ function getItemDetails(inpId, value) {
             console.log(sel_num);
             $.ajax({
                 type: "GET",
-                url: "",
+                url: "{% url 'checksalesorderNumber' %}",
                 data: {
                     selNum : sel_num,
                 },

@@ -2678,7 +2678,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "",
+                    url: "{% url 'getinvBankAccountNumber' %}",
                     data: {
                         id: $('#paymentMethod').find(':selected').attr('text'),
                     },
@@ -2828,7 +2828,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "",
+                    url: "{% url 'getinvItemDetails' %}",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2946,7 +2946,7 @@
               }else{
                   var n = inpId.slice(4);
                   $.ajax({
-                      url: "",
+                      url: "{% url 'getinvItemDetails' %}",
                       type : 'GET',
                       data:{
                           item : value,
@@ -4544,7 +4544,7 @@ function reloadItems() {
         
         function reloadAccounts(account) {
             $.ajax({
-                url: "",
+                url: "{% url 'getAllAccounts' %}",
                 type: "GET",
                 dataType: "json", 
                 data: {},
