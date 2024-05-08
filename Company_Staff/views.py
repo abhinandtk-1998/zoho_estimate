@@ -18379,7 +18379,7 @@ def sales_estimate_new(request):
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
             items=Items.objects.filter(company=comp_details)
             units=Unit.objects.filter(company=comp_details)
-            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+            accounts=Chart_of_Accounts.objects.filter(company=comp_details)
 
             numbers = ['1','2','3','4','5','6','7','8','9']
             if Estimate.objects.all().exists():
@@ -19120,6 +19120,45 @@ def sales_estimate_new_add(request):
 
     else:
         return('/')
+
+
+
+
+
+def addest_unit(request):
+    login_id = request.session['login_id']
+    log_user = LoginDetails.objects.get(id=login_id)
+
+    if log_user.user_type == 'Company':
+        if request.method == 'POST':
+            c = CompanyDetails.objects.get(login_details=login_id)
+            unit_name = request.POST['units']
+            
+            if Unit.objects.filter(unit_name=unit_name, company=c).exists():
+                return JsonResponse({"message": "error"})
+            else:
+                unit = Unit(unit_name=unit_name, company=c)  
+                unit.save()  
+                return JsonResponse({"message": "success"})
+
+
+
+def show_unit_dropdownest(request):
+
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+            options = {}
+            option_objects = Unit.objects.filter(company=com)
+            for option in option_objects:
+                options[option.id] = [option.id,option.unit_name]
+            return JsonResponse(options)
+
 
 
 
@@ -20690,7 +20729,7 @@ def attach_estimate_document(request,pk):
     
 
 
-def newSalesCustomerAjax(request):
+def newEstimateCustomerAjax(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -20698,30 +20737,6 @@ def newSalesCustomerAjax(request):
             com = CompanyDetails.objects.get(login_details = log_details)
         else:
             com = StaffDetails.objects.get(login_details = log_details).company
-
-        post_data = QueryDict(request.body)
-        if 'vendor_email' in post_data:
-            vendor_email = post_data['vendor_email']
-        else:
-            # Handle the case where 'vendor_email' is missing
-            return JsonResponse({'status': False, 'message': 'Vendor email is missing'})
-
-        if 'gst_number' in request.POST:
-
-            if Customer.objects.filter(company = com, GST_number=request.POST['gst_number']).exists():
-                return JsonResponse({'status':False, 'message':'GSTIN already exists'})
-
-        if 'pan_number' in request.POST:
-
-            if Customer.objects.filter(company = com, PAN_number=request.POST['pan_number']).exists():
-                return JsonResponse({'status':False, 'message':'PAN No. already exists'})
-            
-        if Customer.objects.filter(company = com, customer_email=request.POST['vendor_email']).exists():
-            return JsonResponse({'status':False, 'message':'Email already exists'})
-        elif Customer.objects.filter(company = com, customer_phone=request.POST['w_phone']).exists():
-            return JsonResponse({'status':False, 'message':'Work Phone no. already exists'})
-        elif Customer.objects.filter(company = com, customer_mobile=request.POST['m_phone']).exists():
-            return JsonResponse({'status':False, 'message':'Mobile No. already exists'})
 
         if request.method=="POST":
             customer_data=Customer()
@@ -20811,6 +20826,8 @@ def newSalesCustomerAjax(request):
             customer_data.shipping_pincode=request.POST['szip']
             customer_data.shipping_mobile=request.POST['sphone']
             customer_data.shipping_fax=request.POST['sfax']
+            customer_data.remarks=request.POST['remark']
+
             customer_data.save()
             
             vendor_history_obj=CustomerHistory()
@@ -20821,12 +20838,12 @@ def newSalesCustomerAjax(request):
             vendor_history_obj.action='Completed'
             vendor_history_obj.save()
 
-            vdata=Customer.objects.get(id=customer_data.id)
-            rdata=Customer_remarks_table()
-            rdata.remarks=request.POST['remark']
-            rdata.company=com
-            rdata.customer=vdata
-            rdata.save()
+            # vdata=Customer.objects.get(id=customer_data.id)
+            # rdata=Customer_remarks_table()
+            # rdata.remarks=request.POST['remark']
+            # rdata.company=com
+            # rdata.customer=vdata
+            # rdata.save()
 
         
             title =request.POST.getlist('tsalutation[]')
@@ -20852,7 +20869,7 @@ def newSalesCustomerAjax(request):
             return JsonResponse({'status':False})
 
 
-def getCustomersAjax(request):
+def getEstCustomersAjax(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21678,6 +21695,68 @@ def createNewIteminv(request):
        return redirect('/')
 
 
+
+def getinvItemDetails(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            cmp = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            cmp = StaffDetails.objects.get(login_details = log_details).company
+        
+        itemName = request.GET['item']
+        priceListId = request.GET['listId']
+        item = Items.objects.filter(company = cmp, item_name = itemName).first()
+
+        if priceListId != "":
+            priceList = PriceList.objects.get(id = int(priceListId))
+
+            if priceList.item_rate_type == 'Each Item':
+                try:
+                    priceListPrice = float(PriceListItem.objects.get(company = cmp, price_list = priceList, item = item).custom_rate)
+                except:
+                    priceListPrice = item.selling_price
+            else:
+                mark = priceList.percentage_type
+                percentage = float(priceList.percentage_value)
+                roundOff = priceList.round_off
+
+                if mark == 'Markup':
+                    price = float(item.selling_price) + float((item.selling_price) * (percentage/100))
+                else:
+                    price = float(item.selling_price) - float((item.selling_price) * (percentage/100))
+
+                if priceList.round_off != 'Never Mind':
+                    if roundOff == 'Nearest Whole Number':
+                        finalPrice = round(price)
+                    else:
+                        finalPrice = int(price) + float(roundOff)
+                else:
+                    finalPrice = price
+
+                priceListPrice = finalPrice
+        else:
+            priceListPrice = None
+
+        context = {
+            'status':True,
+            'id': item.id,
+            'hsn':item.hsn_code,
+            'sales_rate':item.selling_price,
+            'purchase_rate':item.purchase_price,
+            'avl':item.current_stock,
+            'tax': True if item.tax_reference == 'taxable' else False,
+            'gst':item.intrastate_tax,
+            'igst':item.interstate_tax,
+            'PLPrice':priceListPrice,
+
+        }
+        return JsonResponse(context)
+    else:
+       return redirect('/')
+
+
 def getAllItemsinv(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -21778,6 +21857,25 @@ def showinvunit_dropdown(request):
             for option in option_objects:
                 options[option.id] = [option.id,option.unit_name]
             return JsonResponse(options)
+
+
+def getAllAccounts(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+
+        acc = {}
+        acc_objects = Chart_of_Accounts.objects.filter(company = com, status = 'Active')
+        for option in acc_objects:
+            acc[option.id] = [option.account_name,option.account_type]
+
+        return JsonResponse(acc)
+    else:
+        return redirect('/')
 
 
 def getinvBankAccountNumber(request):

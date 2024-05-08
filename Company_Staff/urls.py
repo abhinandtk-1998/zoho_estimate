@@ -476,9 +476,15 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/Convert/Recurring_invoice_operation/<int:pk>',views.convert_estimate_to_recurring_invoice_op,name='convert_estimate_to_recurring_invoice_op'),
     path('Zohomodule/Sales/Estimate/Import',views.download_recurring_invoice_sample_import_file,name='download_recurring_invoice_sample_import_file'),
     path('Zohomodule/Sales/Estimate/Import_operation',views.import_estimate_from_excel,name='import_estimate_from_excel'),
+    path('Zohomodule/Sales/Estimate/Customer/Add',views.newEstimateCustomerAjax, name='newEstimateCustomerAjax'),
+    path('Zohomodule/Sales/Estimate/Customer/Display',views.getEstCustomersAjax, name='getEstCustomersAjax'),
+    path('Zohomodule/Sales/Estimate/Unit',views.addest_unit, name='addest_unit'),
+    path('Zohomodule/Sales/Estimate/Unit_view',view.show_unit_dropdownest, name='show_unit_dropdownest'),
 
-    path('Company/new_sales_customer_ajax',views.newSalesCustomerAjax, name='newSalesCustomerAjax'),
-    path('Company/get_all_cust',views.getCustomersAjax, name='getCustomersAjax'),
+
+
+    # path('Company/new_sales_customer_ajax',views.newSalesCustomerAjax, name='newSalesCustomerAjax'),
+    # path('Company/get_all_cust',views.getCustomersAjax, name='getCustomersAjax'),
     path('Company/save_new_itm',views.createNewItemAjax, name='createNewItemAjax'),
     path('Company/get_all_itms',views.getAllItemsAjax, name='getAllItemsAjax'),
     path('createsalesCustomer',views.createsalesCustomer,name='createsalesCustomer'),
@@ -490,17 +496,20 @@ urlpatterns = [
     path('show_unit_dropdownsel',views.show_unit_dropdownsel,name='show_unit_dropdownsel'),
 
 
-    path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
+    
     path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
     path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
+    path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
 
     path('getinvCustomerDetails',views.getinvCustomerDetails,name='getinvCustomerDetails'),
     path('Company/get_cust_details',views.getCustomerDetailsAjax, name='getCustomerDetailsAjax'),
     path('Staff/invoice/createNewIteminv',views.createNewIteminv,name='createNewIteminv'),
     path('Staff/invoice/getAllItemsinv',views.getAllItemsinv,name='getAllItemsinv'),
+    path('getinvItemDetails',views.getinvItemDetails,name='getinvItemDetails'),
     path('newinvPaymentTerm',views.newinvPaymentTerm,name='newinvPaymentTerm'),
     path('Staff/invoice/addinv_unit',views.addinv_unit,name='addinv_unit'),
     path('Staff/invoice/showinvunit_dropdown',views.showinvunit_dropdown,name='showinvunit_dropdown'),
+    path('Staff/invoice/getAllAccounts',views.getAllAccounts, name='getAllAccounts'),
     path('getinvBankAccountNumber',views.getinvBankAccountNumber,name='getinvBankAccountNumber'),
 
     path('Company/new_pymnt_trm',views.newPaymentTermAjax, name='newPaymentTermAjax'),

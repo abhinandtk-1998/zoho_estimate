@@ -4132,7 +4132,7 @@ $('#mphone').on('input', function() {
       if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" && tax_ref != undefined){
           $.ajax({
               type : 'POST',
-              url:"{% url 'newSalesCustomerAjax' %}",
+              url:"{% url 'newEstimateCustomerAjax' %}",
               data:{
                 'type': type,
                 'salutation' : title,
@@ -4212,7 +4212,7 @@ $('#mphone').on('input', function() {
   function reloadCustomer(title,fName,lName) {
       const fullName = title+' '+fName+' '+lName
       $.ajax({
-          url: "{% url 'getCustomersAjax' %}",
+          url: "{% url 'getEstCustomersAjax' %}",
           type: "GET",
           dataType: "json",
           data: {},
