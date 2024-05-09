@@ -479,7 +479,9 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/Customer/Add',views.newEstimateCustomerAjax, name='newEstimateCustomerAjax'),
     path('Zohomodule/Sales/Estimate/Customer/Display',views.getEstCustomersAjax, name='getEstCustomersAjax'),
     path('Zohomodule/Sales/Estimate/Unit',views.addest_unit, name='addest_unit'),
-    path('Zohomodule/Sales/Estimate/Unit_view',view.show_unit_dropdownest, name='show_unit_dropdownest'),
+    path('Zohomodule/Sales/Estimate/Unit_view',views.show_unit_dropdownest, name='show_unit_dropdownest'),
+    path('Zohomodule/Sales/Estimate/New/EstNo_check',views.checkEstimateNumber, name='checkEstimateNumber'),
+    path('Zohomodule/Sales/Estimate/New/Estimate_no_pattern_check',views.checkEstimatePattern, name='checkEstimatePattern'),
 
 
 

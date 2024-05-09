@@ -4266,7 +4266,7 @@ $('#mphone').on('input', function() {
         var uName = $("#unitName").val();
         $.ajax({
           type: 'POST',
-          url: "{% url 'add_unit' %}",
+          url: "{% url 'addest_unit' %}",
           data: {
             units: uName,
             csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -4288,7 +4288,7 @@ $('#mphone').on('input', function() {
       function reloadUnit(unit) {
       
         $.ajax({
-                url: "{% url 'getUnitsAjax' %}",
+                url: "{% url 'show_unit_dropdownest' %}",
                 type: "GET",
                 dataType: "json",
                 data: $(this).serialize(),

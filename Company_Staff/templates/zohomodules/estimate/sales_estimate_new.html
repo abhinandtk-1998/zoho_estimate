@@ -322,8 +322,8 @@
                         <label>Estimate No</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control" name="estimate_no" placeholder="{{est_no}}" required>     
-                        <div class="invalid-feedback">Please fill out this field.</div>   
+                        <input  type="text" class="form-control" id="estNumber" name="estimate_no" placeholder="{{est_no}}" required>     
+                        <span class="text-danger ml-1" id="estNoErr"></span>  
                     </div>
                 </div>
                 
@@ -1008,7 +1008,7 @@
                                 <label class="col-sm-2 col-form-label" style="color: aliceblue;">Unit <i class="fa fa-question-circle"></i></label>
                                 <div class="col-sm-10 col-md-7 col-9" style="margin-left: -2.2rem;">
                                     <div class="d-flex align-items-center">
-                                        <select name="unit" class="form-control bg-black text-white" id="selunit"  >
+                                        <select name="unit" class="form-control bg-black text-white" id="selunit" >
                                         {% for i in units %}
                                             <option value={{i.id}}>{{i.unit_name}}</option>
                                         {% endfor %}
@@ -1127,7 +1127,7 @@
                                     <label class="col-4 col-form-label" style="color: aliceblue;">Account*</label>
                                     <div class="col-sm-8 col-md-8 col-8">
                                         <div class="d-flex align-items-center">
-                                            <select name="cost_acc" class="form-control text-white bg-black" id="myaccount" required>
+                                            <select name="cost_acc" class="form-control text-white bg-black" id="myaccount" style="background-color: black; color: white;" required>
                                             <option value="">--Select Account--</option>
                                             <optgroup id="expensesel" label="Expense">
                                         
@@ -5594,6 +5594,31 @@ $(document).ready(function() {
                   validationResultDiv.textContent = "Invalid: The field does not contain six digits.";
               }
           }
+
+
+
+
+          $(document).on('change','#estNumber', function() {
+            $('#estNoErr').text('');
+            var est_num = $(this).val();
+            if(est_num != ""){
+                console.log(est_num);
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'checkEstimateNumber' %}",
+                    data: {
+                        EstNum : est_num,
+                    },
+                    success: function (response) {
+                        if (response.status){
+                            $('#estNoErr').text('');
+                        }else{
+                            $('#estNoErr').text(response.message);
+                        }
+                    }
+                })
+            }
+        });
 
 
 

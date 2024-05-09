@@ -18381,27 +18381,57 @@ def sales_estimate_new(request):
             units=Unit.objects.filter(company=comp_details)
             accounts=Chart_of_Accounts.objects.filter(company=comp_details)
 
-            numbers = ['1','2','3','4','5','6','7','8','9']
-            if Estimate.objects.all().exists():
-                est_last = Estimate.objects.last()
-                estimate_no = est_last.estimate_number 
 
-                i = 0
-                for c in estimate_no:
-                    if c in numbers:
-                        break
-                    i = i + 1
-                
-                est_char = estimate_no[:i+1]
-                est_num = estimate_no[i+1:]
+             # Finding next rec_invoice number w r t last rec_invoice number if exists.
+            nxtEst = ""
+            lastEst = Estimate.objects.filter(company=comp_details).last()
 
-                int_est_num = int(est_num)
+            if lastEst:
+                est_no = str(lastEst.estimate_number)
+                numbers = []
+                stri = []
+                for word in est_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
 
-                est_no = est_char + str(int_est_num + 1)
-                print(est_no)
+                num = ''.join(numbers)
+                st = ''.join(stri)
 
+                est_no = int(num) + 1
+                if num[0] == 0:
+                    nxtEst = st + num.zfill(len(num)) 
+                else:
+                    nxtEst = st + str(est_no).zfill(len(num))
             else:
-                est_no  = False
+                nxtEst = 'EST001'
+
+
+
+
+
+            # numbers = ['1','2','3','4','5','6','7','8','9']
+            # if Estimate.objects.all().exists():
+            #     est_last = Estimate.objects.last()
+            #     estimate_no = est_last.estimate_number 
+
+            #     i = 0
+            #     for c in estimate_no:
+            #         if c in numbers:
+            #             break
+            #         i = i + 1
+                
+            #     est_char = estimate_no[:i+1]
+            #     est_num = estimate_no[i+1:]
+
+            #     int_est_num = int(est_num)
+
+            #     est_no = est_char + str(int_est_num + 1)
+            #     print(est_no)
+
+            # else:
+            #     est_no  = False
 
             if EstimateReference.objects.all().exists():
                 Reference_no = EstimateReference.objects.last()
@@ -18423,7 +18453,7 @@ def sales_estimate_new(request):
                 'items':items,
                 'units':units,
                 'accounts':accounts,
-                'est_no':est_no,
+                'est_no':nxtEst,
                 'ref_no':ref_no,
                 'cmp':comp_details,
 
@@ -18442,27 +18472,54 @@ def sales_estimate_new(request):
             units=Unit.objects.filter(company=comp_details)
             accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
 
-            numbers = ['1','2','3','4','5','6','7','8','9']
-            if Estimate.objects.all().exists():
-                est_last = Estimate.objects.last()
-                estimate_no = est_last.estimate_number 
+            # Finding next rec_invoice number w r t last rec_invoice number if exists.
+            nxtEst = ""
+            lastEst = Estimate.objects.filter(company=comp_details).last()
 
-                i = 0
-                for c in estimate_no:
-                    if c in numbers:
-                        break
-                    i = i + 1
-                
-                est_char = estimate_no[:i+1]
-                est_num = estimate_no[i+1:]
+            if lastEst:
+                est_no = str(lastEst.estimate_number)
+                numbers = []
+                stri = []
+                for word in est_no:
+                    if word.isdigit():
+                        numbers.append(word)
+                    else:
+                        stri.append(word)
 
-                int_est_num = int(est_num)
+                num = ''.join(numbers)
+                st = ''.join(stri)
 
-                est_no = est_char + str(int_est_num + 1)
-                print(est_no)
-
+                est_no = int(num) + 1
+                if num[0] == 0:
+                    nxtEst = st + num.zfill(len(num)) 
+                else:
+                    nxtEst = st + str(est_no).zfill(len(num))
             else:
-                est_no  = False
+                nxtEst = 'EST001'
+
+
+
+            # numbers = ['1','2','3','4','5','6','7','8','9']
+            # if Estimate.objects.all().exists():
+            #     est_last = Estimate.objects.last()
+            #     estimate_no = est_last.estimate_number 
+
+            #     i = 0
+            #     for c in estimate_no:
+            #         if c in numbers:
+            #             break
+            #         i = i + 1
+                
+            #     est_char = estimate_no[:i+1]
+            #     est_num = estimate_no[i+1:]
+
+            #     int_est_num = int(est_num)
+
+            #     est_no = est_char + str(int_est_num + 1)
+            #     print(est_no)
+
+            # else:
+            #     est_no  = False
 
             if EstimateReference.objects.all().exists():
                 Reference_no = EstimateReference.objects.last()
@@ -18486,7 +18543,7 @@ def sales_estimate_new(request):
                 'items':items,
                 'units':units,
                 'accounts':accounts,
-                'est_no':est_no,
+                'est_no':nxtEst,
                 'ref_no':ref_no,
                 'cmp':comp_details,
 
@@ -18496,6 +18553,75 @@ def sales_estimate_new(request):
             return render(request,'zohomodules/estimate/sales_estimate_new.html', context)
     else:
         return redirect('/')
+
+
+def checkEstimateNumber(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        EstNo = request.GET['EstNum']
+
+        # Finding next estimate number w r t last estimate number if exists.
+        nxtEst = ""
+        lastEst = Estimate.objects.filter(company = com).last()
+        if lastEst:
+            est_no = str(lastEst.estimate_number)
+            numbers = []
+            stri = []
+            for word in est_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+
+            num = ''.join(numbers)
+            st = ''.join(stri)
+
+            inv_num = int(num) + 1
+            if num[0] == 0:
+                nxtEst = st + num.zfill(len(num)) 
+            else:
+                nxtEst = st + str(inv_num).zfill(len(num))
+        # else:
+        #     nxtInv = 'EST001'
+
+        PatternStr = []
+        for word in EstNo:
+            if word.isdigit():
+                pass
+            else:
+                PatternStr.append(word)
+        
+        pattern = ''
+        for j in PatternStr:
+            pattern += j
+
+        pattern_exists = checkEstimatePattern(pattern)
+
+        if pattern !="" and pattern_exists:
+            return JsonResponse({'status':False, 'message':'Estimate No. Pattern already Exists.!'})
+        elif Estimate.objects.filter(company = com, estimate_number__iexact = EstNo).exists():
+            return JsonResponse({'status':False, 'message':'Estimate No. already Exists.!'})
+        elif nxtEst != "" and EstNo != nxtEst:
+            return JsonResponse({'status':False, 'message':'Estimate No. is not continuous.!'})
+        else:
+            return JsonResponse({'status':True, 'message':'Number is okay.!'})
+    else:
+       return redirect('/')
+
+def checkEstimatePattern(pattern):
+    models = [invoice, SaleOrder]
+
+    for model in models:
+        field_name = model.getNumFieldName(model)
+        if model.objects.filter(**{f"{field_name}__icontains": pattern}).exists():
+            return True
+    return False
 
 
 
@@ -19147,17 +19273,22 @@ def show_unit_dropdownest(request):
 
     if 'login_id' in request.session:
         log_id = request.session['login_id']
-        log_details= LoginDetails.objects.get(id=log_id)
+        log_details = LoginDetails.objects.get(id=log_id)
         if log_details.user_type == 'Company':
-            com = CompanyDetails.objects.get(login_details = log_details)
+            com = CompanyDetails.objects.get(login_details=log_details)
         else:
-            com = StaffDetails.objects.get(login_details = log_details).company
+            com = StaffDetails.objects.get(login_details=log_details).company
 
-            options = {}
-            option_objects = Unit.objects.filter(company=com)
-            for option in option_objects:
-                options[option.id] = [option.id,option.unit_name]
-            return JsonResponse(options)
+        options = {}
+        option_objects = Unit.objects.filter(company=com)
+        for option in option_objects:
+            options[option.id] = [option.id, option.unit_name]
+        
+        return JsonResponse(options)
+    
+    # If 'login_id' is not in session or other conditions are not met, return an empty response
+    return JsonResponse({})
+            
 
 
 
