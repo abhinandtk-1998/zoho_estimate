@@ -163,7 +163,7 @@
                             </div>
                         </div>
                         <div class="sample_file mb-2">
-                            <a href="{% url 'download_recurring_invoice_sample_import_file' %}" class="fw-bolder btn btn-outline-warning btn-sm">Download Sample File</a>
+                            <a href="{% url 'download_estimate_sample_import_file' %}" class="fw-bolder btn btn-outline-warning btn-sm">Download Sample File</a>
                         </div>
                         <form id="importEstimateForm" action="{% url 'import_estimate_from_excel' %}" method="POST" class="form" enctype="multipart/form-data">
                             {% csrf_token %}
@@ -234,7 +234,7 @@
         if (sortValue === 'name') {
             sortTableByColumn(3)
         } else if (sortValue === 'est_no') {
-            sortTableByColumn(2); // Assuming year is in the third column (index 2)
+            sortTableByColumn(2); // Assuming est no  is in the third column (index 2)
         } else if (sortValue === 'all') {
             sortTableByColumn(0); // Sorting by the first column (Sl no.)
         } else {
@@ -249,9 +249,9 @@
             var valueB = b.cells[columnIndex].textContent.trim();
 
             // If sorting by Estimate Number, convert values to numbers
-            if (columnIndex === 2) {
-                return parseInt(valueA) - parseInt(valueB);
-            }
+            // if (columnIndex === 2) {
+            //     return parseInt(valueA) - parseInt(valueB);
+            // }
 
             return valueA.localeCompare(valueB);
         });

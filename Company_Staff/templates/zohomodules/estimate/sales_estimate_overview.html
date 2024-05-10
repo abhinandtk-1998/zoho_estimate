@@ -382,7 +382,7 @@
                     <div class="dropdown-menu ">
                         <a class="dropdown-item text-black" href="" >All</a>
                         <a class="dropdown-item text-black" onclick="sortTable(0)">Name</a>
-                        <a class="dropdown-item text-black" onclick="sortTable(1)">RI NO.</a>
+                        <a class="dropdown-item text-black" onclick="sortTable(1)">EST NO.</a>
                     </div>
     
                     <a class="btn btn-outline-warning small_btn mt-4" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
@@ -407,10 +407,11 @@
                             <tr onclick="window.location.href=`{% url 'sales_estimate_overview' est.id %}`" style="cursor: pointer;">
                               <td>
                                 <span class="name"><b>{{ est.customer.title }} {{ est.customer.first_name }} {{ est.customer.last_name }}</b></span><br><br>
-                                <span class="invNo">{{ est.estimate_number }}</span>
+                                <span class="estNo">{{ est.estimate_number }}</span>
                               </td>
                               <td>
-                                <span style="float: right;" class="amt">&#8377;{{ est.balance }}</span><br><br>
+                                <span style="float: right;" class="amt">
+                                  &#8377;{{ est.grand_total }}</span><br><br>
                                 <span style="float: right;" class="stat">{{est.status}}</span>
                               </td>
                             </tr>
@@ -484,7 +485,7 @@
                             {% endif %}
                           </div>
                         
-                          <a href="" class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" title="PDF" id="pdf_btn"> 
+                          <a href="{% url 'estimatePdf' estimate.id %}" class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" title="PDF" id="pdf_btn"> 
                             <i class="fa fa-file-pdf"></i>
                           </a>
                           <a class="btn btn-outline-warning small_btn mt-2 ms-1" style="display: none;" onclick="slipPdf()" title="SLIP PDF" id="slipPdf_btn"> 
@@ -570,16 +571,16 @@
                           <h6 class="mb-0">Payment Method</h6>
                           <p class="mb-0 text-right">{{invoice.payment_method}}</p>
                         </div> -->
-                        {%if invoice.salesOrder_no %}
+                        <!-- {%if invoice.salesOrder_no %}
                         <div class="d-flex px-3 justify-content-between text-black mb-2">
                           <h6 class="mb-0">Sales Order No.</h6>
                           <p class="mb-0 text-right">{{invoice.salesOrder_no}}</p>
                         </div>
-                        {% endif %}
-                        <div class="d-flex px-3 justify-content-between text-black mb-2">
+                        {% endif %} -->
+                        <!-- <div class="d-flex px-3 justify-content-between text-black mb-2">
                           <h6 class="mb-0">Repeat Every</h6>
                           <p class="mb-0 text-right">{{invoice.repeat_every.repeat_every}}</p>
-                        </div>
+                        </div> -->
                         {% if estimate.customer_bill_address != "" %}
                         <div class="d-flex px-3 justify-content-between text-black mb-2">
                           <h6 class="mb-0">Address</h6>
@@ -699,12 +700,12 @@
                                   <div class="col-md-6 text-left">Estimate No:</div>
                                   <div class="col-md-5 text-right">{{estimate.estimate_number}}</div>
                               </div>
-                              {% if invoice.salesOrder_no  %}
+                              <!-- {% if invoice.salesOrder_no  %}
                               <div class="row">
                                   <div class="col-md-6 text-left">Order No:</div>
                                   <div class="col-md-5 text-right">{{invoice.salesOrder_no}}</div>
                               </div>
-                              {% endif %}
+                              {% endif %} -->
                               <div class="row">
                                   <div class="col-md-6 text-left">Customer Name:</div>
                                   <div class="col-md-5 text-right">{{estimate.customer.first_name}} {{estimate.customer.last_name}}</div>
@@ -777,7 +778,7 @@
                               </div>
                               <div class="subtot-item d-flex justify-content-between">
                                   <span>Tax Amount</span>
-                                  <span><span>&#8377; </span>{{estimate.tax_amount}}</span>
+                                  <span><span>&#8377; </span>{{estimate.tax_amount_igst}}</span>
                               </div>
                               {% if estimate.tax_amount_igst == 0 %}
                               <div class="subtot-item d-flex justify-content-between">
@@ -791,7 +792,7 @@
                               {% else %}
                               <div class="subtot-item d-flex justify-content-between">
                                   <span>IGST</span>
-                                  <span><span>&#8377; </span>{{estimate.igst}}</span>
+                                  <span><span>&#8377; </span>{{estimate.tax_amount_igst}}</span>
                               </div>
                               {% endif %}
                               {% if estimate.adjustment != 0 %}
@@ -806,11 +807,11 @@
                               <span><strong>TOTAL</strong></span>
                               <span><strong><span>&#8377; </span>{{estimate.grand_total}}</strong></span>
                           </div>
-                          <div class="divider"></div>
+                          <!-- <div class="divider"></div>
                           <div class="paid-by mb-4 d-flex justify-content-between">
                               <span>Paid By:</span>
                               <span>{{invoice.payment_method}}</span>
-                          </div>
+                          </div> -->
                           <div class="createdby d-flex justify-content-between">
                               <p class="">Created By:</p>
                               <span>{{estimate.login_details.first_name}} {{estimate.login_details.last_name}}</span>
@@ -880,7 +881,7 @@
                                       <div style="margin-left: 10%;">
                                         <h3>{{ estimate.customer.title }}. {{ estimate.customer.first_name }} {{ estimate.customer.last_name }}</h3>
                                         <p class="text-black"> 
-                                          {{ estimate.billing_address|linebreaksbr }}
+                                          {{ estimate.customer_bill_address|linebreaksbr }}
                                         </p>
                                       </div>
                                     </div>
@@ -892,7 +893,7 @@
                                     </div>
                                     <div class="col-6">
                                         <p>Expiration Date : <span>{{estimate.expiration_date | date:'d-m-Y'}}</span></p>
-                                        <p>Payment Method : <span>{{invoice.payment_method}}</span></p>
+                                        <!-- <p>Payment Method : <span>{{invoice.payment_method}}</span></p> -->
                                     </div>
                                   </div>
                                   <hr class="mx-3">
@@ -940,7 +941,7 @@
                                                     <td class="text-right" style="color: #000;">{{estimate.grand_total}}</td>
                                                 </tr>
                                                 
-                                                {% if estimate.igst != 0 %}
+                                                {% if estimate.tax_amount_igst != 0 %}
                                                 <tr >
                                                     <td style="color: #000;">IGST</td>
                                                     <td style="color: #000;">:</td>
@@ -965,7 +966,7 @@
                                                 <tr >
                                                     <td style="color: #000;">Tax Amount</td>
                                                     <td style="color: #000;">:</td>
-                                                    <td class="text-right" style="color: #000;">{{estimate.tax_amount}}</td>
+                                                    <td class="text-right" style="color: #000;">{{estimate.tax_amount_igst}}</td>
                                                 </tr>
                                                 {% if estimate.shipping_charge != 0 %}
                                                 <tr >
@@ -1053,11 +1054,11 @@
                                   <div class="row extra-info pb-3 text-black fw-bold">
                                     <div class="col-6">
                                         <p>Estimate Date: <span>{{estimate.start_date | date:'d-m-Y'}}</span></p>
-                                        <p>Repeat Every: <span>{{estimate_c.repeat_every.repeat_every}}</span></p>
+                                        <!-- <p>Repeat Every: <span>{{estimate_c.repeat_every.repeat_every}}</span></p> -->
                                     </div>
                                     <div class="col-6">
                                         <p>Expiration Date : <span>{{estimate.expiration_date | date:'d-m-Y'}}</span></p>
-                                        <p>Payment Method : <span>{{estimate_c.payment_method}}</span></p>
+                                        <!-- <p>Payment Method : <span>{{estimate_c.payment_method}}</span></p> -->
                                     </div>
                                   </div>
                                   <hr class="mx-3">
@@ -1105,7 +1106,7 @@
                                                     <td class="text-right" style="color: #000;">{{estimate.sub_total}}</td>
                                                 </tr>
                                                 
-                                                {% if estimate_c.igst != 0 %}
+                                                {% if estimate_c.tax_amount_igst != 0 %}
                                                 <tr >
                                                     <td style="color: #000;">IGST</td>
                                                     <td style="color: #000;">:</td>
@@ -1130,7 +1131,7 @@
                                                 <tr >
                                                     <td style="color: #000;">Tax Amount</td>
                                                     <td style="color: #000;">:</td>
-                                                    <td class="text-right" style="color: #000;">{{estimate.tax_amount}}</td>
+                                                    <td class="text-right" style="color: #000;">{{estimate.tax_amount_igst}}</td>
                                                 </tr>
                                                 {% if estimate.shipping_charge != 0 %}
                                                 <tr >
@@ -1201,13 +1202,13 @@
                                                         <td style="color: #000;">:</td>
                                                         <td class="text-right" style="color: #000;">{{ estimate.estimate_number }}</td>
                                                     </tr>
-                                                    {%if invoice.salesOrder_no %}
+                                                    <!-- {%if invoice.salesOrder_no %}
                                                     <tr >
                                                         <td style="color: #000; font-weight: bold;">Order No</td>
                                                         <td style="color: #000;">:</td>
                                                         <td class="text-right" style="color: #000;">{{ invoice.salesOrder_no }}</td>
                                                     </tr>
-                                                    {% endif %}
+                                                    {% endif %} -->
                                                     
                                                     <tr >
                                                         <td style="color: #000; font-weight: bold;">Estimate Date</td>
@@ -1223,9 +1224,9 @@
                                                     </tr>
   
                                                     <tr>
-                                                        <td style="color: #000; font-weight: bold;">Payment Method</td>
+                                                        <!-- <td style="color: #000; font-weight: bold;">Payment Method</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{invoice.payment_method}}</td>
+                                                        <td class="text-right" style="color: #000;">{{invoice.payment_method}}</td> -->
                                                         
                                                     </tr>
                                                 </tbody>
@@ -1301,7 +1302,7 @@
                                                     <tr >
                                                         <td style="color: #000;">Tax Amount</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{estimate.tax_amount}}</td>
+                                                        <td class="text-right" style="color: #000;">{{estimate.tax_amount_igst}}</td>
                                                     </tr>
                                                     {% if estimate.shipping_charge != 0 %}
                                                     <tr >
@@ -1612,8 +1613,8 @@
     var rows = Array.from(tbody.querySelectorAll('tr'));
     if (col == 1){
       rows.sort(function(a, b) {
-          var balanceA = parseFloat(a.querySelector('.amt').innerText.replace(/[^\d.-]/g, ''));
-          var balanceB = parseFloat(b.querySelector('.amt').innerText.replace(/[^\d.-]/g, ''));
+          var balanceA = parseFloat(a.querySelector('.estNo').innerText.replace(/[^\d.-]/g, ''));
+          var balanceB = parseFloat(b.querySelector('.estNo').innerText.replace(/[^\d.-]/g, ''));
           return balanceA - balanceB;
       });
     }else{
@@ -1783,16 +1784,16 @@
 <script>
   function export_as_pdf() {
     const content = document.getElementById('Templates');
-    html2pdf().from(content).save('{{invoice.bnk_name }}.pdf');
+    html2pdf().from(content).save('{{estimate.estimate_number }}.pdf');
   }
 
   function slipPdf(){
-    var recInvNo = `{{invoice.rec_invoice_no }}`;
+    var recInvNo = `{{estimate.estimate_number }}`;
     var element = document.getElementById('slip_container');
     var opt =
     {
         margin: 1,
-        filename: 'RecurringInvoice_slip_'+ recInvNo + '.pdf',
+        filename: 'Estimate_slip_'+ recInvNo + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }

@@ -397,7 +397,7 @@
                         <label for="" class="labels">RI No.</label>
                       </div>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" value="{{nxtInv}}" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.rec_invoice_no}}" required>
+                        <input type="text" class="form-control bg-black text-white" name="rec_invoice_no"  id="recInvoiceNumber" placeholder="{{nxtInv}}" required>
                         <span class="text-danger ml-1" id="invNoErr"></span>
                       </div>
                     </div>
@@ -755,6 +755,7 @@
                 </div>
                 <div class="mt-4">
                   <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save">
+                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="submit" value="DRAFT" name="save_as_draft" id="draft">
                   <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=``" value="CANCEL" id="cancel">
                 </div>
               </form>
@@ -5790,6 +5791,35 @@ if (vals == "Other Expense") {
             }
         }
     }
+
+
+
+
+    $(document).on('change','#recInvoiceNumber', function() {
+            $('#invNoErr').text('');
+            var inv_num = $(this).val();
+            if(inv_num != ""){
+                console.log(inv_num);
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'checkRecInvoiceNumberEst' %}",
+                    data: {
+                        InvNum : inv_num,
+                    },
+                    success: function (response) {
+                        if (response.status){
+                            $('#invNoErr').text('');
+                        }else{
+                            $('#invNoErr').text(response.message);
+                        }
+                    }
+                })
+            }
+        });
+
+
+
+
 </script>
 
 {%endblock%}

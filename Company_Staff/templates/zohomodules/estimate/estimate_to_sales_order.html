@@ -5562,6 +5562,35 @@ if (vals == "Other Expense") {
             }
         }
     }
+
+
+
+    $(document).on('change','#recSalesorderNumber', function() {
+            $('#selNoErr').text('');
+            var inv_num = $(this).val();
+            if(inv_num != ""){
+                console.log(inv_num);
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'checkSalesOrderNumberEst' %}",
+                    data: {
+                        SelNum : sel_num,
+                    },
+                    success: function (response) {
+                        if (response.status){
+                            $('#selNoErr').text('');
+                        }else{
+                            $('#selNoErr').text(response.message);
+                        }
+                    }
+                })
+            }
+        });
+
+
+
+
+
 </script>
 
 {%endblock%}

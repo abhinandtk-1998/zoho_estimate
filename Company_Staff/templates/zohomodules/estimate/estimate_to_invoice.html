@@ -366,7 +366,7 @@
                         <label for="" class="labels">Invoice No.</label>
                       </div>
                       <div class="col-md-9">
-                        <input type="text" class="form-control bg-black text-white" value="{{nxtInv}}" name="invoice_no"  id="recInvoiceNumber" placeholder="{{invoice.invoice_number}}" required>
+                        <input type="text" class="form-control bg-black text-white" name="invoice_no"  id="InvoiceNumber" placeholder="{{nxtInv}}" required>
                         <span class="text-danger ml-1" id="invNoErr"></span>
                       </div>
                     </div>
@@ -724,6 +724,7 @@
                 </div>
                 <div class="mt-4">
                   <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save">
+                  <input class="btn save_btn" style="background-color: chocolate; color: white;" type="submit" value="DRAFT" name="save_as_draft" id="draft">
                   <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=``" value="CANCEL" id="cancel">
                 </div>
               </form>
@@ -5695,6 +5696,31 @@ if (vals == "Other Expense") {
             }
         }
     }
+
+
+
+
+    $(document).on('change','#InvoiceNumber', function() {
+            $('#invNoErr').text('');
+            var inv_num = $(this).val();
+            if(est_num != ""){
+                console.log(est_num);
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'checkInvoiceNumberEst' %}",
+                    data: {
+                        InvNum : inv_num,
+                    },
+                    success: function (response) {
+                        if (response.status){
+                            $('#invNoErr').text('');
+                        }else{
+                            $('#invNoErr').text(response.message);
+                        }
+                    }
+                })
+            }
+        });
 </script>
 
 

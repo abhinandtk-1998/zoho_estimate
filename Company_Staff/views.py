@@ -18615,7 +18615,7 @@ def checkEstimateNumber(request):
        return redirect('/')
 
 def checkEstimatePattern(pattern):
-    models = [invoice, SaleOrder]
+    models = [invoice, SaleOrder, Estimate, RecurringInvoice]
 
     for model in models:
         field_name = model.getNumFieldName(model)
@@ -19308,6 +19308,7 @@ def sales_estimate_overview(request,pk):
             comments = EstimateComment.objects.filter(estimate=estimate)
             history = EstimateHistory.objects.filter(estimate=estimate)
             est_items = EstimateItems.objects.filter(estimate=estimate)
+            last_history = EstimateHistory.objects.filter(estimate = estimate).last()
 
 
         
@@ -19321,6 +19322,7 @@ def sales_estimate_overview(request,pk):
                 'comments':comments,
                 'history':history,
                 'est_items':est_items,
+                'last_history':last_history,
                 
 
             }
@@ -19335,6 +19337,7 @@ def sales_estimate_overview(request,pk):
             comments = EstimateComment.objects.filter(estimate=estimate)
             history = EstimateHistory.objects.filter(estimate=estimate)
             est_items = EstimateItems.objects.filter(estimate=estimate)
+            last_history = EstimateHistory.objects.filter(estimate = estimate).last()
 
         
             context = {
@@ -19347,6 +19350,7 @@ def sales_estimate_overview(request,pk):
                 'comments':comments,
                 'history':history,
                 'est_items':est_items,
+                'last_history':last_history,
 
             }
             return render(request,'zohomodules/estimate/sales_estimate_overview.html', context)
@@ -19808,6 +19812,67 @@ def convert_estimate_to_sales_order(request,pk):
             return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
 
 
+
+def checkSalesOrderNumberEst(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        EstNo = request.GET['EstNum']
+
+        # Finding next estimate number w r t last estimate number if exists.
+        nxtEst = ""
+        lastEst = Estimate.objects.filter(company = com).last()
+        if lastEst:
+            est_no = str(lastEst.estimate_number)
+            numbers = []
+            stri = []
+            for word in est_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+
+            num = ''.join(numbers)
+            st = ''.join(stri)
+
+            inv_num = int(num) + 1
+            if num[0] == 0:
+                nxtEst = st + num.zfill(len(num)) 
+            else:
+                nxtEst = st + str(inv_num).zfill(len(num))
+        # else:
+        #     nxtInv = 'EST001'
+
+        PatternStr = []
+        for word in EstNo:
+            if word.isdigit():
+                pass
+            else:
+                PatternStr.append(word)
+        
+        pattern = ''
+        for j in PatternStr:
+            pattern += j
+
+        pattern_exists = checkEstimatePattern(pattern)
+
+        if pattern !="" and pattern_exists:
+            return JsonResponse({'status':False, 'message':'Estimate No. Pattern already Exists.!'})
+        elif Estimate.objects.filter(company = com, estimate_number__iexact = EstNo).exists():
+            return JsonResponse({'status':False, 'message':'Estimate No. already Exists.!'})
+        elif nxtEst != "" and EstNo != nxtEst:
+            return JsonResponse({'status':False, 'message':'Estimate No. is not continuous.!'})
+        else:
+            return JsonResponse({'status':True, 'message':'Number is okay.!'})
+    else:
+       return redirect('/')
+
+
 def convert_estimate_to_sales_order_op(request,pk):
 
     if 'login_id' in request.session:
@@ -19860,6 +19925,7 @@ def convert_estimate_to_sales_order_op(request,pk):
                 description = request.POST['description'],
                 terms_and_condition = request.POST['terms_and_condition']
             )
+            
 
             if 'customer_billing_address' in request.POST:
                 sale.customer_billing_address = request.POST['customer_billing_address']
@@ -20102,6 +20168,69 @@ def convert_estimate_to_invoice(request,pk):
 
             }
             return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
+
+
+def checkInvoiceNumberEst(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        InvNo = request.GET['InvNum']
+
+        # Finding next estimate number w r t last estimate number if exists.
+        nxtInv = ""
+        lastInv = invoice.objects.filter(company = com).last()
+        if lastInv:
+            inv_no = str(lastInv.invoice_number)
+            numbers = []
+            stri = []
+            for word in inv_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+
+            num = ''.join(numbers)
+            st = ''.join(stri)
+
+            inv_num = int(num) + 1
+            if num[0] == 0:
+                nxtInv = st + num.zfill(len(num)) 
+            else:
+                nxtInv = st + str(inv_num).zfill(len(num))
+        # else:
+        #     nxtInv = 'EST001'
+
+        PatternStr = []
+        for word in InvNo:
+            if word.isdigit():
+                pass
+            else:
+                PatternStr.append(word)
+        
+        pattern = ''
+        for j in PatternStr:
+            pattern += j
+
+        pattern_exists = checkEstimatePattern(pattern)
+
+        if pattern !="" and pattern_exists:
+            return JsonResponse({'status':False, 'message':'Invoice No. Pattern already Exists.!'})
+        elif invoice.objects.filter(company = com, invoice_number__iexact = InvNo).exists():
+            return JsonResponse({'status':False, 'message':'Invoice No. already Exists.!'})
+        elif nxtInv != "" and InvNo != nxtInv:
+            return JsonResponse({'status':False, 'message':'Invoice No. is not continuous.!'})
+        else:
+            return JsonResponse({'status':True, 'message':'Number is okay.!'})
+    else:
+       return redirect('/')
+
+
+
 
 def convert_estimate_to_invoice_op(request,pk):
 
@@ -20369,6 +20498,69 @@ def convert_estimate_to_recurring_invoice(request,pk):
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
 
+
+def checkRecInvoiceNumberEst(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        InvNo = request.GET['InvNum']
+
+        # Finding next estimate number w r t last estimate number if exists.
+        nxtInv = ""
+        lastInv = RecurringInvoice.objects.filter(company = com).last()
+        if lastInv:
+            inv_no = str(lastInv.rec_invoice_no)
+            numbers = []
+            stri = []
+            for word in inv_no:
+                if word.isdigit():
+                    numbers.append(word)
+                else:
+                    stri.append(word)
+
+            num = ''.join(numbers)
+            st = ''.join(stri)
+
+            inv_num = int(num) + 1
+            if num[0] == 0:
+                nxtInv = st + num.zfill(len(num)) 
+            else:
+                nxtInv = st + str(inv_num).zfill(len(num))
+        # else:
+        #     nxtInv = 'EST001'
+
+        PatternStr = []
+        for word in InvNo:
+            if word.isdigit():
+                pass
+            else:
+                PatternStr.append(word)
+        
+        pattern = ''
+        for j in PatternStr:
+            pattern += j
+
+        pattern_exists = checkEstimatePattern(pattern)
+
+        if pattern !="" and pattern_exists:
+            return JsonResponse({'status':False, 'message':'Recurring Invoice No. Pattern already Exists.!'})
+        elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = InvNo).exists():
+            return JsonResponse({'status':False, 'message':'Recurring Invoice No. already Exists.!'})
+        elif nxtInv != "" and InvNo != nxtInv:
+            return JsonResponse({'status':False, 'message':'Recurring Invoice No. is not continuous.!'})
+        else:
+            return JsonResponse({'status':True, 'message':'Number is okay.!'})
+    else:
+       return redirect('/')
+
+
+
+
 def convert_estimate_to_recurring_invoice_op(request,pk):
 
     if 'login_id' in request.session:
@@ -20500,7 +20692,7 @@ def convert_estimate_to_recurring_invoice_op(request,pk):
     else:
        return redirect('/')
 
-def download_recurring_invoice_sample_import_file(request):
+def download_estimate_sample_import_file(request):
 
     estimate_table_data = [['SLNO','CUSTOMER','ESTIMATE DATE','PLACE OF SUPPLY','ESTIMATE NO','TERMS','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','SHIPPING CHARGE','GRAND TOTAL'],['1', 'Arun Kumar', '2024-03-20', '[KL]-Kerala','EST100','NET 30','','1000','0','25','25','50','0','0','1050']]
     items_table_data = [['ESTIMATE NO', 'PRODUCT','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL'], ['1', 'Test Item 1','789987','1','1000','5','0','1000']]
@@ -20802,6 +20994,40 @@ def checkEstNumberPattern(pattern):
         if model.objects.filter(**{f"{field_name}__icontains": pattern}).exists():
             return True
     return False
+
+
+def estimatePdf(request,pk):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        log_details= LoginDetails.objects.get(id=log_id)
+        if log_details.user_type == 'Company':
+            com = CompanyDetails.objects.get(login_details = log_details)
+        else:
+            com = StaffDetails.objects.get(login_details = log_details).company
+        
+        est = Estimate.objects.get(id = pk)
+        itms = EstimateItems.objects.filter(estimate = est)
+    
+        context = {'estimate':est, 'estimateItems':itms,'cmp':com}
+        
+        template_path = 'zohomodules/estimate/estimate_pdf.html'
+        fname = 'Estimate_'+ est.estimate_number
+        # Create a Django response object, and specify content_type as pdftemp_
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] =f'attachment; filename = {fname}.pdf'
+        # find the template and render it.
+        template = get_template(template_path)
+        html = template.render(context)
+
+        # create a pdf
+        pisa_status = pisa.CreatePDF(
+        html, dest=response)
+        # if error then show some funny view
+        if pisa_status.err:
+            return HttpResponse('We had some errors <pre>' + html + '</pre>')
+        return response
+    else:
+        return redirect('/')
 
 
 def estimate_share_email(request,pk):
