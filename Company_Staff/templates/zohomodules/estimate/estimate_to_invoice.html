@@ -5703,8 +5703,8 @@ if (vals == "Other Expense") {
     $(document).on('change','#InvoiceNumber', function() {
             $('#invNoErr').text('');
             var inv_num = $(this).val();
-            if(est_num != ""){
-                console.log(est_num);
+            if(inv_num != ""){
+                console.log(inv_num);
                 $.ajax({
                     type: "GET",
                     url: "{% url 'checkInvoiceNumberEst' %}",

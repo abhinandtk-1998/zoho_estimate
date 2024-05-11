@@ -476,6 +476,7 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/Convert/Invoice_number_check',views.checkInvoiceNumberEst,name='checkInvoiceNumberEst'),
     path('Zohomodule/Sales/Estimate/Convert/Invoice_operation/<int:pk>',views.convert_estimate_to_invoice_op,name='convert_estimate_to_invoice_op'),
     path('Zohomodule/Sales/Estimate/Convert/Recurring_invoice/<int:pk>',views.convert_estimate_to_recurring_invoice,name='convert_estimate_to_recurring_invoice'),
+    path('Zohomodule/Sales/Estimate/convert/Recurring_invoice_number_check',views.checkRecurringInvoiceNumber,name='checkRecurringInvoiceNumber'),
     path('Zohomodule/Sales/Estimate/Convert/Recurring_invoice_operation/<int:pk>',views.convert_estimate_to_recurring_invoice_op,name='convert_estimate_to_recurring_invoice_op'),
     path('Zohomodule/Sales/Estimate/Import',views.download_estimate_sample_import_file,name='download_estimate_sample_import_file'),
     path('Zohomodule/Sales/Estimate/Import_operation',views.import_estimate_from_excel,name='import_estimate_from_excel'),

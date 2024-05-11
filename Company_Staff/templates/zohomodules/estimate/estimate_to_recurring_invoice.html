@@ -5795,27 +5795,52 @@ if (vals == "Other Expense") {
 
 
 
-    $(document).on('change','#recInvoiceNumber', function() {
-            $('#invNoErr').text('');
-            var inv_num = $(this).val();
-            if(inv_num != ""){
-                console.log(inv_num);
-                $.ajax({
-                    type: "GET",
-                    url: "{% url 'checkRecInvoiceNumberEst' %}",
-                    data: {
-                        InvNum : inv_num,
-                    },
-                    success: function (response) {
-                        if (response.status){
-                            $('#invNoErr').text('');
-                        }else{
-                            $('#invNoErr').text(response.message);
-                        }
+    // $(document).on('change','#recInvoiceNumber', function() {
+    //         $('#invNoErr').text('');
+    //         var inv_num = $(this).val();
+    //         if(inv_num != ""){
+    //             console.log(inv_num);
+    //             $.ajax({
+    //                 type: "GET",
+    //                 url: "",
+    //                 data: {
+    //                     InvNum : inv_num,
+    //                 },
+    //                 success: function (response) {
+    //                     if (response.status){
+    //                         $('#invNoErr').text('');
+    //                     }else{
+    //                         $('#invNoErr').text(response.message);
+    //                     }
+    //                 }
+    //             })
+    //         }
+    //     });
+
+
+    
+
+        $(document).on('change','#recInvoiceNumber', function() {
+        $('#invNoErr').text('');
+        var inv_num = $(this).val();
+        if(inv_num != ""){
+            console.log(inv_num);
+            $.ajax({
+                type: "GET",
+                url: "{% url 'checkRecurringInvoiceNumber' %}",
+                data: {
+                    RecInvNum : inv_num,
+                },
+                success: function (response) {
+                    if (response.status){
+                        $('#invNoErr').text('');
+                    }else{
+                        $('#invNoErr').text(response.message);
                     }
-                })
-            }
-        });
+                }
+            })
+        }
+    });
 
 
 

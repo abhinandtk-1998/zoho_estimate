@@ -19822,16 +19822,16 @@ def checkSalesOrderNumberEst(request):
         else:
             com = StaffDetails.objects.get(login_details = log_details).company
         
-        EstNo = request.GET['EstNum']
+        SelNo = request.GET['SelNum']
 
         # Finding next estimate number w r t last estimate number if exists.
-        nxtEst = ""
-        lastEst = Estimate.objects.filter(company = com).last()
-        if lastEst:
-            est_no = str(lastEst.estimate_number)
+        nxtSel = ""
+        lastSel = SaleOrder.objects.filter(company = com).last()
+        if lastSel:
+            sel_no = str(lastSel.sales_order_number)
             numbers = []
             stri = []
-            for word in est_no:
+            for word in sel_no:
                 if word.isdigit():
                     numbers.append(word)
                 else:
@@ -19840,16 +19840,16 @@ def checkSalesOrderNumberEst(request):
             num = ''.join(numbers)
             st = ''.join(stri)
 
-            inv_num = int(num) + 1
+            sel_num = int(num) + 1
             if num[0] == 0:
-                nxtEst = st + num.zfill(len(num)) 
+                nxtSel = st + num.zfill(len(num)) 
             else:
-                nxtEst = st + str(inv_num).zfill(len(num))
+                nxtSel = st + str(sel_num).zfill(len(num))
         # else:
         #     nxtInv = 'EST001'
 
         PatternStr = []
-        for word in EstNo:
+        for word in SelNo:
             if word.isdigit():
                 pass
             else:
@@ -19862,11 +19862,11 @@ def checkSalesOrderNumberEst(request):
         pattern_exists = checkEstimatePattern(pattern)
 
         if pattern !="" and pattern_exists:
-            return JsonResponse({'status':False, 'message':'Estimate No. Pattern already Exists.!'})
-        elif Estimate.objects.filter(company = com, estimate_number__iexact = EstNo).exists():
-            return JsonResponse({'status':False, 'message':'Estimate No. already Exists.!'})
-        elif nxtEst != "" and EstNo != nxtEst:
-            return JsonResponse({'status':False, 'message':'Estimate No. is not continuous.!'})
+            return JsonResponse({'status':False, 'message':'SaleOrder No. Pattern already Exists.!'})
+        elif SaleOrder.objects.filter(company = com, sales_order_number__iexact = SelNo).exists():
+            return JsonResponse({'status':False, 'message':'SaleOrder No. already Exists.!'})
+        elif nxtSel != "" and SelNo != nxtSel:
+            return JsonResponse({'status':False, 'message':'SaleOrder No. is not continuous.!'})
         else:
             return JsonResponse({'status':True, 'message':'Number is okay.!'})
     else:
@@ -20499,7 +20499,67 @@ def convert_estimate_to_recurring_invoice(request,pk):
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
 
 
-def checkRecInvoiceNumberEst(request):
+# def checkRecInvoiceNumberEst(request):
+#     if 'login_id' in request.session:
+#         log_id = request.session['login_id']
+#         log_details= LoginDetails.objects.get(id=log_id)
+#         if log_details.user_type == 'Company':
+#             com = CompanyDetails.objects.get(login_details = log_details)
+#         else:
+#             com = StaffDetails.objects.get(login_details = log_details).company
+        
+#         InvNo = request.GET['InvNum']
+
+#         # Finding next estimate number w r t last estimate number if exists.
+#         nxtInv = ""
+#         lastInv = RecurringInvoice.objects.filter(company = com).last()
+#         if lastInv:
+#             inv_no = str(lastInv.rec_invoice_no)
+#             numbers = []
+#             stri = []
+#             for word in inv_no:
+#                 if word.isdigit():
+#                     numbers.append(word)
+#                 else:
+#                     stri.append(word)
+
+#             num = ''.join(numbers)
+#             st = ''.join(stri)
+
+#             inv_num = int(num) + 1
+#             if num[0] == 0:
+#                 nxtInv = st + num.zfill(len(num)) 
+#             else:
+#                 nxtInv = st + str(inv_num).zfill(len(num))
+#         # else:
+#         #     nxtInv = 'EST001'
+
+#         PatternStr = []
+#         for word in InvNo:
+#             if word.isdigit():
+#                 pass
+#             else:
+#                 PatternStr.append(word)
+        
+#         pattern = ''
+#         for j in PatternStr:
+#             pattern += j
+
+#         pattern_exists = checkEstimatePattern(pattern)
+
+#         if pattern !="" and pattern_exists:
+#             return JsonResponse({'status':False, 'message':'Recurring Invoice No. Pattern already Exists.!'})
+#         elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = InvNo).exists():
+#             return JsonResponse({'status':False, 'message':'Recurring Invoice No. already Exists.!'})
+#         elif nxtInv != "" and InvNo != nxtInv:
+#             return JsonResponse({'status':False, 'message':'Recurring Invoice No. is not continuous.!'})
+#         else:
+#             return JsonResponse({'status':True, 'message':'Number is okay.!'})
+#     else:
+#        return redirect('/')
+
+
+def checkRecurringInvoiceNumber(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -20508,9 +20568,9 @@ def checkRecInvoiceNumberEst(request):
         else:
             com = StaffDetails.objects.get(login_details = log_details).company
         
-        InvNo = request.GET['InvNum']
+        RecInvNo = request.GET['RecInvNum']
 
-        # Finding next estimate number w r t last estimate number if exists.
+        # Finding next rec_invoice number w r t last rec_invoice number if exists.
         nxtInv = ""
         lastInv = RecurringInvoice.objects.filter(company = com).last()
         if lastInv:
@@ -20532,10 +20592,10 @@ def checkRecInvoiceNumberEst(request):
             else:
                 nxtInv = st + str(inv_num).zfill(len(num))
         # else:
-        #     nxtInv = 'EST001'
+        #     nxtInv = 'RI01'
 
         PatternStr = []
-        for word in InvNo:
+        for word in RecInvNo:
             if word.isdigit():
                 pass
             else:
@@ -20545,18 +20605,28 @@ def checkRecInvoiceNumberEst(request):
         for j in PatternStr:
             pattern += j
 
-        pattern_exists = checkEstimatePattern(pattern)
+        # if nxtInv != RecInvNo: 
+        #     pattern_exists = checkRecInvNumberPattern(pattern)
 
         if pattern !="" and pattern_exists:
-            return JsonResponse({'status':False, 'message':'Recurring Invoice No. Pattern already Exists.!'})
-        elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = InvNo).exists():
-            return JsonResponse({'status':False, 'message':'Recurring Invoice No. already Exists.!'})
-        elif nxtInv != "" and InvNo != nxtInv:
-            return JsonResponse({'status':False, 'message':'Recurring Invoice No. is not continuous.!'})
+            return JsonResponse({'status':False, 'message':'Rec. Invoice No. Pattern already Exists.!'})
+        elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = RecInvNo).exists():
+            return JsonResponse({'status':False, 'message':'Rec. Invoice No. already Exists.!'})
+        elif nxtInv != "" and RecInvNo != nxtInv:
+            return JsonResponse({'status':False, 'message':'Rec. Invoice No. is not continuous.!'})
         else:
             return JsonResponse({'status':True, 'message':'Number is okay.!'})
     else:
        return redirect('/')
+
+def checkRecInvNumberPattern(pattern):
+    models = [invoice, Journal, Estimate, SaleOrder]
+
+    for model in models:
+        field_name = model.getNumFieldName(model)
+        if model.objects.filter(**{f"{field_name}__icontains": pattern}).exists():
+            return True
+    return False
 
 
 
@@ -20604,7 +20674,6 @@ def convert_estimate_to_recurring_invoice_op(request,pk):
                 gst_type = request.POST['customer_gst_type'],
                 # gstin = request.POST['customer_gstin'],
                 place_of_supply = request.POST['place_of_supply'],
-                ly = request.POST['place_of_supply'],
                 profile_name = request.POST['profile_name'],
                 entry_type = None if request.POST['entry_type'] == "" else request.POST['entry_type'],
                 reference_no = request.POST['reference_number'],
@@ -22510,7 +22579,7 @@ def checkRecurringInvoiceNumber(request):
         for j in PatternStr:
             pattern += j
 
-        pattern_exists = checkRecInvNumberPattern(pattern)
+        pattern_exists = checkEstimatePattern(pattern)
 
         if pattern !="" and pattern_exists:
             return JsonResponse({'status':False, 'message':'Rec. Invoice No. Pattern already Exists.!'})

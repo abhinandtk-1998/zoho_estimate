@@ -5567,9 +5567,9 @@ if (vals == "Other Expense") {
 
     $(document).on('change','#recSalesorderNumber', function() {
             $('#selNoErr').text('');
-            var inv_num = $(this).val();
-            if(inv_num != ""){
-                console.log(inv_num);
+            var sel_num = $(this).val();
+            if(sel_num != ""){
+                console.log(sel_num);
                 $.ajax({
                     type: "GET",
                     url: "{% url 'checkSalesOrderNumberEst' %}",
@@ -5577,6 +5577,7 @@ if (vals == "Other Expense") {
                         SelNum : sel_num,
                     },
                     success: function (response) {
+                        console.log(response)
                         if (response.status){
                             $('#selNoErr').text('');
                         }else{
