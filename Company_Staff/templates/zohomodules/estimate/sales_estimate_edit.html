@@ -4949,6 +4949,54 @@ $(document).ready(function() {
 
 
 
+          $(document).ready(function(){
+      $(document).on('keyup',"#ship",function(){
+          var subtot = $('#sub_total').val();
+          var tax = $('#tax_amount').val();
+          var sh = $("#ship").val();
+          var adj = $("#adj").val();
+          $('#grandtotal').val((parseFloat(subtot)+parseFloat(tax)+parseFloat(sh)+parseFloat(adj)).toFixed(2));
+          $('#balance').val((parseFloat($("#grandtotal").val())-parseFloat($("#advance").val())).toFixed(2))
+          
+      });
+
+      $(document).on("blur", "#ship", function(){
+          if($(this).val() != ""){
+          }else{
+          $(this).val(0);
+          calc_total();
+          }
+      }); 
+    });
+
+    $(document).ready(function(){
+      $(document).on("keyup", "#adj", function(){
+          var subtot = $('#sub_total').val();
+          var tax = $('#tax_amount').val();
+          var sh = $("#ship").val();
+          var adj = $("#adj").val();
+          $('#grandtotal').val((parseFloat(subtot)+parseFloat(tax)+parseFloat(sh)+parseFloat(adj)).toFixed(2));
+          $('#balance').val((parseFloat($("#grandtotal").val())-parseFloat($("#advance").val())).toFixed(2))
+      });
+
+      $(document).on("blur", "#adj", function(){
+          if($(this).val() != ""){
+          }else{
+          $(this).val(0);
+          calc_total();
+          }
+      }); 
+    });
+
+
+
+
+          
+
+
+
+
+
 
     // // Assuming estimate.customer_place_of_supply contains the default value for place of supply
     // const taxrate = '{{ i.tax_rate }}';

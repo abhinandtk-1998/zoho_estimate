@@ -273,7 +273,7 @@
                     <div class="col-sm-12 col-md-6 col-lg-7">
                         <input hidden value="{{cmp.state}}" id="cmpstate">
                         <select name="place_of_supply" id="placeOfSupply" class="form-control">
-                            <option value="value" selected></option>
+                            <option value="" selected></option>
                             <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
                             <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                             <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> 
@@ -5623,6 +5623,44 @@ $(document).ready(function() {
 
 
 
+        $(document).ready(function(){
+      $(document).on('keyup',"#ship",function(){
+          var subtot = $('#sub_total').val();
+          var tax = $('#tax_amount').val();
+          var sh = $("#ship").val();
+          var adj = $("#adj").val();
+          $('#grandtotal').val((parseFloat(subtot)+parseFloat(tax)+parseFloat(sh)+parseFloat(adj)).toFixed(2));
+          $('#balance').val((parseFloat($("#grandtotal").val())-parseFloat($("#advance").val())).toFixed(2))
+          
+      });
+
+      $(document).on("blur", "#ship", function(){
+          if($(this).val() != ""){
+          }else{
+          $(this).val(0);
+          calc_total();
+          }
+      }); 
+    });
+
+    $(document).ready(function(){
+      $(document).on("keyup", "#adj", function(){
+          var subtot = $('#sub_total').val();
+          var tax = $('#tax_amount').val();
+          var sh = $("#ship").val();
+          var adj = $("#adj").val();
+          $('#grandtotal').val((parseFloat(subtot)+parseFloat(tax)+parseFloat(sh)+parseFloat(adj)).toFixed(2));
+          $('#balance').val((parseFloat($("#grandtotal").val())-parseFloat($("#advance").val())).toFixed(2))
+      });
+
+      $(document).on("blur", "#adj", function(){
+          if($(this).val() != ""){
+          }else{
+          $(this).val(0);
+          calc_total();
+          }
+      }); 
+    });
 
 
 
@@ -5631,44 +5669,6 @@ $(document).ready(function() {
 
 
 
-
-
-
-
-
-
-// function calc() {
-//     // Retrieve values from input fields and convert them to numbers
-//     var price = parseFloat(document.getElementById('price').value);
-//     var qty = parseInt(document.getElementById('qty').value);
-//     var discount = parseFloat(document.getElementById('discount').value);
-
-//     // Calculate the total
-//     var tot = (price * qty) - discount;
-
-//     // Set the total in the appropriate input field
-//     document.getElementById('total').value = tot.toFixed(2);
-//     calc_total()
-// }
-
-// function calc_total() { 
-//       total = 0;
-//       $('.total').each(function () {
-//           total += parseFloat($(this).val());
-//       });
-//       taxamount = 0;
-//       $('#sub_total').val(total.toFixed(2));
-//       var ship = parseFloat($("#ship").val());
-//       var adj_val = parseFloat($('#adj').val())
-//       var gtot = taxamount + total + ship + adj_val;
-
-//       $('#grandtotal').val(gtot.toFixed(2));
-      
-//       var adv_val = parseFloat($('#advance').val())
-//       var bal = gtot - adv_val
-//       $('#balance').val(bal.toFixed(2));
-//       splitTax();
-//     }
 
 
 

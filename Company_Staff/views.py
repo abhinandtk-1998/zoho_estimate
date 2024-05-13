@@ -18448,7 +18448,7 @@ def sales_estimate_new(request):
                 'allmodules':allmodules,
                 'login_details':login_d,
                 'customer':customer_details,
-                'price_lists':price_lists,
+                'priceListItems':price_lists,
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
                 'units':units,
@@ -18464,7 +18464,7 @@ def sales_estimate_new(request):
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             customer_details = Customer.objects.filter(company=dash_details.company)
-            comp_details = CompanyDetails.objects.get(login_details=login_d)
+            comp_details = CompanyDetails.objects.get(id=dash_details.company.id)
 
             comp_payment_terms=Company_Payment_Term.objects.filter(company=comp_details)
             price_lists=PriceList.objects.filter(company=comp_details,type='Sales',status='Active')
@@ -18538,7 +18538,7 @@ def sales_estimate_new(request):
                 'allmodules':allmodules,
                 'login_details':login_d,
                 'customer':customer_details,
-                'price_lists':price_lists,
+                'priceListItems':price_lists,
                 'comp_payment_terms':comp_payment_terms,
                 'items':items,
                 'units':units,
@@ -18615,7 +18615,7 @@ def checkEstimateNumber(request):
        return redirect('/')
 
 def checkEstimatePattern(pattern):
-    models = [invoice, SaleOrder, Estimate, RecurringInvoice]
+    models = [invoice, SaleOrder, RecurringInvoice]
 
     for model in models:
         field_name = model.getNumFieldName(model)
@@ -19333,7 +19333,7 @@ def sales_estimate_overview(request,pk):
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             estimate = Estimate.objects.get(id=pk)
             estimates = Estimate.objects.filter(company=dash_details.company)
-            company = CompanyDetails.objects.get(login_details=login_d)
+            company = CompanyDetails.objects.get(id=dash_details.company.id)
             comments = EstimateComment.objects.filter(estimate=estimate)
             history = EstimateHistory.objects.filter(estimate=estimate)
             est_items = EstimateItems.objects.filter(estimate=estimate)
@@ -19405,8 +19405,8 @@ def sales_estimate_edit(request,pk):
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             estimate = Estimate.objects.get(id=pk)
-            company = CompanyDetails.objects.get(login_details=login_d)
-            customer_details = Customer.objects.filter(company=dash_details)
+            company = CompanyDetails.objects.get(id=dash_details.company.id)
+            customer_details = Customer.objects.filter(company=dash_details.company)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             items=Items.objects.filter(company=company)
@@ -19414,7 +19414,7 @@ def sales_estimate_edit(request,pk):
 
             price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
             units=Unit.objects.filter(company=company)
-            accounts=Chart_of_Accounts.objects.filter(company=dash_details)
+            accounts=Chart_of_Accounts.objects.filter(company=dash_details.company)
 
         
             context = {
@@ -19443,81 +19443,90 @@ def estimate_edit_op(request,pk):
         log_id = request.session['login_id']
         login_d = LoginDetails.objects.get(id=log_id)
 
+    
+
         if login_d.user_type == 'Company':
             company_id = request.session['login_id']
-            company = CompanyDetails.objects.get(id=company_id)
-            if request.method=='POST':
-                est = Estimate.objects.get(id=pk)
-                customer_id = request.POST['customerId']
-                est.customer = Customer.objects.get(id=customer_id)
-                est.customer_email = request.POST['email']
+            company = CompanyDetails.objects.get(login_details=login_d)
 
-                if 'billingAddress' in request.POST:
-                    est.customer_bill_address = request.POST['billingAddress']
+        else:
+            staff_id = request.session['login_id']
+            staff_details = StaffDetails.objects.get(login_details=login_d)
+            company = CompanyDetails.objects.get(id= staff_details.company.id)
 
+        
+        if request.method=='POST':
+            est = Estimate.objects.get(id=pk)
+            customer_id = request.POST['customerId']
+            est.customer = Customer.objects.get(id=customer_id)
+            est.customer_email = request.POST['email']
 
-                est.customer_gst_treatment = request.POST['gst_treatment']
-
-                if 'gst_number' in request.POST:
-                    est.customer_gst_number = request.POST['gst_number']
-                
-                est.customer_place_of_supply = request.POST['place_of_supply']
-                est.estimate_date = request.POST['estimate_date']
-                paymentterm_id = request.POST['payment_term']
-                est.payment_term = Company_Payment_Term.objects.get(id=paymentterm_id)
-                est.expiration_date = request.POST['exp_date']
-                est.description = request.POST['description']
-                if 'file' in request.FILES:
-                    est.document = request.FILES['file']
-
-                est.terms_and_condition = request.POST['terms']
-                est.sub_total = request.POST['subtotal']
-                est.cgst = request.POST['cgst']
-                est.sgst = request.POST['sgst']
-                est.tax_amount_igst = request.POST['igst']
-                est.shipping_charge = request.POST['ship']
-                est.adjustment = request.POST['adj']
-                est.grand_total = request.POST['grandtotal']
+            if 'billingAddress' in request.POST:
+                est.customer_bill_address = request.POST['billingAddress']
 
 
-                est.save()
+            est.customer_gst_treatment = request.POST['gst_treatment']
 
-    #..................save estimate history............................
+            if 'gst_number' in request.POST:
+                est.customer_gst_number = request.POST['gst_number']
+            
+            est.customer_place_of_supply = request.POST['place_of_supply']
+            est.estimate_date = request.POST['estimate_date']
+            paymentterm_id = request.POST['payment_term']
+            est.payment_term = Company_Payment_Term.objects.get(id=paymentterm_id)
+            est.expiration_date = request.POST['exp_date']
+            est.description = request.POST['description']
+            if 'file' in request.FILES:
+                est.document = request.FILES['file']
 
-                history = EstimateHistory()
-                history.company = company
-                history.login_details = login_d
-                history.estimate = est
-                history.date = datetime.today().date()
-                history.action = "Edited"
-                history.save() 
+            est.terms_and_condition = request.POST['terms']
+            est.sub_total = request.POST['subtotal']
+            est.cgst = request.POST['cgst']
+            est.sgst = request.POST['sgst']
+            est.tax_amount_igst = request.POST['igst']
+            est.shipping_charge = request.POST['ship']
+            est.adjustment = request.POST['adj']
+            est.grand_total = request.POST['grandtotal']
 
 
-    #................Adding item table .............................................
+            est.save()
+
+#..................save estimate history............................
+
+            history = EstimateHistory()
+            history.company = company
+            history.login_details = login_d
+            history.estimate = est
+            history.date = datetime.today().date()
+            history.action = "Edited"
+            history.save() 
 
 
-                old_items = EstimateItems.objects.filter(estimate=est)
-                old_items.delete()
-                # Save estimate items.
+#................Adding item table .............................................
 
-                itemId = request.POST.getlist("itemId[]")
-                # itemName = request.POST.getlist("item_name[]")
-                hsn  = request.POST.getlist("hsn[]")
-                qty = request.POST.getlist("qty[]")
-                price = request.POST.getlist("price[]")
-                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == company.state else request.POST.getlist("taxIGST[]")
-                discount = request.POST.getlist("discount[]")
-                total = request.POST.getlist("total[]")
 
-                if len(itemId)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and hsn and qty and price and tax and discount and total:
-                    mapped = zip(itemId,hsn,qty,price,tax,discount,total)
-                    mapped = list(mapped)
-                    for ele in mapped:
-                        itm = Items.objects.get(id = int(ele[0]))
-                        EstimateItems.objects.create(item=itm, hsn=ele[1], quantity=int(ele[2]), price = float(ele[3]), tax_rate = float(ele[4]),
-                        discount=float(ele[5]), total=float(ele[6]), estimate=est, login_details=login_d, company=company)
-                        itm.current_stock -= int(ele[2])
-                        itm.save()
+            old_items = EstimateItems.objects.filter(estimate=est)
+            old_items.delete()
+            # Save estimate items.
+
+            itemId = request.POST.getlist("itemId[]")
+            # itemName = request.POST.getlist("item_name[]")
+            hsn  = request.POST.getlist("hsn[]")
+            qty = request.POST.getlist("qty[]")
+            price = request.POST.getlist("price[]")
+            tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == company.state else request.POST.getlist("taxIGST[]")
+            discount = request.POST.getlist("discount[]")
+            total = request.POST.getlist("total[]")
+
+            if len(itemId)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and hsn and qty and price and tax and discount and total:
+                mapped = zip(itemId,hsn,qty,price,tax,discount,total)
+                mapped = list(mapped)
+                for ele in mapped:
+                    itm = Items.objects.get(id = int(ele[0]))
+                    EstimateItems.objects.create(item=itm, hsn=ele[1], quantity=int(ele[2]), price = float(ele[3]), tax_rate = float(ele[4]),
+                    discount=float(ele[5]), total=float(ele[6]), estimate=est, login_details=login_d, company=company)
+                    itm.current_stock -= int(ele[2])
+                    itm.save()
 
                             
                         
@@ -19528,10 +19537,6 @@ def estimate_edit_op(request,pk):
                 
 
             return redirect('sales_estimate')
-        
-        if login_d.user_type == 'Staff':
-            company_id = request.session['login_id']
-            company = CompanyDetails.objects.get(id=company_id)
 
 
 
@@ -19556,7 +19561,6 @@ def sales_estimate_comment(request,pk):
 
             comment=request.POST['comment']
 
-            estimate = Estimate.objects.get(id=pk)
 
             c1 = EstimateComment(estimate=estimate,comment=comment,company=company,login_details=login_d)
             c1.save()
@@ -19566,12 +19570,11 @@ def sales_estimate_comment(request,pk):
             return redirect(reverse('sales_estimate_overview', args=[pk]))
 
         if login_d.user_type == 'Staff':
-            estimate_c = Estimate.objects.get(id=pk)
-            company = CompanyDetails.objects.get(login_details=login_d)
+            estimate = Estimate.objects.get(id=pk)
+            company = CompanyDetails.objects.get(id=estimate.company.id)
 
             comment=request.POST['comment']
 
-            estimate = Estimate.objects.get(id=pk)
 
             c1 = EstimateComment(estimate=estimate,comment=comment,company=company,login_details=login_d)
             c1.save()
@@ -19657,7 +19660,7 @@ def convert_estimate_to_sales_order(request,pk):
             banks = Banking.objects.filter(company = company)
             
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
-            price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+            priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
 
             if SalesOrderReference.objects.filter(company = company).exists():
 
@@ -19722,6 +19725,7 @@ def convert_estimate_to_sales_order(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
+                'priceListItems':priceList
                 
 
             }
@@ -19734,6 +19738,7 @@ def convert_estimate_to_sales_order(request,pk):
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.get(estimate=estimate)
+            
 
 
             customer=Customer.objects.all()
@@ -19743,7 +19748,7 @@ def convert_estimate_to_sales_order(request,pk):
             banks = Banking.objects.filter(company = company)
             
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
-            price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
+            priceList = PriceList.objects.filter(company = cmp, type = 'Sales', status = 'Active')
 
             if SalesOrderReference.objects.filter(company = company).exists():
 
@@ -19807,6 +19812,7 @@ def convert_estimate_to_sales_order(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
+                'priceListItems':priceList
 
             }
             return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
@@ -19859,7 +19865,7 @@ def checkSalesOrderNumberEst(request):
         for j in PatternStr:
             pattern += j
 
-        pattern_exists = checkEstimatePattern(pattern)
+        pattern_exists = checkSalesOrderNumberPatternEst(pattern)
 
         if pattern !="" and pattern_exists:
             return JsonResponse({'status':False, 'message':'SaleOrder No. Pattern already Exists.!'})
@@ -19871,6 +19877,16 @@ def checkSalesOrderNumberEst(request):
             return JsonResponse({'status':True, 'message':'Number is okay.!'})
     else:
        return redirect('/')
+
+
+def checkSalesOrderNumberPatternEst(pattern):
+    models = [RecurringInvoice, Estimate, invoice]
+
+    for model in models:
+        field_name = model.getNumFieldName(model)
+        if model.objects.filter(**{f"{field_name}__icontains": pattern}).exists():
+            return True
+    return False
 
 
 def convert_estimate_to_sales_order_op(request,pk):
@@ -20006,6 +20022,7 @@ def convert_estimate_to_invoice(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
 
             units = Unit.objects.filter(company=company)
 
@@ -20078,6 +20095,7 @@ def convert_estimate_to_invoice(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
+                'priceListItems':priceList,
                 
 
             }
@@ -20091,6 +20109,7 @@ def convert_estimate_to_invoice(request,pk):
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
+            priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
 
             item=Items.objects.filter(company=company)
 
@@ -20165,6 +20184,7 @@ def convert_estimate_to_invoice(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
+                'priceListItems':priceList,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
@@ -20181,7 +20201,7 @@ def checkInvoiceNumberEst(request):
         
         InvNo = request.GET['InvNum']
 
-        # Finding next estimate number w r t last estimate number if exists.
+        # Finding next invoice number w r t last invoice number if exists.
         nxtInv = ""
         lastInv = invoice.objects.filter(company = com).last()
         if lastInv:
@@ -20216,7 +20236,7 @@ def checkInvoiceNumberEst(request):
         for j in PatternStr:
             pattern += j
 
-        pattern_exists = checkEstimatePattern(pattern)
+        pattern_exists = checkInvoiceNumberPatternEst(pattern)
 
         if pattern !="" and pattern_exists:
             return JsonResponse({'status':False, 'message':'Invoice No. Pattern already Exists.!'})
@@ -20228,6 +20248,19 @@ def checkInvoiceNumberEst(request):
             return JsonResponse({'status':True, 'message':'Number is okay.!'})
     else:
        return redirect('/')
+
+
+
+
+
+def checkInvoiceNumberPatternEst(pattern):
+    models = [RecurringInvoice, Estimate, SaleOrder]
+
+    for model in models:
+        field_name = model.getNumFieldName(model)
+        if model.objects.filter(**{f"{field_name}__icontains": pattern}).exists():
+            return True
+    return False
 
 
 
@@ -20356,6 +20389,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
+            priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
 
             item=Items.objects.filter(company=company)
 
@@ -20419,6 +20453,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
+                'priceListItems':priceList,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
@@ -20432,6 +20467,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
+            priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
 
             item=Items.objects.filter(company=company)
 
@@ -20494,72 +20530,16 @@ def convert_estimate_to_recurring_invoice(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
+                'priceListItems':priceList,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
 
 
-# def checkRecInvoiceNumberEst(request):
-#     if 'login_id' in request.session:
-#         log_id = request.session['login_id']
-#         log_details= LoginDetails.objects.get(id=log_id)
-#         if log_details.user_type == 'Company':
-#             com = CompanyDetails.objects.get(login_details = log_details)
-#         else:
-#             com = StaffDetails.objects.get(login_details = log_details).company
-        
-#         InvNo = request.GET['InvNum']
-
-#         # Finding next estimate number w r t last estimate number if exists.
-#         nxtInv = ""
-#         lastInv = RecurringInvoice.objects.filter(company = com).last()
-#         if lastInv:
-#             inv_no = str(lastInv.rec_invoice_no)
-#             numbers = []
-#             stri = []
-#             for word in inv_no:
-#                 if word.isdigit():
-#                     numbers.append(word)
-#                 else:
-#                     stri.append(word)
-
-#             num = ''.join(numbers)
-#             st = ''.join(stri)
-
-#             inv_num = int(num) + 1
-#             if num[0] == 0:
-#                 nxtInv = st + num.zfill(len(num)) 
-#             else:
-#                 nxtInv = st + str(inv_num).zfill(len(num))
-#         # else:
-#         #     nxtInv = 'EST001'
-
-#         PatternStr = []
-#         for word in InvNo:
-#             if word.isdigit():
-#                 pass
-#             else:
-#                 PatternStr.append(word)
-        
-#         pattern = ''
-#         for j in PatternStr:
-#             pattern += j
-
-#         pattern_exists = checkEstimatePattern(pattern)
-
-#         if pattern !="" and pattern_exists:
-#             return JsonResponse({'status':False, 'message':'Recurring Invoice No. Pattern already Exists.!'})
-#         elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = InvNo).exists():
-#             return JsonResponse({'status':False, 'message':'Recurring Invoice No. already Exists.!'})
-#         elif nxtInv != "" and InvNo != nxtInv:
-#             return JsonResponse({'status':False, 'message':'Recurring Invoice No. is not continuous.!'})
-#         else:
-#             return JsonResponse({'status':True, 'message':'Number is okay.!'})
-#     else:
-#        return redirect('/')
 
 
-def checkRecurringInvoiceNumber(request):
+
+def checkRecurringInvoiceNumberEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -20605,12 +20585,13 @@ def checkRecurringInvoiceNumber(request):
         for j in PatternStr:
             pattern += j
 
-        # if nxtInv != RecInvNo: 
-        #     pattern_exists = checkRecInvNumberPattern(pattern)
+
+
+        pattern_exists = checkRecInvNumberPatternEst(pattern)
 
         if pattern !="" and pattern_exists:
             return JsonResponse({'status':False, 'message':'Rec. Invoice No. Pattern already Exists.!'})
-        elif RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = RecInvNo).exists():
+        if RecurringInvoice.objects.filter(company = com, rec_invoice_no__iexact = RecInvNo).exists():
             return JsonResponse({'status':False, 'message':'Rec. Invoice No. already Exists.!'})
         elif nxtInv != "" and RecInvNo != nxtInv:
             return JsonResponse({'status':False, 'message':'Rec. Invoice No. is not continuous.!'})
@@ -20619,8 +20600,8 @@ def checkRecurringInvoiceNumber(request):
     else:
        return redirect('/')
 
-def checkRecInvNumberPattern(pattern):
-    models = [invoice, Journal, Estimate, SaleOrder]
+def checkRecInvNumberPatternEst(pattern):
+    models = [invoice, Estimate, SaleOrder]
 
     for model in models:
         field_name = model.getNumFieldName(model)
@@ -20763,7 +20744,7 @@ def convert_estimate_to_recurring_invoice_op(request,pk):
 
 def download_estimate_sample_import_file(request):
 
-    estimate_table_data = [['SLNO','CUSTOMER','ESTIMATE DATE','PLACE OF SUPPLY','ESTIMATE NO','TERMS','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','SHIPPING CHARGE','GRAND TOTAL'],['1', 'Arun Kumar', '2024-03-20', '[KL]-Kerala','EST100','NET 30','','1000','0','25','25','50','0','0','1050']]
+    estimate_table_data = [['SLNO','CUSTOMER','ESTIMATE DATE','PLACE OF SUPPLY','ESTIMATE NO','TERMS','DESCRIPTION','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','ADJUSTMENT','SHIPPING CHARGE','GRAND TOTAL'],['1', 'Arun Kumar', '2024-03-20', '[KL]-Kerala','EST100','NET 30','description','1000','0','25','25','50','0','0','1050']]
     items_table_data = [['ESTIMATE NO', 'PRODUCT','HSN','QUANTITY','PRICE','TAX PERCENTAGE','DISCOUNT','TOTAL'], ['1', 'Test Item 1','789987','1','1000','5','0','1000']]
 
     wb = Workbook()
@@ -20978,7 +20959,7 @@ def import_estimate_from_excel(request):
                     adjustment = 0.0 if adjustment == "" else float(adjustment),
                     shipping_charge = 0.0 if shipping == "" else float(shipping),
                     grand_total = 0.0 if grandtotal == "" else float(grandtotal),
-                    description = description,
+                    description = "" if description == "" else description,
                     status = "Draft"
                 )
                 est.save()
@@ -21056,7 +21037,7 @@ def getNextEstNumber(estimate_no):
 
 
 def checkEstNumberPattern(pattern):
-    models = [invoice, SaleOrder, Estimate]
+    models = [invoice, SaleOrder, RecurringInvoice]
 
     for model in models:
         field_name = model.getNumFieldName(model)
