@@ -25,7 +25,7 @@
      }
   
     #searchInput {
-    margin-bottom: 10px;
+    background-color: black;
     }
   
     .section-3
@@ -198,8 +198,6 @@
                 <form  method="POST" action="{% url 'estimate_edit_op' estimate.id %}"  enctype="multipart/form-data" class="mb-3">
                     {% csrf_token %}
     
-                    <input type="text" id="cmpstate" hidden value="{{cmp.state}}">
-    
                     <div class="form-group row mt-4">
                         <div class="col-sm-12 col-md-3 col-lg-3 col-form-label">
                             <label for="" class="labels">Customer</label>
@@ -279,7 +277,7 @@
                             <label>Place of Supply</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-7">
-                            <input hidden value="{{cmp.state}}" id="cmpstate">
+                            <input hidden value="{{company.state}}" id="cmpstate">
                             <select name="place_of_supply" id="placeOfSupply" class="form-control" value="{{estimate.customer_place_of_supply}}">
                                 <option value="value" selected></option>
                                 <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
@@ -467,25 +465,25 @@
                                     
                                     <td>
                                         <!-- <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex"> -->
-                                        <select name='taxGST[]' id="taxGST{{forloop.counter}}" class="form-control bg-black text-white tax_ref tax_ref_gst" style="display: block;" onchange="taxchange(this.id)">
-                                            <option selected disabled hidden>Select GST</option>
-                                            <!-- <option value={{i.tax_rate}}>{{i.tax_rate}}% GST</option> -->
-                                            <option value=28 {% if i.tax_rate == 28 %}selected{% endif %} >28.0% GST</option>
-                                            <option value=18 {% if i.tax_rate == 18 %}selected{% endif %} >18.0% GST</option>
-                                            <option value=12 {% if i.tax_rate == 12 %}selected{% endif %} >12.0% GST</option>
-                                            <option value=5 {% if i.tax_rate == 5 %}selected{% endif %} >05.0% GST</option>
-                                            <option value=3 {% if i.tax_rate == 3 %}selected{% endif %} >03.0% GST</option>
-                                            <option value=0 {% if i.tax_rate == 0 %}selected{% endif %} >0.0% GST</option>
+                                        <select name='taxGST[]' id="taxGST{{forloop.counter}}" class="form-control bg-black text-white tax_ref tax_ref_gst" {% if estimate.customer_place_of_supply == estimate.company.state %} style="display: block;" {% else %} style="display: none" {% endif %}  onchange="taxchange(this.id)">
+                                            <option disabled hidden>Select GST</option>
+                                            <option value={{i.tax_rate}}>{{i.tax_rate}}% GST</option>
+                                            <option value=28 >28.0% GST</option>
+                                            <option value=18 >18.0% GST</option>
+                                            <option value=12 >12.0% GST</option>
+                                            <option value=5 >05.0% GST</option>
+                                            <option value=3 >03.0% GST</option>
+                                            <option value=0 >0.0% GST</option>
                                         </select>
-                                        <select name='taxIGST[]' id="taxIGST{{forloop.counter}}" class="form-control bg-black text-white tax_ref tax_ref_igst" style="display: none;" onchange="taxchange(this.id)">
-                                            <option selected disabled hidden >Select IGST</option>
-                                            <!-- <option value={{i.tax_rate}}>{{i.tax_rate}}% IGST</option> -->
-                                            <option value=28 {% if i.tax_rate == 28 %}selected{% endif %} >28.0% IGST</option>
-                                            <option value=18 {% if i.tax_rate == 28 %}selected{% endif %} >18.0% IGST</option>
-                                            <option value=12 {% if i.tax_rate == 28 %}selected{% endif %} >12.0% IGST</option>
-                                            <option value=5 {% if i.tax_rate == 28 %}selected{% endif %} >05.0% IGST</option>
-                                            <option value=3 {% if i.tax_rate == 28 %}selected{% endif %} >03.0% IGST</option>
-                                            <option value=0 {% if i.tax_rate == 28 %}selected{% endif %} >0.0% IGST</option>
+                                        <select name='taxIGST[]' id="taxIGST{{forloop.counter}}" class="form-control bg-black text-white tax_ref tax_ref_igst" {% if estimate.customer_place_of_supply != estimate.company.state %} style="display: block;" {% else %} style="display: none" {% endif %}  onchange="taxchange(this.id)">
+                                            <option disabled hidden >Select IGST</option>
+                                            <option value={{i.tax_rate}}>{{i.tax_rate}}% IGST</option>
+                                            <option value=28 >28.0% IGST</option>
+                                            <option value=18 >18.0% IGST</option>
+                                            <option value=12 >12.0% IGST</option>
+                                            <option value=5 >05.0% IGST</option>
+                                            <option value=3 >03.0% IGST</option>
+                                            <option value=0 >0.0% IGST</option>
                                         </select>
                                         <div class="mt-1" style=" text-align: center;color: red;" ><span id="invalidtax1" style="display: none;"> Invalid Tax %</span> </div>    
                                     </td>
@@ -526,25 +524,25 @@
                                             <div class="col-sm-1 mt-2">:</div>
                                             <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value="{{estimate.sub_total}}" readonly class="form-control bg-black text-white" id="sub_total"></div>
                                         </div>
-                                        <div class="row container-fluid p-2 m-0" id="taxamountIGST" style="display: flex;">
+                                        <div class="row container-fluid p-2 m-0" id="taxamountIGST" {% if estimate.customer_place_of_supply != estimate.company.state %} style="display: flex;" {% else %} style="display: none" {% endif %}>
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">IGST</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount" value=0.00 readonly class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount" value="{{estimate.tax_amount_igst}}" readonly class="form-control bg-black text-white"/></div>
                                         </div>
-                                        <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountCGST">
+                                        <div class="row container-fluid p-2 m-0" {% if estimate.customer_place_of_supply == estimate.company.state %} style="display: flex;" {% else %} style="display: none" {% endif %} id="taxamountCGST">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">CGST</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount" value=0.00 readonly class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount" value="{{estimate.cgst}}" readonly class="form-control bg-black text-white"/></div>
                                         </div>
-                                        <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountSGST">
+                                        <div class="row container-fluid p-2 m-0" {% if estimate.customer_place_of_supply == estimate.company.state %} style="display: flex;" {% else %} style="display: none" {% endif %} style="display: none;" id="taxamountSGST">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-cente text-white">SGST</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount" value=0.00 readonly class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount" value="{{estimate.sgst}}" readonly class="form-control bg-black text-white"/></div>
                                         </div>
                                         <div class="row container-fluid p-2 m-0">
                                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Tax Amount</label></div>
                                             <div class="col-sm-1 mt-2">:</div>
-                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value=0.00 readonly class="form-control bg-black text-white"/></div>
+                                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" {% if estimate.customer_place_of_supply == estimate.company.state %} value="{{tax}}" {% else %} value="{{estimate.tax_amount_igst}}" {% endif %} readonly class="form-control bg-black text-white"/></div>
                                         </div>
                                         
                                         <div class="row container-fluid p-2 m-0">
@@ -1096,8 +1094,8 @@
                       </div>
                   </div>
                 </fieldset4>
-  
-  
+
+
                 <div class="form-group row mt-4">
                   <label class="col-sm-12 col-md-3 col-lg-3 col-form-label text-white" > Source of Supply*</label>
                   <div class=" col-sm-12 col-md-3 col-lg-3">
@@ -3904,6 +3902,7 @@
     function refreshTax(){
             var cmpState = $('#cmpstate').val();
             var plc = $('#placeOfSupply').val();
+            console.log(cmpState,"hi", plc)
             if(cmpState == plc){
                 $('.tax_ref').css('display','none');
                 $('.tax_ref_gst').css('display','block');
@@ -4998,33 +4997,6 @@ $(document).ready(function() {
 
 
 
-    // // Assuming estimate.customer_place_of_supply contains the default value for place of supply
-    // const taxrate = '{{ i.tax_rate }}';
-
-    // const placeofsupply = document.getElementById('placeOfSupply');
-    // const cmpState = document.getElementById('cmpstate');
-
-    // if (placeofsupply == cmpState){
-    //     const selectTax = document.getElementById('taxGST');
-    // }else{
-    //     const selectTax = document.getElementById('taxIGST');
-    // }
-
-
-    
-
-    // // Find the option that matches the default value and set it as selected
-    // if (selectTax) {
-    //     const options = selectTax.options;
-    //     for (let i = 0; i < options.length; i++) {
-    //         if (options[i].value === taxrate) {
-    //             options[i].selected = true;
-    //             break;
-    //         }
-    //     }
-    // }
-
-
 
     
 
@@ -5040,38 +5012,6 @@ $(document).ready(function() {
     
     
     
-    // function calc() {
-    //     // Retrieve values from input fields and convert them to numbers
-    //     var price = parseFloat(document.getElementById('price').value);
-    //     var qty = parseInt(document.getElementById('qty').value);
-    //     var discount = parseFloat(document.getElementById('discount').value);
-    
-    //     // Calculate the total
-    //     var tot = (price * qty) - discount;
-        
-    //     // Set the total in the appropriate input field
-    //     document.getElementById('total').value = tot.toFixed(2);
-    //     calc_total()
-    // }
-    
-    // function calc_total() { 
-    //       total = 0;
-    //       $('.total').each(function () {
-    //           total += parseFloat($(this).val());
-    //       });
-    //       taxamount = 0;
-    //       $('#sub_total').val(total.toFixed(2));
-    //       var ship = parseFloat($("#ship").val());
-    //       var adj_val = parseFloat($('#adj').val())
-    //       var gtot = taxamount + total + ship + adj_val;
-    
-    //       $('#grandtotal').val(gtot.toFixed(2));
-          
-    //       var adv_val = parseFloat($('#advance').val())
-    //       var bal = gtot - adv_val
-    //       $('#balance').val(bal.toFixed(2));
-    //       splitTax();
-    //     }
     
     
     

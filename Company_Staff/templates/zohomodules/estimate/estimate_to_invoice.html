@@ -311,7 +311,7 @@
                 <div class="row mt-2">
                   <label for="" class="col-md-3 labels">Place of Supply</label>
                   <div class="col-md-6">
-                    <input hidden value="{{cmp.state}}" id="cmpstate">
+                    <input hidden value="{{company.state}}" id="cmpstate">
                     <select name="place_of_supply" id="placeOfSupply" class="form-control bg-black text-white">
                       <option value="" selected>Select Place of Supply</option>
                       <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option>
@@ -653,17 +653,17 @@
                             <div class="col-sm-1 mt-2">:</div>
                             <div class="col-sm-7 mt-2"><input type="number" step="any" name='subtotal' value={{estimate.sub_total}} readonly class="form-control bg-black text-white" id="sub_total"></div>
                         </div>
-                        <div class="row container-fluid p-2 m-0" id="taxamountIGST" style="display: flex;">
+                        <div class="row container-fluid p-2 m-0" id="taxamountIGST" {% if estimate.customer_place_of_supply != estimate.company.state %} style="display: flex;" {% else %} style="display: none" {% endif %}>
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">IGST</label></div>
                             <div class="col-sm-1 mt-2">:</div>
                             <div class="col-sm-7 mt-2"><input type="number" name='igst' step="any" id="igstAmount" value={{estimate.tax_amount_igst}} readonly class="form-control bg-black text-white"/></div>
                         </div>
-                        <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountCGST">
+                        <div class="row container-fluid p-2 m-0" {% if estimate.customer_place_of_supply == estimate.company.state %} style="display: flex;" {% else %} style="display: none" {% endif %} id="taxamountCGST">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">CGST</label></div>
                             <div class="col-sm-1 mt-2">:</div>
                             <div class="col-sm-7 mt-2"><input type="number" name='cgst' step="any" id="cgstAmount" value={{estimate.cgst}} readonly class="form-control bg-black text-white"/></div>
                         </div>
-                        <div class="row container-fluid p-2 m-0" style="display: none;" id="taxamountSGST">
+                        <div class="row container-fluid p-2 m-0" {% if estimate.customer_place_of_supply == estimate.company.state %} style="display: flex;" {% else %} style="display: none" {% endif %} id="taxamountSGST">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-cente text-white">SGST</label></div>
                             <div class="col-sm-1 mt-2">:</div>
                             <div class="col-sm-7 mt-2"><input type="number" name='sgst' step="any" id="sgstAmount" value={{estimate.sgst}} readonly class="form-control bg-black text-white"/></div>
@@ -671,7 +671,7 @@
                         <div class="row container-fluid p-2 m-0">
                             <div class="col-sm-4 mt-2"><label for="a" class="text-center text-white">Tax Amount</label></div>
                             <div class="col-sm-1 mt-2">:</div>
-                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" value={{estimate.tax_amount_igst}} readonly class="form-control bg-black text-white"/></div>
+                            <div class="col-sm-7 mt-2"><input type="number" step="any" name='taxamount' id="tax_amount" {% if estimate.customer_place_of_supply == estimate.company.state %} value="{{tax}}" {% else %} value="{{estimate.tax_amount_igst}}" {% endif %} readonly class="form-control bg-black text-white"/></div>
                         </div>
                         
                         <div class="row container-fluid p-2 m-0">

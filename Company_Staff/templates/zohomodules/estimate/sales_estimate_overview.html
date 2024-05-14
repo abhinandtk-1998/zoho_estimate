@@ -604,7 +604,7 @@
                           </div>
                           <div class="d-flex justify-content-between mb-4 text-white">
                               <h6 class="text-white">Tax Amount</h6>
-                              {{estimate.tax_amount_igst }}
+                              {% if estimate.customer_place_of_supply == estimate.company.state %} {{tax}} {% else %} {{estimate.tax_amount_igst}} {% endif %}
                           </div>
                           {%if estimate.tax_amount_igst != 0 %}
                           <div class="d-flex justify-content-between mb-4 text-white">
@@ -778,7 +778,9 @@
                               </div>
                               <div class="subtot-item d-flex justify-content-between">
                                   <span>Tax Amount</span>
-                                  <span><span>&#8377; </span>{{estimate.tax_amount_igst}}</span>
+                                  <span><span>&#8377; </span>
+                                                        {% if estimate.customer_place_of_supply == estimate.company.state %} {{tax}} {% else %} {{estimate.tax_amount_igst}} {% endif %}
+                                                      </span>
                               </div>
                               {% if estimate.tax_amount_igst == 0 %}
                               <div class="subtot-item d-flex justify-content-between">
@@ -966,7 +968,9 @@
                                                 <tr >
                                                     <td style="color: #000;">Tax Amount</td>
                                                     <td style="color: #000;">:</td>
-                                                    <td class="text-right" style="color: #000;">{{estimate.tax_amount_igst}}</td>
+                                                    <td class="text-right" style="color: #000;">
+                                                      {% if estimate.customer_place_of_supply == estimate.company.state %} {{tax}} {% else %} {{estimate.tax_amount_igst}} {% endif %}
+                                                    </td>
                                                 </tr>
                                                 {% if estimate.shipping_charge != 0 %}
                                                 <tr >
@@ -1131,7 +1135,9 @@
                                                 <tr >
                                                     <td style="color: #000;">Tax Amount</td>
                                                     <td style="color: #000;">:</td>
-                                                    <td class="text-right" style="color: #000;">{{estimate.tax_amount_igst}}</td>
+                                                    <td class="text-right" style="color: #000;">
+                                                      {% if estimate.customer_place_of_supply == estimate.company.state %} {{tax}} {% else %} {{estimate.tax_amount_igst}} {% endif %}
+                                                    </td>
                                                 </tr>
                                                 {% if estimate.shipping_charge != 0 %}
                                                 <tr >
@@ -1302,7 +1308,9 @@
                                                     <tr >
                                                         <td style="color: #000;">Tax Amount</td>
                                                         <td style="color: #000;">:</td>
-                                                        <td class="text-right" style="color: #000;">{{estimate.tax_amount_igst}}</td>
+                                                        <td class="text-right" style="color: #000;">
+                                                          {% if estimate.customer_place_of_supply == estimate.company.state %} {{tax}} {% else %} {{estimate.tax_amount_igst}} {% endif %}
+                                                        </td>
                                                     </tr>
                                                     {% if estimate.shipping_charge != 0 %}
                                                     <tr >

@@ -19309,6 +19309,7 @@ def sales_estimate_overview(request,pk):
             history = EstimateHistory.objects.filter(estimate=estimate)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             last_history = EstimateHistory.objects.filter(estimate = estimate).last()
+            tax = estimate.cgst + estimate.sgst
 
 
         
@@ -19323,6 +19324,7 @@ def sales_estimate_overview(request,pk):
                 'history':history,
                 'est_items':est_items,
                 'last_history':last_history,
+                'tax':tax,
                 
 
             }
@@ -19338,6 +19340,7 @@ def sales_estimate_overview(request,pk):
             history = EstimateHistory.objects.filter(estimate=estimate)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             last_history = EstimateHistory.objects.filter(estimate = estimate).last()
+            tax = estimate.cgst + estimate.sgst
 
         
             context = {
@@ -19351,6 +19354,7 @@ def sales_estimate_overview(request,pk):
                 'history':history,
                 'est_items':est_items,
                 'last_history':last_history,
+                'tax':tax,
 
             }
             return render(request,'zohomodules/estimate/sales_estimate_overview.html', context)
@@ -19375,6 +19379,7 @@ def sales_estimate_edit(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             items=Items.objects.filter(company=company)
+            tax = estimate.cgst + estimate.sgst
 
 
             price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
@@ -19396,6 +19401,7 @@ def sales_estimate_edit(request,pk):
                 'items':items,
                 'units':units,
                 'accounts':accounts,
+                'tax':tax,
                 
 
             }
@@ -19410,6 +19416,7 @@ def sales_estimate_edit(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             items=Items.objects.filter(company=company)
+            tax = estimate.sgst + estimate.cgst
 
 
             price_lists=PriceList.objects.filter(company=company,type='Sales',status='Active')
@@ -19429,6 +19436,7 @@ def sales_estimate_edit(request,pk):
                 'items':items,
                 'units':units,
                 'accounts':accounts,
+                'tax':tax,
 
             }
             return render(request,'zohomodules/estimate/sales_estimate_edit.html', context)
@@ -19650,6 +19658,7 @@ def convert_estimate_to_sales_order(request,pk):
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.filter(estimate=estimate)
+            tax = estimate.cgst + estimate.sgst
 
 
         
@@ -19725,7 +19734,8 @@ def convert_estimate_to_sales_order(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
-                'priceListItems':priceList
+                'priceListItems':priceList,
+                'tax':tax,
                 
 
             }
@@ -19738,6 +19748,7 @@ def convert_estimate_to_sales_order(request,pk):
             company = CompanyDetails.objects.get(login_details=login_d)
             customer_details = Customer.objects.filter(company=dash_details)
             est_items = EstimateItems.objects.get(estimate=estimate)
+            tax = estimate.cgst + estimate.sgst
             
 
 
@@ -19812,7 +19823,8 @@ def convert_estimate_to_sales_order(request,pk):
                 'items':item,
                 'units':units,
                 'accounts':accounts,
-                'priceListItems':priceList
+                'priceListItems':priceList,
+                'tax':tax,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_sales_order.html', context)
@@ -20023,6 +20035,7 @@ def convert_estimate_to_invoice(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
+            tax = estimate.cgst + estimate.sgst
 
             units = Unit.objects.filter(company=company)
 
@@ -20096,6 +20109,7 @@ def convert_estimate_to_invoice(request,pk):
                 'units':units,
                 'accounts':accounts,
                 'priceListItems':priceList,
+                'tax':tax,
                 
 
             }
@@ -20110,6 +20124,7 @@ def convert_estimate_to_invoice(request,pk):
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
+            tax = estimate.cgst + estimate.sgst
 
             item=Items.objects.filter(company=company)
 
@@ -20185,6 +20200,7 @@ def convert_estimate_to_invoice(request,pk):
                 'units':units,
                 'accounts':accounts,
                 'priceListItems':priceList,
+                'tax':tax,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_invoice.html', context)
@@ -20390,6 +20406,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
             priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
+            tax = estimate.cgst + estimate.sgst
 
             item=Items.objects.filter(company=company)
 
@@ -20454,6 +20471,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
                 'units':units,
                 'accounts':accounts,
                 'priceListItems':priceList,
+                'tax':tax,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
@@ -20468,6 +20486,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
             priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
+            tax = estimate.cgst + estimate.sgst
 
             item=Items.objects.filter(company=company)
 
@@ -20531,6 +20550,7 @@ def convert_estimate_to_recurring_invoice(request,pk):
                 'units':units,
                 'accounts':accounts,
                 'priceListItems':priceList,
+                'tax':tax,
 
             }
             return render(request,'zohomodules/estimate/estimate_to_recurring_invoice.html', context)
