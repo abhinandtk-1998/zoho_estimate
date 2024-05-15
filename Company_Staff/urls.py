@@ -452,6 +452,8 @@ urlpatterns = [
 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 
+
+    # -------------------------------Estimate-----Abhinand T K-----------------------
     path('Zohomodule/Sales/Estimate',views.sales_estimate,name='sales_estimate'),
     path('Zohomodule/Sales/Estimate/New',views.sales_estimate_new,name='sales_estimate_new'),
     path('Zohomodule/Sales/Estimate/New/Customer_new',views.sales_estimate_new_customer,name='sales_estimate_new_customer'),
@@ -488,44 +490,38 @@ urlpatterns = [
     path('Zohomodule/Sales/Estimate/New/Estimate_no_pattern_check',views.checkEstimatePattern, name='checkEstimatePattern'),
 
 
+    path('Company/save_new_itm',views.createNewItemAjaxEst, name='createNewItemAjaxEst'),
+    path('Company/get_all_itms',views.getAllItemsAjaxEst, name='getAllItemsAjaxEst'),
+    path('createsalesCustomerEst',views.createsalesCustomerEst,name='createsalesCustomerEst'),
+    path('getsalesCustomersEst',views.getsalesCustomersEst,name='getsalesCustomersEst'),
+    path('createNewItemselEst',views.createNewItemselEst,name='createNewItemselEst'),
+    path('getAllItemsselEst',views.getAllItemsselEst,name='getAllItemsselEst'),
+    path('newselPaymentTermEst',views.newselPaymentTermEst,name='newselPaymentTermEst'),
+    path('addsel_unitEst',views.addsel_unitEst,name='addsel_unitEst'),
+    path('show_unit_dropdownselEst',views.show_unit_dropdownselEst,name='show_unit_dropdownselEst'),
+    path('getselCustomerDetailsEst',views.getselCustomerDetailsEst,name='getselCustomerDetailsEst'),
+    path('getselItemDetailsEst',views.getselItemDetailsEst,name='getselItemDetailsEst'),
+    path('checksalesorderNumberEsti',views.checksalesorderNumberEsti,name='checksalesorderNumberEsti'),
+    path('getinvCustomerDetailsEst',views.getinvCustomerDetailsEst,name='getinvCustomerDetailsEst'),
+    path('Company/get_cust_details',views.getCustomerDetailsAjaxEst, name='getCustomerDetailsAjaxEst'),
+    path('Staff/invoice/createNewIteminvEst',views.createNewIteminvEst,name='createNewIteminvEst'),
+    path('Staff/invoice/getAllItemsinvEst',views.getAllItemsinvEst,name='getAllItemsinvEst'),
+    path('getinvItemDetailsEst',views.getinvItemDetailsEst,name='getinvItemDetailsEst'),
+    path('newinvPaymentTermEst',views.newinvPaymentTermEst,name='newinvPaymentTermEst'),
+    path('Staff/invoice/addinv_unitEst',views.addinv_unitEst,name='addinv_unitEst'),
+    path('Staff/invoice/showinvunit_dropdownEst',views.showinvunit_dropdownEst,name='showinvunit_dropdownEst'),
+    path('Staff/invoice/getAllAccountsEst',views.getAllAccountsEst, name='getAllAccountsEst'),
+    path('getinvBankAccountNumberEst',views.getinvBankAccountNumberEst,name='getinvBankAccountNumberEst'),
+    path('Company/new_pymnt_trm',views.newPaymentTermAjaxEst, name='newPaymentTermAjaxEst'),
+    path('Company/new_repeat_every_ajax',views.newRepeatEveryTypeAjaxEst, name='newRepeatEveryTypeAjaxEst'),
+    path('Company/get_units_ajax',views.getUnitsAjaxEst, name='getUnitsAjaxEst'),
+    path('Company/get_itm_details',views.getItemDetailsAjaxEst, name='getItemDetailsAjaxEst'),
+    path('Company/get_bank_acc_num',views.getBankAccountNumberAjaxEst, name='getBankAccountNumberAjaxEst'),
+    path('Company/check_recurring_invoice_number',views.checkRecurringInvoiceNumberEsti, name='checkRecurringInvoiceNumberEsti'),
+    path('Company/create_new_acc',views.createNewAccountAjaxEst, name= 'createNewAccountAjaxEst'),
+    path('Company/get_all_accnts',views.getAllAccountsAjaxEst, name='getAllAccountsAjaxEst'),
 
-    # path('Company/new_sales_customer_ajax',views.newSalesCustomerAjax, name='newSalesCustomerAjax'),
-    # path('Company/get_all_cust',views.getCustomersAjax, name='getCustomersAjax'),
-    path('Company/save_new_itm',views.createNewItemAjax, name='createNewItemAjax'),
-    path('Company/get_all_itms',views.getAllItemsAjax, name='getAllItemsAjax'),
-    path('createsalesCustomer',views.createsalesCustomer,name='createsalesCustomer'),
-    path('getsalesCustomers',views.getsalesCustomers,name='getsalesCustomers'),
-    path('createNewItemsel',views.createNewItemsel,name='createNewItemsel'),
-    path('getAllItemssel',views.getAllItemssel,name='getAllItemssel'),
-    path('newselPaymentTerm',views.newselPaymentTerm,name='newselPaymentTerm'),
-    path('addsel_unit',views.addsel_unit,name='addsel_unit'),
-    path('show_unit_dropdownsel',views.show_unit_dropdownsel,name='show_unit_dropdownsel'),
-
-
-    
-    path('getselCustomerDetails',views.getselCustomerDetails,name='getselCustomerDetails'),
-    path('getselItemDetails',views.getselItemDetails,name='getselItemDetails'),
-    path('checksalesorderNumber',views.checksalesorderNumber,name='checksalesorderNumber'),
-
-    path('getinvCustomerDetails',views.getinvCustomerDetails,name='getinvCustomerDetails'),
-    path('Company/get_cust_details',views.getCustomerDetailsAjax, name='getCustomerDetailsAjax'),
-    path('Staff/invoice/createNewIteminv',views.createNewIteminv,name='createNewIteminv'),
-    path('Staff/invoice/getAllItemsinv',views.getAllItemsinv,name='getAllItemsinv'),
-    path('getinvItemDetails',views.getinvItemDetails,name='getinvItemDetails'),
-    path('newinvPaymentTerm',views.newinvPaymentTerm,name='newinvPaymentTerm'),
-    path('Staff/invoice/addinv_unit',views.addinv_unit,name='addinv_unit'),
-    path('Staff/invoice/showinvunit_dropdown',views.showinvunit_dropdown,name='showinvunit_dropdown'),
-    path('Staff/invoice/getAllAccounts',views.getAllAccounts, name='getAllAccounts'),
-    path('getinvBankAccountNumber',views.getinvBankAccountNumber,name='getinvBankAccountNumber'),
-
-    path('Company/new_pymnt_trm',views.newPaymentTermAjax, name='newPaymentTermAjax'),
-    path('Company/new_repeat_every_ajax',views.newRepeatEveryTypeAjax, name='newRepeatEveryTypeAjax'),
-    path('Company/get_units_ajax',views.getUnitsAjax, name='getUnitsAjax'),
-    path('Company/get_itm_details',views.getItemDetailsAjax, name='getItemDetailsAjax'),
-    path('Company/get_bank_acc_num',views.getBankAccountNumberAjax, name='getBankAccountNumberAjax'),
-    path('Company/check_recurring_invoice_number',views.checkRecurringInvoiceNumber, name='checkRecurringInvoiceNumber'),
-    path('Company/create_new_acc',views.createNewAccountAjax, name= 'createNewAccountAjax'),
-    path('Company/get_all_accnts',views.getAllAccountsAjax, name='getAllAccountsAjax'),
+    #-----------------------------------------End--------------------------------
 
 
 

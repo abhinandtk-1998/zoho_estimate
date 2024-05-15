@@ -2596,7 +2596,7 @@
           $('#custErr').text('');
           $.ajax({
               type : 'POST',
-              url: "{% url 'getinvCustomerDetails' %}",
+              url: "{% url 'getinvCustomerDetailsEst' %}",
               data: {
                   id: custId,
                   csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -2679,7 +2679,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "{% url 'getinvBankAccountNumber' %}",
+                    url: "{% url 'getinvBankAccountNumberEst' %}",
                     data: {
                         id: $('#paymentMethod').find(':selected').attr('text'),
                     },
@@ -2705,7 +2705,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newinvPaymentTerm' %}",
+                url:"{% url 'newinvPaymentTermEst' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -2829,7 +2829,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "{% url 'getinvItemDetails' %}",
+                    url: "{% url 'getinvItemDetailsEst' %}",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2947,7 +2947,7 @@
               }else{
                   var n = inpId.slice(4);
                   $.ajax({
-                      url: "{% url 'getinvItemDetails' %}",
+                      url: "{% url 'getinvItemDetailsEst' %}",
                       type : 'GET',
                       data:{
                           item : value,
@@ -3931,7 +3931,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newinvPaymentTerm' %}",
+                url:"{% url 'newinvPaymentTermEst' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -4292,7 +4292,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != ""){
         $.ajax({
             type : 'POST',
-            url:"{% url 'createNewIteminv' %}",
+            url:"{% url 'createNewIteminvEst' %}",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4338,7 +4338,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "{% url 'getAllItemsinv' %}",
+        url: "{% url 'getAllItemsinvEst' %}",
         type: "GET",
         dataType: "json",
         data: {},
@@ -4553,7 +4553,7 @@ function reloadItems() {
         
         function reloadAccounts(account) {
             $.ajax({
-                url: "{% url 'getAllAccounts' %}",
+                url: "{% url 'getAllAccountsEst' %}",
                 type: "GET",
                 dataType: "json", 
                 data: {},

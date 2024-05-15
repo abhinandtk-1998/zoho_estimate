@@ -413,7 +413,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Expected Shippment Date</label>
                       <div class="col-md-9">
-                        <input type="Date" id="" class="form-control bg-black text-white" name="expiration_date" value="{{estimate.estimate_date|date:'Y-m-d'}}">
+                        <input type="Date" id="" class="form-control bg-black text-white" name="expiration_date" value="{{estimate.expiration_date|date:'Y-m-d'}}">
                       </div>
                     </div>+
                   </div>
@@ -2441,7 +2441,7 @@
           $('#custErr').text('');
           $.ajax({
               type : 'POST',
-              url: "{% url 'getselCustomerDetails' %}",
+              url: "{% url 'getselCustomerDetailsEst' %}",
               data: {
                   id: custId,
                   csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -2545,7 +2545,7 @@
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newselPaymentTerm' %}",
+                url:"{% url 'newselPaymentTermEst' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -2671,7 +2671,7 @@
                     $('#custPriceListName').text('Applied: '+$("#priceListIds option:selected").text())
                     var n = itemId.slice(4);
                     $.ajax({
-                    url: "{% url 'getselItemDetails' %}",
+                    url: "{% url 'getselItemDetailsEst' %}",
                     type : 'GET',
                     data:{
                         item : itemName,
@@ -2726,28 +2726,28 @@
 
 
 
-  $(document).on('change','#recSalesorderNumber', function() {
-    $('#selNoErr').text('');
-    var sel_num = $(this).val();
+//   $(document).on('change','#recSalesorderNumber', function() {
+//     $('#selNoErr').text('');
+//     var sel_num = $(this).val();
 
-    if(sel_num != ""){
-        console.log(sel_num);
-        $.ajax({
-            type: "GET",
-            url: "{% url 'checksalesorderNumber' %}",
-            data: {
-                RecSelNum : sel_num,
-            },
-            success: function (response) {
-                if (response.status){
-                    $('#selNoErr').text('');
-                }else{
-                    $('#selNoErr').text(response.message);
-                }
-            }
-        })
-    }
-});
+//     if(sel_num != ""){
+//         console.log(sel_num);
+//         $.ajax({
+//             type: "GET",
+//             url: "",
+//             data: {
+//                 RecSelNum : sel_num,
+//             },
+//             success: function (response) {
+//                 if (response.status){
+//                     $('#selNoErr').text('');
+//                 }else{
+//                     $('#selNoErr').text(response.message);
+//                 }
+//             }
+//         })
+//     }
+// });
 
 
 
@@ -2792,7 +2792,7 @@ function getItemDetails(inpId, value) {
         if (plc != "") {
             var n = inpId.slice(4);
             $.ajax({
-                url: "{% url 'getselItemDetails' %}",
+                url: "{% url 'getselItemDetailsEst' %}",
                 type: 'GET',
                 data: {
                     item: value,
@@ -3016,7 +3016,7 @@ function changeItemQty(id,QTY){
             console.log(sel_num);
             $.ajax({
                 type: "GET",
-                url: "{% url 'checksalesorderNumber' %}",
+                url: "{% url 'checksalesorderNumberEsti' %}",
                 data: {
                     selNum : sel_num,
                 },
@@ -3800,7 +3800,7 @@ $('#mphone').on('input', function() {
         if (trm !="" && dys !=""){
             $.ajax({
                 type : 'POST',
-                url:"{% url 'newselPaymentTerm' %}",
+                url:"{% url 'newselPaymentTermEst' %}",
                 data:{
                     'term' : trm,
                     'days' : dys,
@@ -3905,7 +3905,7 @@ $('#mphone').on('input', function() {
     if(fName != "" && lName != "" && placeSupply != "" && gstType != "" && panNo != "" && Email != "" && Mob != "" ){
           $.ajax({
               type : 'POST',
-              url:"{% url 'createsalesCustomer' %}",
+              url:"{% url 'createsalesCustomerEst' %}",
               data:{
                 'type': type,
                 'salutation' : title,
@@ -3985,7 +3985,7 @@ $('#mphone').on('input', function() {
   function reloadCustomer(title,fName,lName) {
       const fullName = title+' '+fName+' '+lName
       $.ajax({
-          url: "{% url 'getsalesCustomers' %}",
+          url: "{% url 'getsalesCustomersEst' %}",
           type: "GET",
           dataType: "json",
           data: {},
@@ -4160,7 +4160,7 @@ $(document).on("click","#saveNewItem",function(){
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != ""){
         $.ajax({
             type : 'POST',
-            url:"{% url 'createNewItemsel' %}",
+            url:"{% url 'createNewItemselEst' %}",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4207,7 +4207,7 @@ $(document).on("click","#saveNewItem",function(){
 
 function reloadItems() {
     $.ajax({
-        url: "{% url 'getAllItemssel' %}",
+        url: "{% url 'getAllItemsselEst' %}",
         type: "GET",
         dataType: "json",
         data: {},

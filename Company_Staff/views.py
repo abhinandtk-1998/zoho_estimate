@@ -18319,8 +18319,7 @@ def get_loanaddition_data(request):                                             
 
 
 
-#estimate
-        
+#------------------------Estimate----------------------     
 
 def sales_estimate(request):
     if 'login_id' in request.session:
@@ -18410,35 +18409,12 @@ def sales_estimate_new(request):
 
 
 
-
-            # numbers = ['1','2','3','4','5','6','7','8','9']
-            # if Estimate.objects.all().exists():
-            #     est_last = Estimate.objects.last()
-            #     estimate_no = est_last.estimate_number 
-
-            #     i = 0
-            #     for c in estimate_no:
-            #         if c in numbers:
-            #             break
-            #         i = i + 1
-                
-            #     est_char = estimate_no[:i+1]
-            #     est_num = estimate_no[i+1:]
-
-            #     int_est_num = int(est_num)
-
-            #     est_no = est_char + str(int_est_num + 1)
-            #     print(est_no)
-
-            # else:
-            #     est_no  = False
-
-            if EstimateReference.objects.all().exists():
-                Reference_no = EstimateReference.objects.last()
+            if EstimateReference.objects.filter(company=comp_details).exists():
+                Reference_no = EstimateReference.objects.filter(company=comp_details).last()
                 ref_no =int(Reference_no.reference_number) + 1
 
             else:
-                ref_no = False
+                ref_no = 1
 
 
 
@@ -18499,34 +18475,13 @@ def sales_estimate_new(request):
 
 
 
-            # numbers = ['1','2','3','4','5','6','7','8','9']
-            # if Estimate.objects.all().exists():
-            #     est_last = Estimate.objects.last()
-            #     estimate_no = est_last.estimate_number 
 
-            #     i = 0
-            #     for c in estimate_no:
-            #         if c in numbers:
-            #             break
-            #         i = i + 1
-                
-            #     est_char = estimate_no[:i+1]
-            #     est_num = estimate_no[i+1:]
-
-            #     int_est_num = int(est_num)
-
-            #     est_no = est_char + str(int_est_num + 1)
-            #     print(est_no)
-
-            # else:
-            #     est_no  = False
-
-            if EstimateReference.objects.all().exists():
-                Reference_no = EstimateReference.objects.last()
+            if EstimateReference.objects.filter(company=comp_details).exists():
+                Reference_no = EstimateReference.objects.filter(company=comp_details).last()
                 ref_no =int(Reference_no.reference_number) + 1
 
             else:
-                ref_no = False
+                ref_no = 1
 
 
 
@@ -18587,8 +18542,8 @@ def checkEstimateNumber(request):
                 nxtEst = st + num.zfill(len(num)) 
             else:
                 nxtEst = st + str(inv_num).zfill(len(num))
-        # else:
-        #     nxtInv = 'EST001'
+        else:
+            nxtEst = 'EST001'
 
         PatternStr = []
         for word in EstNo:
@@ -18663,38 +18618,6 @@ def get_item_detailsAjax(request):
         itemId = request.GET['id']
         item = Items.objects.get(id=itemId)
 
-        # priceListId = request.GET['listId']
-        # item = Items.objects.filter(company = cmp, item_name = itemName).first()
-
-        # if priceListId != "":
-        #     priceList = PriceList.objects.get(id = int(priceListId))
-
-        #     if priceList.item_rate_type == 'Each Item':
-        #         try:
-        #             priceListPrice = float(PriceListItem.objects.get(company = cmp, price_list = priceList, item = item).custom_rate)
-        #         except:
-        #             priceListPrice = item.selling_price
-        #     else:
-        #         mark = priceList.percentage_type
-        #         percentage = float(priceList.percentage_value)
-        #         roundOff = priceList.round_off
-
-        #         if mark == 'Markup':
-        #             price = float(item.selling_price) + float((item.selling_price) * (percentage/100))
-        #         else:
-        #             price = float(item.selling_price) - float((item.selling_price) * (percentage/100))
-
-        #         if priceList.round_off != 'Never Mind':
-        #             if roundOff == 'Nearest Whole Number':
-        #                 finalPrice = round(price)
-        #             else:
-        #                 finalPrice = int(price) + float(roundOff)
-        #         else:
-        #             finalPrice = price
-
-        #         priceListPrice = finalPrice
-        # else:
-        #     priceListPrice = None
 
         if item:
 
@@ -18951,20 +18874,6 @@ def sales_estimate_new_item(request):
                 }
                 return JsonResponse(response_data)
                 
-                # if Items.objects.filter(item_name=item_name, company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same name exsits !!!')
-                #     return redirect('new_items')
-                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same  hsn code exsits !!!')
-                #     return redirect('new_items')
-                # else:
-                #     a.save()    
-                #     t=Items.objects.get(id=a.id)
-                #     b.items=t
-                #     b.save()
-                #     return redirect('items_list')
             
         else:
             staff_id = request.session['login_id']
@@ -19036,104 +18945,10 @@ def sales_estimate_new_item(request):
             
             
 
-            
-                # if Items.objects.filter(item_name=item_name,company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same name exsits !!!')
-                #     return redirect('new_items')
-                # elif Items.objects.filter(hsn_code=hsncode, company=c).exists():
-                #     error='yes'
-                #     messages.error(request,'Item with same  hsn code exsits !!!')
-                #     return redirect('new_items')
-                # else:
-                #     a.save()    
-                #     t=Items.objects.get(id=a.id)
-                #     b.items=t
-                #     b.save()
-                #     return redirect('items_list')
-
     else:
         redirect('/')
 
 
-
-    # if 'login_id' in request.session:
-    #     log_id = request.session['login_id']
-    #     log_details= LoginDetails.objects.get(id=log_id)
-    #     if log_details.user_type == 'Company':
-    #         com = CompanyDetails.objects.get(login_details = log_details)
-    #     else:
-    #         com = StaffDetails.objects.get(login_details = log_details).company
-
-    #     name = request.POST['name']
-    #     type = request.POST['type']
-    #     unit = request.POST.get('unit')
-    #     hsn = request.POST['hsn']
-    #     tax = request.POST['taxref']
-    #     gstTax = 0 if tax == 'None-Taxable' else request.POST['intra_st']
-    #     igstTax = 0 if tax == 'None-Taxable' else request.POST['inter_st']
-    #     purPrice = 0 if request.POST['pcost'] == "" else request.POST['pcost']
-    #     purAccount = None if not 'pur_account' in request.POST or request.POST['pur_account'] == "" else request.POST['pur_account']
-    #     purDesc = request.POST['pur_desc']
-    #     salePrice = 0 if request.POST['salesprice'] == "" else request.POST['salesprice']
-    #     saleAccount = None if not 'sale_account' in request.POST or request.POST['sale_account'] == "" else request.POST['sale_account']
-    #     saleDesc = request.POST['sale_desc']
-    #     inventory = request.POST.get('invacc')
-    #     stock = 0 if request.POST.get('stock') == "" else request.POST.get('stock')
-    #     stockUnitRate = 0 if request.POST.get('stock_rate') == "" else request.POST.get('stock_rate')
-    #     minStock = 0 if request.POST['min_stock'] == "" else request.POST['min_stock']
-    #     createdDate = date.today()
-        
-    #     #save item and transaction if item or hsn doesn't exists already
-    #     if Items.objects.filter(company=com, item_name__iexact=name).exists():
-    #         res = f"{name} already exists, try another!"
-    #         return JsonResponse({'status': False, 'message':res})
-    #     elif Items.objects.filter(company = com, hsn_code__iexact = hsn).exists():
-    #         res = f"HSN - {hsn} already exists, try another.!"
-    #         return JsonResponse({'status': False, 'message':res})
-    #     else:
-    #         item = Items(
-    #             company = com,
-    #             login_details = com.login_details,
-    #             item_name = name,
-    #             item_type = type,
-    #             unit = None if unit == "" else Unit.objects.get(id = int(unit)),
-    #             hsn_code = hsn,
-    #             tax_reference = tax,
-    #             intrastate_tax = gstTax,
-    #             interstate_tax = igstTax,
-    #             sales_account = saleAccount,
-    #             selling_price = salePrice,
-    #             sales_description = saleDesc,
-    #             purchase_account = purAccount,
-    #             purchase_price = purPrice,
-    #             purchase_description = purDesc,
-    #             date = createdDate,
-    #             minimum_stock_to_maintain = minStock,
-    #             inventory_account = inventory,
-    #             opening_stock = stock,
-    #             current_stock = stock,
-    #             opening_stock_per_unit = stockUnitRate,
-    #             track_inventory = int(request.POST['trackInv']),
-    #             activation_tag = 'active',
-    #             type = 'Opening Stock'
-    #         )
-    #         item.save()
-
-    #         #save transaction
-
-    #         Item_Transaction_History.objects.create(
-    #             company = com,
-    #             logindetails = log_details,
-    #             items = item,
-    #             Date = createdDate,
-    #             action = 'Created'
-
-    #         )
-            
-    #         return JsonResponse({'status': True})
-    # else:
-    #    return redirect('/')
 
     
 
@@ -19149,7 +18964,7 @@ def sales_estimate_new_add(request):
 
         if login_d.user_type == 'Company':
             company_id = request.session['login_id']
-            company = CompanyDetails.objects.get(id=company_id)
+            company = CompanyDetails.objects.get(login_details=login_d)
             if request.method=='POST':
                 est = Estimate()
                 est.company = company
@@ -19239,6 +19054,97 @@ def sales_estimate_new_add(request):
                 
 
             return redirect('sales_estimate')
+
+        else:
+
+            company_id = request.session['login_id']
+            staff_details = StaffDetails.objects.get(login_details=login_d)
+            company = CompanyDetails.objects.get(id=staff_details.company.id)
+            if request.method=='POST':
+                est = Estimate()
+                est.company = company
+                est.login_details = login_d
+                customer_id = request.POST['customerId']
+                est.customer = Customer.objects.get(id=customer_id)
+                est.customer_email = request.POST['email']
+                est.customer_bill_address = request.POST['billingAddress']
+                est.customer_gst_treatment = request.POST['gst_treatment']
+                est.customer_gst_number = request.POST['gst_number']
+                est.customer_place_of_supply = request.POST['place_of_supply']
+                est.estimate_date = request.POST['estimate_date']
+                paymentterm_id = request.POST['payment_term']
+                est.payment_term = Company_Payment_Term.objects.get(id=paymentterm_id)
+                est.expiration_date = request.POST['exp_date']
+                est.reference_number = request.POST['reference_no']
+                est.estimate_number = request.POST['estimate_no']
+                est.description = request.POST['description']
+                est.document = request.FILES['file']
+                est.terms_and_condition = request.POST['terms']
+                est.sub_total = request.POST['subtotal']
+                est.cgst = request.POST['cgst']
+                est.sgst = request.POST['sgst']
+                est.tax_amount_igst = request.POST['igst']
+                est.shipping_charge = request.POST['ship']
+                est.adjustment = request.POST['adj']
+                est.grand_total = request.POST['grandtotal']
+
+                if 'Draft' in request.POST:
+                    est.status = "Draft"
+
+                elif "Save" in request.POST:
+                    est.status = "Saved"
+
+                est.save()
+
+
+    #..................save reference number.............................
+
+                reference = EstimateReference()
+                reference.reference_number = request.POST['reference_no']
+                reference.company = company
+                reference.login_details = login_d
+
+                reference.save()
+
+    #..................save estimate history............................
+
+                history = EstimateHistory()
+                history.company = company
+                history.login_details = login_d
+                history.estimate = est
+                history.date = datetime.today().date()
+                history.action = "Created"
+
+                history.save() 
+
+
+    #................Adding item table .............................................
+
+                # Save estimate items.
+
+                itemId = request.POST.getlist("itemId[]")
+                # itemName = request.POST.getlist("item_name[]")
+                hsn  = request.POST.getlist("hsn[]")
+                qty = request.POST.getlist("qty[]")
+                price = request.POST.getlist("price[]")
+                tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == company.state else request.POST.getlist("taxIGST[]")
+                discount = request.POST.getlist("discount[]")
+                total = request.POST.getlist("total[]")
+
+                if len(itemId)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and hsn and qty and price and tax and discount and total:
+                    mapped = zip(itemId,hsn,qty,price,tax,discount,total)
+                    mapped = list(mapped)
+                    for ele in mapped:
+                        itm = Items.objects.get(id = int(ele[0]))
+                        EstimateItems.objects.create(item=itm, hsn=ele[1], quantity=int(ele[2]), price = float(ele[3]), tax_rate = float(ele[4]),
+                        discount=float(ele[5]), total=float(ele[6]), estimate=est, login_details=login_d, company=company)
+                        itm.current_stock -= int(ele[2])
+                        itm.save()
+
+
+
+            return redirect('sales_estimate')
+
 
 
 
@@ -19626,7 +19532,7 @@ def sales_estimate_delete(request,pk):
 
         est_first = Estimate.objects.first()
 
-        return redirect(reverse('sales_estimate_overview', args=[est_first.id]))
+        return redirect(reverse('sales_estimate')
 
     else:
         return('/')
@@ -19745,9 +19651,9 @@ def convert_estimate_to_sales_order(request,pk):
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             estimate = Estimate.objects.get(id=pk)
-            company = CompanyDetails.objects.get(login_details=login_d)
-            customer_details = Customer.objects.filter(company=dash_details)
-            est_items = EstimateItems.objects.get(estimate=estimate)
+            company = CompanyDetails.objects.get(id=dash_details.company.id)
+            customer_details = Customer.objects.filter(company=company)
+            est_items = EstimateItems.objects.filter(estimate=estimate)
             tax = estimate.cgst + estimate.sgst
             
 
@@ -19759,7 +19665,7 @@ def convert_estimate_to_sales_order(request,pk):
             banks = Banking.objects.filter(company = company)
             
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
-            priceList = PriceList.objects.filter(company = cmp, type = 'Sales', status = 'Active')
+            priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
 
             if SalesOrderReference.objects.filter(company = company).exists():
 
@@ -19842,6 +19748,8 @@ def checkSalesOrderNumberEst(request):
         
         SelNo = request.GET['SelNum']
 
+        print(SelNo)
+
         # Finding next estimate number w r t last estimate number if exists.
         nxtSel = ""
         lastSel = SaleOrder.objects.filter(company = com).last()
@@ -19863,8 +19771,10 @@ def checkSalesOrderNumberEst(request):
                 nxtSel = st + num.zfill(len(num)) 
             else:
                 nxtSel = st + str(sel_num).zfill(len(num))
-        # else:
-        #     nxtInv = 'EST001'
+        else:
+            nxtSel = 'sel-01'
+
+        print(nxtSel)
 
         PatternStr = []
         for word in SelNo:
@@ -20119,8 +20029,8 @@ def convert_estimate_to_invoice(request,pk):
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             estimate = Estimate.objects.get(id=pk)
-            company = CompanyDetails.objects.get(login_details=login_d)
-            customer_details = Customer.objects.filter(company=dash_details)
+            company = CompanyDetails.objects.get(id=dash_details.company.id)
+            customer_details = Customer.objects.filter(company=dash_details.company)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             priceList = PriceList.objects.filter(company = company, type = 'Sales', status = 'Active')
@@ -20238,8 +20148,8 @@ def checkInvoiceNumberEst(request):
                 nxtInv = st + num.zfill(len(num)) 
             else:
                 nxtInv = st + str(inv_num).zfill(len(num))
-        # else:
-        #     nxtInv = 'EST001'
+        else:
+            nxtInv = 'in-01'
 
         PatternStr = []
         for word in InvNo:
@@ -20480,8 +20390,8 @@ def convert_estimate_to_recurring_invoice(request,pk):
             dash_details = StaffDetails.objects.get(login_details=login_d,company_approval=1)
             allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
             estimate = Estimate.objects.get(id=pk)
-            company = CompanyDetails.objects.get(login_details=login_d)
-            customer_details = Customer.objects.filter(company=dash_details)
+            company = CompanyDetails.objects.get(id=dash_details.company.id)
+            customer_details = Customer.objects.filter(company=dash_details.company)
             est_items = EstimateItems.objects.filter(estimate=estimate)
             comp_payment_terms=Company_Payment_Term.objects.filter(company=company)
             repeat = CompanyRepeatEvery.objects.filter(company = company)
@@ -20591,8 +20501,8 @@ def checkRecurringInvoiceNumberEst(request):
                 nxtInv = st + num.zfill(len(num)) 
             else:
                 nxtInv = st + str(inv_num).zfill(len(num))
-        # else:
-        #     nxtInv = 'RI01'
+        else:
+            nxtInv = 'RI001'
 
         PatternStr = []
         for word in RecInvNo:
@@ -21316,7 +21226,7 @@ def getEstCustomersAjax(request):
 
 
 
-def createNewItemAjax(request):
+def createNewItemAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21395,7 +21305,7 @@ def createNewItemAjax(request):
     else:
        return redirect('/')
 
-def getAllItemsAjax(request):
+def getAllItemsAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21426,7 +21336,7 @@ def getAllItemsAjax(request):
 
 
 
-def getselCustomerDetails(request):
+def getselCustomerDetailsEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21451,7 +21361,7 @@ def getselCustomerDetails(request):
        return redirect('/')
 
 
-def getselItemDetails(request):
+def getselItemDetailsEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details = LoginDetails.objects.get(id=log_id)
@@ -21486,7 +21396,7 @@ def getselItemDetails(request):
 
 
 
-def createsalesCustomer(request):
+def createsalesCustomerEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21611,7 +21521,7 @@ def createsalesCustomer(request):
             return JsonResponse({'status':False})
 
 
-def getsalesCustomers(request):
+def getsalesCustomersEst(request):
     
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -21632,7 +21542,7 @@ def getsalesCustomers(request):
 
 
 
-def createNewItemsel(request):
+def createNewItemselEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21713,7 +21623,7 @@ def createNewItemsel(request):
 
 
 
-def getAllItemssel(request):
+def getAllItemsselEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21732,7 +21642,7 @@ def getAllItemssel(request):
         return redirect('/')
     
 
-def newselPaymentTerm(request):
+def newselPaymentTermEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -21766,7 +21676,7 @@ def newselPaymentTerm(request):
         return redirect('/')
 
 
-def addsel_unit(request):                                                               
+def addsel_unitEst(request):                                                               
     login_id = request.session['login_id']
     log_user = LoginDetails.objects.get(id=login_id)
 
@@ -21783,7 +21693,7 @@ def addsel_unit(request):
                 return JsonResponse({"message": "success"})
 
 
-def show_unit_dropdownsel(request):
+def show_unit_dropdownselEst(request):
 
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -21800,7 +21710,7 @@ def show_unit_dropdownsel(request):
             return JsonResponse(options)
 
 
-def checksalesorderNumber(request):
+def checksalesorderNumberEsti(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22018,7 +21928,7 @@ def createInvoiceCustomer(request):
 
 
 
-def getinvCustomerDetails(request):
+def getinvCustomerDetailsEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22042,7 +21952,7 @@ def getinvCustomerDetails(request):
        return redirect('/')
 
 
-def createNewIteminv(request):
+def createNewIteminvEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22123,7 +22033,7 @@ def createNewIteminv(request):
 
 
 
-def getinvItemDetails(request):
+def getinvItemDetailsEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22184,7 +22094,7 @@ def getinvItemDetails(request):
        return redirect('/')
 
 
-def getAllItemsinv(request):
+def getAllItemsinvEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22203,7 +22113,7 @@ def getAllItemsinv(request):
         return redirect('/')
 
 
-def newinvPaymentTerm(request):
+def newinvPaymentTermEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22236,7 +22146,7 @@ def newinvPaymentTerm(request):
     else:
         return redirect('/')
 
-def addinv_unit(request):                                                               
+def addinv_unitEst(request):                                                               
     login_id = request.session['login_id']
     log_user = LoginDetails.objects.get(id=login_id)
 
@@ -22270,7 +22180,7 @@ def addinv_unit(request):
 # create unit
 
 
-def showinvunit_dropdown(request):                                                               
+def showinvunit_dropdownEst(request):                                                               
    if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22286,7 +22196,7 @@ def showinvunit_dropdown(request):
             return JsonResponse(options)
 
 
-def getAllAccounts(request):
+def getAllAccountsEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22305,7 +22215,7 @@ def getAllAccounts(request):
         return redirect('/')
 
 
-def getinvBankAccountNumber(request):
+def getinvBankAccountNumberEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22336,7 +22246,7 @@ def getinvBankAccountNumber(request):
 
 
 
-def getCustomerDetailsAjax(request):
+def getCustomerDetailsAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22362,7 +22272,7 @@ def getCustomerDetailsAjax(request):
 
 
 
-def newPaymentTermAjax(request):
+def newPaymentTermAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22397,7 +22307,7 @@ def newPaymentTermAjax(request):
 
 
 
-def newRepeatEveryTypeAjax(request):
+def newRepeatEveryTypeAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22435,7 +22345,7 @@ def newRepeatEveryTypeAjax(request):
         return redirect('/')
 
 
-def getUnitsAjax(request):
+def getUnitsAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22451,7 +22361,7 @@ def getUnitsAjax(request):
             return JsonResponse(options)
 
         
-def getItemDetailsAjax(request):
+def getItemDetailsAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22514,7 +22424,7 @@ def getItemDetailsAjax(request):
 
 
 
-def getBankAccountNumberAjax(request):
+def getBankAccountNumberAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22534,7 +22444,7 @@ def getBankAccountNumberAjax(request):
        return redirect('/')
 
 
-def checkRecurringInvoiceNumber(request):
+def checkRecurringInvoiceNumberEsti(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22594,7 +22504,7 @@ def checkRecurringInvoiceNumber(request):
        return redirect('/')
 
 
-def createNewAccountAjax(request):                                                                #new by tinto mt
+def createNewAccountAjaxEst(request):                                                                #new by tinto mt
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22673,7 +22583,7 @@ def createNewAccountAjax(request):                                              
     else:
         return redirect('/')
 
-def getAllAccountsAjax(request):
+def getAllAccountsAjaxEst(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
@@ -22690,3 +22600,7 @@ def getAllAccountsAjax(request):
         return JsonResponse(acc)
     else:
         return redirect('/')
+
+
+
+

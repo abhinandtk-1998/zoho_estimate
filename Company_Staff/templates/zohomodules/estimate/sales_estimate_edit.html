@@ -160,6 +160,11 @@
   .select-box1.active .select-option1:after {
       transform: rotate(-180deg);
   }
+
+  .selectize-input {
+    background-color: #000 !important;
+    color: white !important;
+  }
     
   </style>
   
@@ -4739,7 +4744,7 @@
     if (name !="" && type !="" && unit != "" && hsn != "" && tax != "" && purAccount != ""){
         $.ajax({
             type : 'POST',
-            url:"{% url 'createNewItemAjax' %}",
+            url:"{% url 'createNewItemAjaxEst' %}",
             data:{
                 'name' : name,
                 'type' : type,
@@ -4785,7 +4790,7 @@
 
 function reloadItems() {
     $.ajax({
-        url: "{% url 'getAllItemsAjax' %}",
+        url: "{% url 'getAllItemsAjaxEst' %}",
         type: "GET",
         dataType: "json",
         data: {},
