@@ -1176,7 +1176,7 @@ class Recurring_Invoice_Comments(models.Model):
 
 
 
-
+#<-------------------------Estimate--------Abhinand T K------------------------------>
 class Estimate(models.Model):
     company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
     login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True) 
@@ -1245,4 +1245,4 @@ class EstimateComment(models.Model):
     company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE)
     login_details = models.ForeignKey(LoginDetails,on_delete=models.CASCADE)
     
-    
+#<----------------Estimate---End------------------------------------------------->

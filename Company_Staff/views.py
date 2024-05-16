@@ -18319,7 +18319,7 @@ def get_loanaddition_data(request):                                             
 
 
 
-#------------------------Estimate----------------------     
+#-------------------------------Estimate------------------------------------------     
 
 def sales_estimate(request):
     if 'login_id' in request.session:
@@ -19532,7 +19532,7 @@ def sales_estimate_delete(request,pk):
 
         est_first = Estimate.objects.first()
 
-        return redirect(reverse('sales_estimate')
+        return redirect('sales_estimate')
 
     else:
         return('/')
@@ -21041,9 +21041,19 @@ def estimate_share_email(request,pk):
                 filename = f'Estimate_{est.estimate_number}'
                 subject = f"Estimate_{est.estimate_number}"
                 # from django.core.mail import EmailMessage as EmailMsg
-                email = EmailMsg(subject, f"Hi,\nPlease find the attached Estimate for - ESTIMATE-{est.estimate_number}. \n{email_message}\n\n--\nRegards,\n{com.company_name}\n{com.address}\n{com.state} - {com.country}\n{com.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
-                email.attach(filename, pdf, "application/pdf")
-                email.send(fail_silently=False)
+
+
+                msg = EmailMultiAlternatives(subject, f"Hi,\nPlease find the attached Estimate for - ESTIMATE-{est.estimate_number}. \n{email_message}\n\n--\nRegards,\n{com.company_name}\n{com.address}\n{com.state} - {com.country}\n{com.contact}", settings.EMAIL_HOST_USER, emails_list)
+                msg.attach(filename, pdf, 'application/pdf')
+                msg.send()
+
+
+
+
+
+                # email = EmailMsg(subject, f"Hi,\nPlease find the attached Estimate for - ESTIMATE-{est.estimate_number}. \n{email_message}\n\n--\nRegards,\n{com.company_name}\n{com.address}\n{com.state} - {com.country}\n{com.contact}", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                # email.attach(filename, pdf, "application/pdf")
+                # email.send(fail_silently=False)
 
                 messages.success(request, 'Estimate details has been shared via email successfully..!')
                 return redirect(reverse('sales_estimate_overview', args=[pk]))
@@ -22604,3 +22614,4 @@ def getAllAccountsAjaxEst(request):
 
 
 
+#<-------------------estimate--end-------------------------------------------------------->

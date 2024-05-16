@@ -163,6 +163,12 @@
     background-color: #000 !important;
     color: white !important;
   }
+
+  .dropdown-item.customers-options:hover, .dropdown-item.items-options:hover{
+    background: white !important;
+    color: black !important;
+    cursor: pointer;
+  }
   
 </style>
 
@@ -586,7 +592,7 @@
                     </div>
                     <div class="modal-body" style="background: rgb(32, 35, 37);">
                     <div class="card p-3 m-3" style="background-color: black;">
-                        <form id="modalPayment_terms">
+                        <form class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms1">
                         
             
             
@@ -796,7 +802,7 @@
                                     <label class="col-4 col-form-label" style="color: aliceblue;">Account*</label>
                                     <div class="col-sm-8 col-md-8 col-8">
                                         <div class="d-flex align-items-center">
-                                            <select name="cost_acc" class="form-control" id="myaccount" style="background-color: black; color: white;" required>
+                                            <select name="cost_acc" class="form-control text-white bg-black" id="myaccount" style="background-color: black; color: white;" required>
                                             <option value="">--Select Account--</option>
                                             <optgroup id="expensesel" label="Expense">
                                         
@@ -1543,7 +1549,7 @@
             </div>
             <div class="modal-body" style="background: rgb(32, 35, 37);">
             <div class="card p-3 m-3" style="background-color: black;">
-                <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
+                <form class="needs-validation" novalidate autocomplete="off" id="modalPayment_terms">
                 
     
     
@@ -2874,73 +2880,178 @@ function updateOutputFields() {
 </script>
 
 <script>
-    $(document).on("click","#termSave",function(){
+
+
+$(document).on("click","#termSave",function(){
+        var trm = $('#tname').val();
+        var dys = $("#tdays").val();
+        if (trm !="" && dys !=""){
+            $.ajax({
+                type : 'POST',
+                url:"{% url 'newselPaymentTermEst' %}",
+                data:{
+                    'term' : trm,
+                    'days' : dys,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                
+                success: function(response) {
+                    if(response.status){
+                        document.getElementById("modalPayment_terms").reset();
+                        
+                        var dropdown = $('#paytearm-select1');
+                        dropdown.empty();
+                        dropdown.append(`<option value="" selected>Choose</option>`);
+                        $.each(response, function(key, value) {
+                            for(let i=0; i<value.length; i++){
+                                if(value[i].name == trm){
+                                    dropdown.append($('<option selected></option>').attr('text',value[i].days).text(value[i].name).val(value[i].id))
+                                }else{
+                                    dropdown.append($('<option></option>').attr('text',value[i].days).text(value[i].name).val(value[i].id))
+                                }   
+                            }
+                        });
+
+                        findDueDate();
+
+                    }else{
+                        alert("Something went wrong.!")
+                    }
+                },         
+            });
+        }
+        else{
+            alert('Invalid')
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+//     $(document).on("click","#termSave",function(){
    
+//     var trm = $("#tname").val();
+//     var dys = $("#tdays").val();
 
-  $.ajax({
-    type : 'POST',
-    url:"{% url 'customer_payment_terms_add' %}",
+//   $.ajax({
+//     type : 'POST',
+//     url:"",
 
-    data:{
-        name : $("#tname").val(),
-        days : $("#tdays").val(),
+//     data:{
+//         'term' : trm,
+//         'days' : dys,
         
-        csrfmiddlewaretoken: '{{ csrf_token }}'
+//         csrfmiddlewaretoken: '{{ csrf_token }}'
         
-      },
+//       },
     
-      success: function(response) {
-        $("#tname").val('')
-        $("#tdays").val('')
-        var paytearmSelect = $('#paytearm-select'); 
-          paytearmSelect.empty();  // Clear existing options
+//       success: function(response) {
+//         // $("#tname").val('')
+//         // $("#tdays").val('')
+//         // var paytearmSelect = $('#paytearm-select'); 
+//         //   paytearmSelect.empty();  // Clear existing options
           
 
-          // Add "Select" option
-          paytearmSelect.append('<option value="Due on Receipt" selected>Due on Receipt</option>');
+//         //   // Add "Select" option
+//         //   paytearmSelect.append('<option value="Due on Receipt" selected>Due on Receipt</option>');
 
-          // Add new options based on the Ajax response
-          $.each(response.payment_list, function(index, pay_terms) {
-            paytearmSelect.append('<option value="' + pay_terms.id + '">' + pay_terms.name + '</option>');
-          });
-        // reloadPayment();
-      },
-  });        
-});
+//         //   // Add new options based on the Ajax response
+//         //   $.each(response.payment_list, function(index, pay_terms) {
+//         //     paytearmSelect.append('<option value="' + pay_terms.id + '">' + pay_terms.name + '</option>');
+//         //   });
+//         // // reloadPayment();
+
+
+//         if(response.status){
+//                         document.getElementById("modalPayment_terms").reset();
+                        
+//                         var dropdown = $('#paytearm-select');
+//                         dropdown.empty();
+//                         dropdown.append(`<option value="" selected>Choose</option>`);
+//                         $.each(response, function(key, value) {
+//                             for(let i=0; i<value.length; i++){
+//                                 if(value[i].name == trm){
+//                                     dropdown.append($('<option selected></option>').text(value[i].name).val(value[i].id))
+//                                 }else{
+//                                     dropdown.append($('<option></option>').text(value[i].name).val(value[i].id))
+//                                 }   
+//                             }
+//                         });
+
+//                     }else{
+//                         alert("Something went wrong.!")
+//                     }
+
+
+
+
+//       },
+//   });        
+// });
 
 
 
     $(document).on("click","#termSave1",function(){
+    var trm = $("#tname1").val();
+    var dys = $("#tdays1").val();
    
 
   $.ajax({
     type : 'POST',
-    url:"{% url 'customer_payment_terms_add' %}",
+    url:"{% url 'newinvPaymentTermEst' %}",
 
     data:{
-        name : $("#tname1").val(),
-        days : $("#tdays1").val(),
+        'term' : trm,
+        'days' : dys,
         
         csrfmiddlewaretoken: '{{ csrf_token }}'
         
       },
     
       success: function(response) {
-        console.log(response)
-        $("#tname1").val('')
-        $("#tdays1").val('')
-        var paytearmSelect = $('#paytearm-select1'); 
-          paytearmSelect.empty();  // Clear existing options
+        // console.log(response)
+        // $("#tname1").val('')
+        // $("#tdays1").val('')
+        // var paytearmSelect = $('#paytearm-select1'); 
+        //   paytearmSelect.empty();  // Clear existing options
           
 
-          // Add "Select" option
-          paytearmSelect.append('<option value="Due on Receipt" selected>Due on Receipt</option>');
+        //   // Add "Select" option
+        //   paytearmSelect.append('<option value="Due on Receipt" selected>Due on Receipt</option>');
 
-          // Add new options based on the Ajax response data-days="{{pay_terms.days}}"
-          $.each(response.payment_list, function(index, pay_terms) {
-            paytearmSelect.append('<option value="' + pay_terms.id + '">' + pay_terms.name + '</option>');
-          });
-        // reloadPayment();
+        //   // Add new options based on the Ajax response data-days="{{pay_terms.days}}"
+        //   $.each(response.payment_list, function(index, pay_terms) {
+        //     paytearmSelect.append('<option value="' + pay_terms.id + '">' + pay_terms.name + '</option>');
+        //   });
+        // // reloadPayment();
+
+
+
+        if(response.status){
+                        document.getElementById("modalPayment_terms").reset();
+                        
+                        var dropdown = $('#paytearm-select1');
+                        dropdown.empty();
+                        dropdown.append(`<option value="" selected>Choose</option>`);
+                        $.each(response, function(key, value) {
+                            for(let i=0; i<value.length; i++){
+                                if(value[i].name == trm){
+                                    dropdown.append($('<option selected></option>').text(value[i].name).val(value[i].id))
+                                }else{
+                                    dropdown.append($('<option></option>').text(value[i].name).val(value[i].id))
+                                }   
+                            }
+                        });
+
+                    }else{
+                        alert("Something went wrong.!")
+                    }
 
 
                     
