@@ -461,7 +461,8 @@
                                     
                                     </td>
                                     <td>
-                                        <input type="hidden" name="item_id[]" id="itemId1">
+                                        <input type="hidden" name="item_id[]" value="{{i.item.id}}" id="itemId{{forloop.counter}}">
+                                        <input type="hidden" name="id[]" value="{{i.id}}" >
                                         <input type="text" name='hsn[]' id="hsn{{forloop.counter}}" placeholder='HSN' value="{{i.hsn}}" class="form-control bg-black text-white HSNCODE" readonly />
                                     </td>
                                     <td >

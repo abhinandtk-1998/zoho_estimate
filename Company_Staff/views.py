@@ -18542,8 +18542,8 @@ def checkEstimateNumber(request):
                 nxtEst = st + num.zfill(len(num)) 
             else:
                 nxtEst = st + str(inv_num).zfill(len(num))
-        else:
-            nxtEst = 'EST001'
+        # else:
+        #     nxtEst = 'EST001'
 
         PatternStr = []
         for word in EstNo:
@@ -19419,8 +19419,6 @@ def estimate_edit_op(request,pk):
 #................Adding item table .............................................
 
 
-            old_items = EstimateItems.objects.filter(estimate=est)
-            old_items.delete()
             # Save estimate items.
 
             itemId = request.POST.getlist("itemId[]")
@@ -19431,6 +19429,19 @@ def estimate_edit_op(request,pk):
             tax = request.POST.getlist("taxGST[]") if request.POST['place_of_supply'] == company.state else request.POST.getlist("taxIGST[]")
             discount = request.POST.getlist("discount[]")
             total = request.POST.getlist("total[]")
+
+            inv_item_ids = request.POST.getlist("id[]")
+            invItem_ids = [int(id) for id in inv_item_ids]
+
+            itms = EstimateItems.objects.filter(estimate=est)
+            for it in itms:
+                item = Items.objects.get(id=it.item.id)
+                item.current_stock += it.quantity
+                item.save()
+
+                # it.item.current_stock += it.quantity
+                # it.save()
+            itms.delete()
 
             if len(itemId)==len(hsn)==len(qty)==len(price)==len(tax)==len(discount)==len(total) and itemId and hsn and qty and price and tax and discount and total:
                 mapped = zip(itemId,hsn,qty,price,tax,discount,total)
@@ -19528,9 +19539,20 @@ def sales_estimate_delete(request,pk):
         login_d = LoginDetails.objects.get(id=log_id)
 
         est = Estimate.objects.get(id=pk)
+        
+        est_itm = EstimateItems.objects.filter(estimate=est)
+        for itm in est_itm:
+            item = Items.objects.get(id=itm.item.id)
+            item.current_stock += itm.quantity
+            item.save()
+            
+            # itm.item.current_stock += itm.quantity
+            # itm.save()
+
+        est_itm.delete()
+
         est.delete()
 
-        est_first = Estimate.objects.first()
 
         return redirect('sales_estimate')
 
@@ -19771,8 +19793,8 @@ def checkSalesOrderNumberEst(request):
                 nxtSel = st + num.zfill(len(num)) 
             else:
                 nxtSel = st + str(sel_num).zfill(len(num))
-        else:
-            nxtSel = 'sel-01'
+        # else:
+        #     nxtSel = 'sel-01'
 
         print(nxtSel)
 
@@ -20148,8 +20170,8 @@ def checkInvoiceNumberEst(request):
                 nxtInv = st + num.zfill(len(num)) 
             else:
                 nxtInv = st + str(inv_num).zfill(len(num))
-        else:
-            nxtInv = 'in-01'
+        # else:
+        #     nxtInv = 'in-01'
 
         PatternStr = []
         for word in InvNo:
@@ -20501,8 +20523,8 @@ def checkRecurringInvoiceNumberEst(request):
                 nxtInv = st + num.zfill(len(num)) 
             else:
                 nxtInv = st + str(inv_num).zfill(len(num))
-        else:
-            nxtInv = 'RI001'
+        # else:
+        #     nxtInv = 'RI001'
 
         PatternStr = []
         for word in RecInvNo:
@@ -20916,7 +20938,7 @@ def import_estimate_from_excel(request):
                             price=0
                         if quantity is None:
                             quantity=0
-                        if not Items.objects.filter(company = com, item_name = name).exists():
+                        if not Items.objects.filter(company = com, item_name = name,hsn_code=hsn,selling_price=price).exists():
                             print('No Item')
                             incorrect_data.append(est_no)
                             continue
