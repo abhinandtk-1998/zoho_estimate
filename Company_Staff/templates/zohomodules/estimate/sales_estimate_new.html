@@ -2,6 +2,14 @@
 {% block content %}
 {% load static %}
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+
+
 <style>
   .form-control{
         color: white;
@@ -171,6 +179,11 @@
   }
   
 </style>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -451,6 +464,7 @@
                                 </td>
                                 <td>
                                     <input type="hidden" name="item_id[]" id="itemId1">
+                                    <input type="hidden" name="id[]">
                                     <input type="text" name='hsn[]' id="hsn1" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
                                 </td>
                                 <td >
@@ -586,8 +600,8 @@
                 <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
                     <div class="modal-header " style="background: rgb(32, 35, 37);">
                         <h3 class="m-3 text-uppercase" style="color: white;">Add Payment Term</h3>
-                        <button type="button" class="close btn btn-danger close_pay_modal" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close btn btn-danger close_pay_modal" data-dismiss="modal">
+                            <span class="close-button"  aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body" style="background: rgb(32, 35, 37);">
@@ -624,7 +638,7 @@
                                 
             
                                 <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-1 mx-1 btn-outline-warning" 
-                                data-dismiss="modal" aria-label="Close">
+                                data-dismiss="modal" aria-label="Close" onclick="closePaymodal()">
                                     <span aria-hidden="true">Cancel</span>
                                 </button>
                             </div>
@@ -2900,6 +2914,7 @@ $(document).on("click","#termSave",function(){
                         document.getElementById("modalPayment_terms").reset();
                         
                         var dropdown = $('#paytearm-select');
+                        
                         // dropdown.empty();
                         // dropdown.append(`<option value="" selected>Choose</option>`);
                         $.each(response, function(key, value) {
@@ -2913,7 +2928,7 @@ $(document).on("click","#termSave",function(){
                             }
                         });
 
-                        findDueDate();
+                        // findDueDate();
 
                     }else{
                         alert("Something went wrong.!")
@@ -3017,7 +3032,10 @@ $(document).on("click","#termSave1",function(){
                     
 
                         document.getElementById("modalPayment_terms1").reset();
-                        document.getElementById('newpaymentTerm').style.display = 'none';
+                        // JavaScript to click the close button
+                        document.querySelector('.close-button').click();
+                        // document.getElementById('newpaymentTerm').style.display = 'none';
+                        // $('#newpaymentTerm').fadeOut();
                         
                         var dropdown = $('#paytearm-select1');
                         // dropdown.empty();
@@ -3033,7 +3051,7 @@ $(document).on("click","#termSave1",function(){
                             }
                         });
 
-                        // findDueDate();
+                        findDueDate();
 
                     }else{
                         alert("Something went wrong.!")
@@ -3879,13 +3897,14 @@ $(document).ready(function(){
                           </div>
                       </div>
                       <a href="#">
-                          <button type="button" class="btn btn-outline-warning ms-1" data-target="#addItem" data-toggle="modal"><i class="fa fa-plus text-yellow"></i></button>
+                          <button type="button" class="btn btn-outline-warning ms-1" data-target="#newItem" data-toggle="modal"><i class="fa fa-plus text-yellow"></i></button>
                       </a>
                   </div>
               
               </td>
               <td>
                   <input type="hidden" name="item_id[]" id="itemId${roinc}">
+                  <input type="hidden" name="id[]">
                   <input type="text" name='hsn[]' id="hsn${roinc}" placeholder='HSN' class="form-control bg-black text-white HSNCODE" readonly />
               </td>
               <td >
@@ -4722,6 +4741,38 @@ $(document).ready(function() {
 
 
 
+    function findDueDate(){
+        var days = parseInt($('#paytearm-select1').find(":selected").attr('text'))
+        start_date =new Date($('#est_date').val())
+
+        if (!isNaN(start_date.getTime())) {
+
+            const endDate = new Date(start_date);
+            endDate.setDate(endDate.getDate() + days);
+
+            const isoString = endDate.toISOString(); 
+            const day = isoString.slice(8, 10);
+            const month = isoString.slice(5, 7);
+            const year = isoString.slice(0, 4);
+
+            const formattedDate = `${year}-${month}-${day}`;
+
+            document.getElementById("exp_date").value = formattedDate;
+        } else {
+                alert("Please enter a valid date.");
+                $('#paytearm-select1').val('')
+        }
+    }
+
+
+
+    function closePaymodal(){
+        // JavaScript to click the close button
+        document.querySelector('.close-button').click();
+    }
+
+
+
 
 
 
@@ -4733,6 +4784,8 @@ $(document).ready(function() {
 
 
       </script>
+
+
 
 
 
