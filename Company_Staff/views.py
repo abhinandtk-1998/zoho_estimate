@@ -19458,10 +19458,7 @@ def estimate_edit_op(request,pk):
 
 
 
-
-                
-
-            return redirect('sales_estimate')
+            return redirect(reverse('sales_estimate_overview', args=[pk]))
 
 
 

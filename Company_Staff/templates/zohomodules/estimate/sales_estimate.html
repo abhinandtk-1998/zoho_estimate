@@ -51,7 +51,7 @@
               <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                     <input type="text" id="searchInput" placeholder="Search..." class="form-control mr-2 m-2 ">
-                    <button class="btn btn-outline-warning dropdown-toggle text-yellow mr-2 m-2" type="button" id="sortButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-outline-warning text-yellow mr-2 m-2" type="button" id="sortButton2" data-bs-toggle="dropdown" aria-expanded="false" style="width: 25%;">
                         <i class="fas fa-sort"></i>
                     </button>
                     <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu2" aria-labelledby="sortButton2">
@@ -61,7 +61,7 @@
                     </ul>
                 </div>
                 <div>
-                  <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="filterButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" type="button" id="filterButton" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-filter"></i>
                   </button>
                   <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu3" aria-labelledby="filterButton">
@@ -69,8 +69,9 @@
                     <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Saved">Saved</a></li>
                     <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Draft">Draft</a></li>
                   </ul>
-                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" onclick="exportToExcel()"><i class="fa fa-file-export"></i>Export</button>
                   <button class="btn btn-outline-warning mr-2 text-yellow m-2" data-toggle="modal" data-target="#importModal"><i class="fa fa-file-import"></i> Import </button>
+                  <button class="btn btn-outline-warning mr-2 text-yellow m-2" onclick="exportToExcel()"><i class="fa fa-file-export"></i>Export</button>
+                  
                   <a href="{% url 'sales_estimate_new' %}" class="btn btn-outline-warning text-yellow m-2"><i class="fa fa-plus text-yellow"></i>New</a>
                 </div>
               </div>
@@ -78,15 +79,15 @@
               <table class="table mt-lg-3 rounded" style="color: white;" id="myTable">
                 <thead>
                   <tr class="border-bottom border-dark">
-                    <th scope="col" ><b>Sl. No</b></th>
-                    <th scope="col" ><b>Date</b></th>
-                    <th scope="col" ><b>Estimate Number</b></th>
-                    <th scope="col" ><b>Customer Name</b></th>
-                    <th scope="col" ><b>Customer Mail ID</b></th>
-                    <th scope="col" ><b>Amount</b></th>
-                    <th scope="col" ><b>Status</b></th>
-                    <th scope="col" ><b>Balance</b></th>
-                    <th scope="col" ><b>Action</b></th>
+                    <th scope="col" ><b>#</b></th>
+                    <th scope="col" ><b>DATE</b></th>
+                    <th scope="col" ><b>ESTIMATE NUMBER</b></th>
+                    <th scope="col" ><b>CUSTOMER NAME</b></th>
+                    <th scope="col" ><b>CUSTOMER MAIL ID</b></th>
+                    <th scope="col" ><b>AMOUNT</b></th>
+                    <th scope="col" ><b>STATUS</b></th>
+                    <th scope="col" ><b>BALANCE</b></th>
+                    <th scope="col" ><b>ACTION</b></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -99,17 +100,7 @@
                     <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
                     <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
                     <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
-                    <td>
-                        <a href="{% url 'sales_estimate_overview' est.id %}">
-                            {% if est.converted_to_invoice %}
-                            {{est.converted_to_invoice.balance}}
-                            {% elif est.converted_to_recurring_invoice %}
-                            {{est.converted_to_recurring_invoice.balance}}
-                            {% elif est.converted_to_sales_order %}
-                            {{est.converted_to_sales_order.balance}}
-                            {% endif %}
-                        </a>
-                    </td>
+                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
                     <td>
                         {% if est.converted_to_invoice %}
                         Converted To Invoice {{est.converted_to_invoice.invoice_number}}

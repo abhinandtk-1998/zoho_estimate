@@ -171,6 +171,22 @@
     color: black !important;
     cursor: pointer;
   }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
     
   </style>
   
@@ -360,7 +376,7 @@
                             <label>Estimate Date</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-7">
-                            <input id="est_date" type="date" class="form-control" name="estimate_date" value="{{estimate.estimate_date | date:'Y-m-d'}}" required readonly>     
+                            <input id="est_date" type="date" class="form-control" name="estimate_date" value="{{estimate.estimate_date | date:'Y-m-d'}}" required>     
                             <div class="invalid-feedback">Please fill out this field.</div>   
                         </div>
                     </div>
@@ -5143,6 +5159,11 @@ $(document).ready(function() {
     }
 
 
+    $('#est_date').on('change', function() {
+        findDueDate();
+    });
+
+
 
 
     function closePaymodal(){
@@ -5193,3 +5214,14 @@ $(document).ready(function() {
 
 
 {% endblock %}
+<!-- // Get today's date
+var today = new Date();
+
+// Format date as YYYY-MM-DD
+var yyyy = today.getFullYear();
+var mm = String(today.getMonth() + 1).padStart(2, '0');
+var dd = String(today.getDate()).padStart(2, '0');
+
+var todayString = yyyy + '-' + mm + '-' + dd;
+
+// Set the default value of the input field to today's date -->

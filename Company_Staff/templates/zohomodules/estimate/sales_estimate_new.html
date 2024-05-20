@@ -177,6 +177,22 @@
     color: black !important;
     cursor: pointer;
   }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
   
 </style>
 
@@ -346,7 +362,7 @@
                         <label>Estimate No</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input  type="text" class="form-control" id="estNumber" name="estimate_no" placeholder="{{est_no}}" required>     
+                        <input  type="text" class="form-control" id="estNumber" name="estimate_no" placeholder="{{est_no}}" required >     
                         <span class="text-danger ml-1" id="estNoErr"></span>  
                     </div>
                 </div>
@@ -367,7 +383,7 @@
                         <label>Estimate Date</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input id="est_date" type="date" class="form-control" name="estimate_date" required readonly>     
+                        <input id="est_date" type="date" class="form-control" name="estimate_date" required  value="{% now 'Y-m-d' %}">     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -382,11 +398,11 @@
                     <div class="col-sm-12 col-md-6 col-lg-7">
                         <div class="d-flex">
                             <div class="w-100">
-                                <select name="payment_term" id="paytearm-select1" class="form-control" onchange="update_expiryDate(this)">
+                                <select name="payment_term" id="paytearm-select1" class="form-control">
                             
                                     <option selected>Select a payment_term</option>
                                     {% for pay_terms in comp_payment_terms %}
-                                    <option value="{{pay_terms.id}}" data-days="{{pay_terms.days}}" >{{pay_terms.term_name}}</option>
+                                    <option value="{{pay_terms.id}}" text="{{pay_terms.days}}" >{{pay_terms.term_name}}</option>
                                     {% endfor %}
                                     
                                 </select>
@@ -525,7 +541,7 @@
                         <div class="row clearfix" style="margin-top:20px">
                             <div class="col-md-6">
                                 <textarea class="form-control bg-black text-white mt-3"  id="" name="description" placeholder="Note" style="height: 190px;"></textarea>
-                                <input type="file" class="form-control" name="file"  style="margin-top: 10px;" required>
+                                <input type="file" class="form-control" name="file"  style="margin-top: 10px;">
                                 <textarea class="form-control bg-black text-white mt-3"  id="" name="terms" placeholder="Terms & conditions" style="height: 130px;"></textarea>
                             </div>            
                             <div class="col-md-1"></div>
@@ -3405,43 +3421,30 @@ function refreshTax(){
 
 
 
-     // Get today's date
-    var today = new Date();
-
-    // Format date as YYYY-MM-DD
-    var yyyy = today.getFullYear();
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
-    var dd = String(today.getDate()).padStart(2, '0');
-
-    var todayString = yyyy + '-' + mm + '-' + dd;
-
-    // Set the default value of the input field to today's date
-    document.getElementById('est_date').value = todayString;
 
 
 
 
 
 
+    // function update_expiryDate(select) {
+    //     var selectedOption = select.options[select.selectedIndex];
+    //     var days = selectedOption.getAttribute('data-days');
+    //     var est_date = document.getElementById('est_date').value;
 
-    function update_expiryDate(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var days = selectedOption.getAttribute('data-days');
-        var est_date = document.getElementById('est_date').value;
 
+    //     // Convert estimate date string to Date object
+    //     var estimateDate = new Date(est_date);
 
-        // Convert estimate date string to Date object
-        var estimateDate = new Date(est_date);
+    //     // Calculate expiration date by adding payment term days to estimate date
+    //     var expirationDate = new Date(estimateDate.getTime() + (days * 24 * 60 * 60 * 1000));
 
-        // Calculate expiration date by adding payment term days to estimate date
-        var expirationDate = new Date(estimateDate.getTime() + (days * 24 * 60 * 60 * 1000));
+    //     // Format expiration date as YYYY-MM-DD
+    //     var formattedExpirationDate = expirationDate.toISOString().slice(0, 10);
 
-        // Format expiration date as YYYY-MM-DD
-        var formattedExpirationDate = expirationDate.toISOString().slice(0, 10);
-
-        // Update the expiration date input field
-        document.getElementById('exp_date').value = formattedExpirationDate;
-    }
+    //     // Update the expiration date input field
+    //     document.getElementById('exp_date').value = formattedExpirationDate;
+    // }
 
 
 
@@ -4749,6 +4752,7 @@ $(document).ready(function() {
 
             const endDate = new Date(start_date);
             endDate.setDate(endDate.getDate() + days);
+            console.log(endDate);
 
             const isoString = endDate.toISOString(); 
             const day = isoString.slice(8, 10);
@@ -4758,11 +4762,20 @@ $(document).ready(function() {
             const formattedDate = `${year}-${month}-${day}`;
 
             document.getElementById("exp_date").value = formattedDate;
+            console.log("done")
         } else {
                 alert("Please enter a valid date.");
                 $('#paytearm-select1').val('')
         }
     }
+
+    $('#est_date').on('change', function() {
+        findDueDate();
+    });
+
+    $('#paymentTerm').on('change', function () {
+        findDueDate();
+    });
 
 
 
