@@ -18966,6 +18966,11 @@ def sales_estimate_new_add(request):
             company_id = request.session['login_id']
             company = CompanyDetails.objects.get(login_details=login_d)
             if request.method=='POST':
+                estNumber = request.POST['estimate_no']
+                if Estimate.objects.filter(company = company, estimate_number__iexact = estNumber).exists():
+                    res = f'<script>alert("Estimate Number `{estNumber}` already exists, try another!");window.history.back();</script>'
+                    return HttpResponse(res)
+                
                 est = Estimate()
                 est.company = company
                 est.login_details = login_d
@@ -18983,7 +18988,10 @@ def sales_estimate_new_add(request):
                 est.reference_number = request.POST['reference_no']
                 est.estimate_number = request.POST['estimate_no']
                 est.description = request.POST['description']
-                est.document = request.FILES['file']
+
+                if 'file' in request.FILES:
+                    est.document = request.FILES['file']
+                
                 est.terms_and_condition = request.POST['terms']
                 est.sub_total = request.POST['subtotal']
                 est.cgst = request.POST['cgst']
@@ -18998,6 +19006,7 @@ def sales_estimate_new_add(request):
 
                 elif "Save" in request.POST:
                     est.status = "Saved"
+
 
                 est.save()
 
@@ -19061,6 +19070,12 @@ def sales_estimate_new_add(request):
             staff_details = StaffDetails.objects.get(login_details=login_d)
             company = CompanyDetails.objects.get(id=staff_details.company.id)
             if request.method=='POST':
+
+                estNumber = request.POST['estimate_no']
+                if Estimate.objects.filter(company = company, estimate_number__iexact = estNumber).exists():
+                    res = f'<script>alert("Estimate Number `{estNumber}` already exists, try another!");window.history.back();</script>'
+                    return HttpResponse(res)
+
                 est = Estimate()
                 est.company = company
                 est.login_details = login_d
@@ -19078,7 +19093,10 @@ def sales_estimate_new_add(request):
                 est.reference_number = request.POST['reference_no']
                 est.estimate_number = request.POST['estimate_no']
                 est.description = request.POST['description']
-                est.document = request.FILES['file']
+
+                if 'file' in request.FILES:
+                    est.document = request.FILES['file']
+
                 est.terms_and_condition = request.POST['terms']
                 est.sub_total = request.POST['subtotal']
                 est.cgst = request.POST['cgst']
@@ -19088,11 +19106,15 @@ def sales_estimate_new_add(request):
                 est.adjustment = request.POST['adj']
                 est.grand_total = request.POST['grandtotal']
 
+                
+
                 if 'Draft' in request.POST:
                     est.status = "Draft"
 
                 elif "Save" in request.POST:
                     est.status = "Saved"
+
+                
 
                 est.save()
 
@@ -19599,7 +19621,7 @@ def convert_estimate_to_sales_order(request,pk):
             if SalesOrderReference.objects.filter(company = company).exists():
 
                 last_ref_num = SalesOrderReference.objects.filter(company = company).last()
-                new_ref_num = last_ref_num.reference_number + 1
+                new_ref_num = int(last_ref_num.reference_number) + 1
 
             else:
                 new_ref_num = 1
@@ -19689,7 +19711,7 @@ def convert_estimate_to_sales_order(request,pk):
             if SalesOrderReference.objects.filter(company = company).exists():
 
                 last_ref_num = SalesOrderReference.objects.filter(company = company).last()
-                new_ref_num = last_ref_num.reference_number + 1
+                new_ref_num = int(last_ref_num.reference_number) + 1
 
             else:
                 new_ref_num = 1
@@ -19933,6 +19955,13 @@ def convert_estimate_to_sales_order_op(request,pk):
             )
 
 
+            SalesOrderReference.objects.create(
+                reference_number = request.POST['reference_number'],
+                company = comp_details,
+                staff = None if log_details.user_type == 'Company' else StaffDetails.objects.get(login_details = log_details) 
+            )
+
+
             # messages.success(request, 'Sales Order created successfully!')
 
 
@@ -19979,7 +20008,7 @@ def convert_estimate_to_invoice(request,pk):
             if invoiceReference.objects.filter(company = company).exists():
 
                 last_ref_num = invoiceReference.objects.filter(company = company).last()
-                new_ref_num = last_ref_num.reference_number + 1
+                new_ref_num = int(last_ref_num.reference_number) + 1
 
             else:
                 new_ref_num = 1
@@ -20069,7 +20098,7 @@ def convert_estimate_to_invoice(request,pk):
             if invoiceReference.objects.filter(company = company).exists():
 
                 last_ref_num = invoiceReference.objects.filter(company = company).last()
-                new_ref_num = last_ref_num.reference_number + 1
+                new_ref_num = int(last_ref_num.reference_number) + 1
 
             else:
                 new_ref_num = 1
@@ -20270,11 +20299,13 @@ def convert_estimate_to_invoice_op(request,pk):
                 inv.document=request.FILES.get('file')
             inv.save()
 
-            if 'Draft' in request.POST:
+            if 'save_as_draft' in request.POST:
                 inv.status = "Draft"
-            elif "Saved" in request.POST:
+            elif "save" in request.POST:
                 inv.status = "Saved" 
             inv.save()
+
+
 
             # Save rec_invoice items.
 
@@ -20303,6 +20334,12 @@ def convert_estimate_to_invoice_op(request,pk):
                 login_details = com.login_details,
                 invoice = inv,
                 action = 'Created'
+            )
+
+            invoiceReference.objects.create(
+                reference_number = request.POST['reference_number'],
+                company = com,
+                staff = None if log_details.user_type == 'Company' else StaffDetails.objects.get(login_details = log_details) 
             )
 
             est = Estimate.objects.get(id=pk)
@@ -20583,6 +20620,7 @@ def convert_estimate_to_recurring_invoice_op(request,pk):
             
             pattern = ''
             for j in PatternStr:
+                
                 pattern += j
 
             # pattern_exists = checkRecInvNumberPattern(pattern)

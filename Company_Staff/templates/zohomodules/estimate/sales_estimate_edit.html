@@ -376,7 +376,7 @@
                             <label>Estimate Date</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-7">
-                            <input id="est_date" type="date" class="form-control" name="estimate_date" value="{{estimate.estimate_date | date:'Y-m-d'}}" required>     
+                            <input id="est_date" type="date" class="form-control" name="estimate_date" value="{{estimate.estimate_date | date:'Y-m-d'}}" required style="color-scheme: dark;">     
                             <div class="invalid-feedback">Please fill out this field.</div>   
                         </div>
                     </div>
@@ -396,9 +396,9 @@
                                         <option selected>Select a payment_term</option>
                                         {% for pay_terms in comp_payment_terms %}
                                         {% if pay_terms.id == estimate.payment_term.id %}
-                                        <option value="{{pay_terms.id}}" data-days="{{pay_terms.days}}" selected >{{pay_terms.term_name}}</option>
+                                        <option value="{{pay_terms.id}}" text="{{pay_terms.days}}" selected >{{pay_terms.term_name}}</option>
                                         {% else %}
-                                        <option value="{{pay_terms.id}}" data-days="{{pay_terms.days}}" >{{pay_terms.term_name}}</option>
+                                        <option value="{{pay_terms.id}}" text="{{pay_terms.days}}" >{{pay_terms.term_name}}</option>
                                         {% endif %}
                                         {% endfor %}
                                         
@@ -428,7 +428,7 @@
                             <label>Expiration Date</label>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-7">
-                            <input id="exp_date" type="date" class="form-control" name="exp_date" value="{{estimate.expiration_date | date:'Y-m-d'}}" required readonly>     
+                            <input id="exp_date" type="date" class="form-control" name="exp_date" value="{{estimate.expiration_date | date:'Y-m-d'}}" required readonly style="color-scheme: dark;">     
                             <div class="invalid-feedback">Please fill out this field.</div>   
                         </div>
                     </div>
@@ -591,7 +591,15 @@
                                     </div>
                                 </div>
                             </div>
+
                             <br>
+                            <div class="mt-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required>
+                                    <label for="agreeTerms">Agree to terms and conditions</label>
+                                    <div class="invalid-feedback">You must agree before submitting.</div>
+                                </div>
+                                </div>
                             <div class="mt-4">
                             <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="Edit" name="Save" id="Save">
                             <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=`{% url 'sales_estimate_overview' estimate.id %}`" value="CANCEL" id="cancel">
@@ -5160,6 +5168,10 @@ $(document).ready(function() {
 
 
     $('#est_date').on('change', function() {
+        findDueDate();
+    });
+
+    $('#paytearm-select1').on('change', function () {
         findDueDate();
     });
 

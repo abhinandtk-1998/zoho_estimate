@@ -418,7 +418,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Start Date</label>
                       <div class="col-md-9">
-                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.estimate_date|date:'Y-m-d'}}">
+                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.estimate_date|date:'Y-m-d'}}" style="color-scheme: dark;">
                       </div>
                     </div>
                   </div>
@@ -450,7 +450,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">End Date</label>
                       <div class="col-md-9">
-                        <input type="text" id="endDate" value="{{estimate.expiration_date|date:'d-m-Y'}}" class="form-control bg-black text-white" name="end_date" readonly>
+                        <input type="text" id="endDate" value="{{estimate.expiration_date|date:'d-m-Y'}}" class="form-control bg-black text-white" name="end_date" style="color-scheme: dark;" readonly>
                       </div>
                     </div>
                   </div>

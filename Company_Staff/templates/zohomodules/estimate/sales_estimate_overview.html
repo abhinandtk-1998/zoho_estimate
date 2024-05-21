@@ -561,6 +561,8 @@
                           <h6 class="mb-0">Email Id</h6>
                           <p class="mb-0 text-right">{{ estimate.customer_email}}</p>
                         </div>
+
+                        {% if estimate.customer_bill_address %}
                         <div class="d-flex px-3 justify-content-between text-black mb-2">
                           <h6 class="mb-0">Address</h6>
                           <p class="mb-0">
@@ -569,6 +571,7 @@
                             {{estimate.customer.billing_pincode}} 
                           </p>
                         </div>
+                        {% endif %}
   
                         <div class="row mt-4">
                           <div class="col-md-8">

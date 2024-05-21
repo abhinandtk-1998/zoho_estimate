@@ -383,7 +383,7 @@
                         <label>Estimate Date</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input id="est_date" type="date" class="form-control" name="estimate_date" required  value="{% now 'Y-m-d' %}">     
+                        <input id="est_date" type="date" class="form-control" name="estimate_date" required  value="{% now 'Y-m-d' %}" style="color-scheme: dark;">     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -431,7 +431,7 @@
                         <label>Expiration Date</label>
                     </div>
                     <div class="col-sm-12 col-md-6 col-lg-7">
-                        <input id="exp_date" type="date" class="form-control" name="exp_date" required readonly>     
+                        <input id="exp_date" type="date" class="form-control" name="exp_date" required readonly style="color-scheme: dark;">     
                         <div class="invalid-feedback">Please fill out this field.</div>   
                     </div>
                 </div>
@@ -4773,7 +4773,7 @@ $(document).ready(function() {
         findDueDate();
     });
 
-    $('#paymentTerm').on('change', function () {
+    $('#paytearm-select1').on('change', function () {
         findDueDate();
     });
 

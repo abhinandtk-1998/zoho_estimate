@@ -387,7 +387,7 @@
                     <div class="row">
                       <label for="" class="col-md-3 labels">Start Date</label>
                       <div class="col-md-9">
-                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.estimate_date|date:'Y-m-d'}}">
+                        <input type="date" class="form-control bg-black text-white" id="startDate" name="start_date" value="{{estimate.estimate_date|date:'Y-m-d'}}" style="color-scheme: dark;">
                       </div>
                     </div>
                   </div>
@@ -723,7 +723,7 @@
                   </div>
                 </div>
                 <div class="mt-4">
-                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save">
+                  <input type="submit" class="btn save_btn" style="background-color: chocolate; color: white;" value="SAVE" id="save" name="save">
                   <input class="btn save_btn" style="background-color: chocolate; color: white;" type="submit" value="DRAFT" name="save_as_draft" id="draft">
                   <input class="btn save_btn" style="background-color: chocolate; color: white;" type="reset" onclick="window.location.href=``" value="CANCEL" id="cancel">
                 </div>
