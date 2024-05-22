@@ -9,6 +9,8 @@
 <!-- Include jQuery from a CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 
 <style>
@@ -21,6 +23,40 @@
   a{
     color: white;
   }
+
+  .btn-outline-warning:hover {
+        color: black !important;
+    }
+
+    tbody tr td{
+        border: none;
+        border-top: none;
+        border-style: none;
+    }
+
+    thead tr th{
+        border-right: 2px solid transparent;
+    }
+
+
+     /* Ensure the table respects the widths set by <col> elements */
+     #myTable {
+      table-layout: fixed;
+      width: 100%; /* Adjust this to fit your needs */
+    }
+    /* Optionally, set widths for specific columns */
+    .col1 { width: 40px; }
+    /* .col2 { width: 100px; } */
+    .col3 { width: 125px; }
+    .col4 { width: 155px; }
+    .col5 { width: 165px; }
+    /* .col6 { width: 80px; } */
+    .col7 { width: 60px; }
+    /* .col8 { width: 100px; } */
+    .col9 { width: 100px; }
+
+
+
 </style>
 
 
@@ -35,8 +71,8 @@
             </ol>
           </nav>
 
-          <div style="overflow-x:auto;background-color: black;border-radius: 10px;" class="m-3 p-5"> 
-            <h1 class="text-center text-white">All Estimates</h1>
+          <div style="overflow-x:auto;background-color: black;border-radius: 10px;" class="m-1 p-5"> 
+            <h1 style="color: white; font-weight: bolder;">All Estimates</h1><br>
             {% for message in messages %}
                     <h5>
                       <div class="alert alert-danger message text-center" style="color: black;" id="alert_danger">
@@ -47,8 +83,76 @@
                       </div>
                     </h5>
             {% endfor %}
-            <div class="table-responsive">
-              <div class="d-flex align-items-center justify-content-between">
+
+
+            <div class="row">
+                <div class="col-md-4 d-flex justify-content-end align-items-start gap-2">
+                    <input class="form-control text-dark bg-light" type="text" id="searchInput" placeholder="Search..." style="border: 2px solid #ffae1f;">
+
+                    <button class="btn text-center btn-outline-warning" type="button" id="sortButton2" data-bs-toggle="dropdown" aria-expanded="false" style="color: #ffae1f; width: 25%;">
+                        <i class="fas fa-sort"></i>
+                    </button>
+                    <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu2" aria-labelledby="sortButton2">
+                        <li><a class="dropdown-item" href="">All</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="name">Name</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="est_no">EST No</a></li>
+                    </ul>
+
+                    <!-- <a class="btn text-center btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    role="button" style="color: #ffae1f; width: 25%;">
+                    <i class="fa fa-sort mt-1 " style="font-size: small;"></i>
+                    </a>
+                    <div class="dropdown-menu " id="dropdown-menu2">
+                        <a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="all">All</a>
+                        <a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="name">Name</a>
+                        <a class="dropdown-item" id="dropdown-itemsort" href="#" data-sort="est_no">EST No</a>
+                    </div> -->
+                </div>
+                
+                <div class="col-md-3"></div>
+                <div class="col-md-5 d-flex justify-content-end align-items-start gap-1">
+                    <!-- <a class="btn text-center btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    role="button" style="color: #ffae1f; width: 22%;">
+                    <i class="fa fa-filter mt-1" style="font-size: small;"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item text-black" onclick="filterTable(6,'all')">All</a>
+                        <a class="dropdown-item text-black" onclick="filterTable(6,'draft')">Draft</a>
+                        <a class="dropdown-item text-black" onclick="filterTable(6,'saved')">Saved</a>
+                    </div> -->
+
+                    <button class="btn btn-outline-warning text-center" type="button" id="filterButton" data-bs-toggle="dropdown" aria-expanded="false" style="color: #ffae1f; width: 22%;">
+                        <i class="fa fa-filter mt-1" style="font-size: small;" ></i>
+                      </button>
+                      <ul class="dropdown-menu mr-2 m-2" id="dropdown-menu3" aria-labelledby="filterButton">
+                        <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="all">All</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Saved">Saved</a></li>
+                        <li><a class="dropdown-item" id="dropdown-itemfilter" href="#" data-filter="Draft">Draft</a></li>
+                      </ul>
+
+
+
+                    <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" data-bs-toggle="modal" href="#importModal" class="btn btn-outline-warning">
+                        <i class="fa fa-file-excel p-1" style="font-size: large;"></i>
+                        <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Import</span>
+                    </a>
+                    <a style="border: 1px solid; border-radius: 5px; height: 2.4rem; display: flex; align-items: center;" onclick="exportToExcel()" class="btn btn-outline-warning" >
+                      <i class="fa fa-file-excel p-1" style="font-size: large;"></i>
+                      <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Export</span>
+                    </a>
+                    <a href="{% url 'sales_estimate_new' %}" class="btn text-center btn-outline-warning" role="button" style="color: #ffae1f; width: 30%;">
+                        NEW &nbsp;<i class="fa fa-plus mt-1"></i>
+                    </a> 
+                </div>
+
+            </div>
+
+
+
+
+
+
+              <!-- <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                     <input type="text" id="searchInput" placeholder="Search..." class="form-control mr-2 m-2 ">
                     <button class="btn btn-outline-warning text-yellow mr-2 m-2" type="button" id="sortButton2" data-bs-toggle="dropdown" aria-expanded="false" style="width: 25%;">
@@ -74,59 +178,71 @@
                   
                   <a href="{% url 'sales_estimate_new' %}" class="btn btn-outline-warning text-yellow m-2"><i class="fa fa-plus text-yellow"></i>New</a>
                 </div>
+              </div> -->
+              <div class="container-fluid">
+                <br>
+                <table class="table table-responsive mt-lg-3 rounded" style="color: white;" id="myTable">
+                    <colgroup>
+                        <col class="col1">
+                        <col class="col2">
+                        <col class="col3">
+                        <col class="col4">
+                        <col class="col5">
+                        <col class="col6">
+                        <col class="col7">
+                        <col class="col8">
+                        <col class="col9">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th ><b>#</b></th>
+                        <th ><b>DATE</b></th>
+                        <th ><b>ESTIMATE NO</b></th>
+                        <th ><b>CUSTOMER NAME</b></th>
+                        <th ><b>CUSTOMER MAIL ID</b></th>
+                        <th ><b>AMOUNT</b></th>
+                        <th ><b>STATUS</b></th>
+                        <th ><b>BALANCE</b></th>
+                        <th ><b>ACTION</b></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for est in estimate %}
+                    <tr>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{forloop.counter}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_date}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_number}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer.customer_display_name}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
+                        <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
+                        <td>
+                            {% if est.converted_to_invoice %}
+                            Converted To Invoice {{est.converted_to_invoice.invoice_number}}
+                            {% elif est.converted_to_recurring_invoice %}
+                            Converted To Recurring Invoice {{est.converted_to_recurring_invoice.rec_invoice_no}}
+                            {% elif est.converted_to_sales_order %}
+                            Converted To Sales Order {{est.converted_to_sales_order.sales_order_number}}
+                            {% else %}
+
+                            <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow" type="button" id="ConvertButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                Convert
+                            </button>
+                            <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
+                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
+                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
+                            <li><a class="dropdown-item" href="{% url 'convert_estimate_to_recurring_invoice' est.id %}" >To Recurring Invoice</a></li>
+                            </ul>
+                            {% endif %}
+
+                        </td>
+                        </a>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
               </div>
-
-              <table class="table mt-lg-3 rounded" style="color: white;" id="myTable">
-                <thead>
-                  <tr class="border-bottom border-dark">
-                    <th scope="col" ><b>#</b></th>
-                    <th scope="col" ><b>DATE</b></th>
-                    <th scope="col" ><b>ESTIMATE NUMBER</b></th>
-                    <th scope="col" ><b>CUSTOMER NAME</b></th>
-                    <th scope="col" ><b>CUSTOMER MAIL ID</b></th>
-                    <th scope="col" ><b>AMOUNT</b></th>
-                    <th scope="col" ><b>STATUS</b></th>
-                    <th scope="col" ><b>BALANCE</b></th>
-                    <th scope="col" ><b>ACTION</b></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for est in estimate %}
-                  <tr class="border-bottom border-dark">
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{forloop.counter}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_date}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.estimate_number}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer.customer_display_name}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.customer_email}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.status}}</a></td>
-                    <td><a href="{% url 'sales_estimate_overview' est.id %}">{{est.grand_total}}</a></td>
-                    <td>
-                        {% if est.converted_to_invoice %}
-                        Converted To Invoice {{est.converted_to_invoice.invoice_number}}
-                        {% elif est.converted_to_recurring_invoice %}
-                        Converted To Recurring Invoice {{est.converted_to_recurring_invoice.rec_invoice_no}}
-                        {% elif est.converted_to_sales_order %}
-                        Converted To Sales Order {{est.converted_to_sales_order.sales_order_number}}
-                        {% else %}
-
-                        <button class="btn btn-outline-warning dropdown-toggle mr-2 text-yellow m-2" type="button" id="ConvertButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            Convert
-                        </button>
-                        <ul class="dropdown-menu mr-2 m-2" id="convert-dropdown-menu" aria-labelledby="ConvertButton">
-                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_sales_order' est.id %}" >To Sales Order</a></li>
-                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_invoice' est.id %}" >To Invoice</a></li>
-                        <li><a class="dropdown-item" href="{% url 'convert_estimate_to_recurring_invoice' est.id %}" >To Recurring Invoice</a></li>
-                        </ul>
-                        {% endif %}
-
-                    </td>
-                    </a>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
           </div>
 
 
